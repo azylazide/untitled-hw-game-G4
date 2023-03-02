@@ -15,6 +15,16 @@ run/main_scene="res://src/levels/world.tscn"
 config/features=PackedStringArray("4.0", "GL Compatibility")
 config/icon="res://icon.svg"
 
+[autoload]
+
+SignalBus="*res://src/signal_bus.gd"
+
+[layer_names]
+
+2d_physics/layer_1="environment"
+2d_physics/layer_2="player"
+2d_physics/layer_5="camera_area"
+
 [rendering]
 
 renderer/rendering_method="gl_compatibility"

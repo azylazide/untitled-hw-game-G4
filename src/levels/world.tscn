@@ -1,9 +1,23 @@
-[gd_scene load_steps=3 format=3 uid="uid://crs5s4v3dcbi5"]
+[gd_scene load_steps=9 format=3 uid="uid://crs5s4v3dcbi5"]
 
 [ext_resource type="PackedScene" uid="uid://bgqooos4dh1px" path="res://src/actors/player.tscn" id="1_ox13q"]
+[ext_resource type="Script" path="res://src/remote_cam.gd" id="2_8ybxg"]
+[ext_resource type="Script" path="res://src/camera_bound_box.gd" id="3_0nohp"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_a7vof"]
 size = Vector2(1162, 82)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_g20po"]
+size = Vector2(3239, 242)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_hftcy"]
+size = Vector2(1332, 784)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_4tlqb"]
+size = Vector2(2849, 784)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_acqml"]
+size = Vector2(581, 253)
 
 [node name="World" type="Node2D"]
 
@@ -15,3 +29,65 @@ position = Vector2(578, 554)
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="StaticBody2D"]
 shape = SubResource("RectangleShape2D_a7vof")
+
+[node name="StaticBody2D2" type="StaticBody2D" parent="."]
+position = Vector2(1680, 489)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="StaticBody2D2"]
+shape = SubResource("RectangleShape2D_a7vof")
+
+[node name="StaticBody2D3" type="StaticBody2D" parent="."]
+position = Vector2(-549, 477)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="StaticBody2D3"]
+position = Vector2(-1038.5, 80)
+shape = SubResource("RectangleShape2D_g20po")
+
+[node name="Camera2D" type="Camera2D" parent="."]
+script = ExtResource("2_8ybxg")
+player_path = NodePath("../Player")
+
+[node name="CameraBoundBox" type="Area2D" parent="."]
+position = Vector2(546, 331)
+collision_layer = 16
+monitoring = false
+script = ExtResource("3_0nohp")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="CameraBoundBox"]
+modulate = Color(1, 1, 1, 0.2)
+shape = SubResource("RectangleShape2D_hftcy")
+
+[node name="CameraBoundBox2" type="Area2D" parent="."]
+position = Vector2(1911, 219)
+collision_layer = 16
+monitoring = false
+script = ExtResource("3_0nohp")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="CameraBoundBox2"]
+modulate = Color(1, 1, 1, 0.2)
+shape = SubResource("RectangleShape2D_hftcy")
+
+[node name="CameraBoundBox4" type="Area2D" parent="."]
+position = Vector2(-868, 160)
+collision_layer = 16
+monitoring = false
+script = ExtResource("3_0nohp")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="CameraBoundBox4"]
+modulate = Color(1, 1, 1, 0.2)
+position = Vector2(-758.5, 0)
+shape = SubResource("RectangleShape2D_4tlqb")
+
+[node name="CameraBoundBox3" type="Area2D" parent="."]
+position = Vector2(1231, 284)
+collision_layer = 16
+monitoring = false
+script = ExtResource("3_0nohp")
+priority_level = 2
+limit_left = false
+limit_right = false
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="CameraBoundBox3"]
+modulate = Color(1, 1, 1, 0.2)
+position = Vector2(-53.5, 75.5)
+shape = SubResource("RectangleShape2D_acqml")
