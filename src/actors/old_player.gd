@@ -33,6 +33,7 @@ func _physics_process(delta):
 	move_and_slide()
 	
 	if direction == 0:
+		SignalBus.player_updated.emit(0,camera_center.global_position)
 		return
 	else:
 		face_direction = -1 if direction < 0 else 1

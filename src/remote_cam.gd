@@ -31,7 +31,7 @@ extends Camera2D
 
 ## Array of nodes that stores the camera regions.
 var bbox_array = []
-## Default max limit.
+## Default max limit greater than any camera bounds.
 var bridge_inf:= 10000000
 
 var player_facing: float
@@ -153,8 +153,8 @@ func _clamp_position(pos: Vector2) -> Vector2:
 		bounds.right = temp_right
 		bounds.bottom = temp_bottom
 		
-		print("cam: (%.00f,%.00f)\nL: %.00f R: %.00f\nT: %.00f B: %.00f" 
-				%[output.x,output.y,temp_left,temp_right,temp_top,temp_bottom])
+#		print("cam: (%.00f,%.00f)\nL: %.00f R: %.00f\nT: %.00f B: %.00f" 
+#				%[output.x,output.y,temp_left,temp_right,temp_top,temp_bottom])
 	
 	elif detector_exited:
 		output.x = clamp(pos.x,bounds.left+0.5*screen_size.x*zoom.x,bounds.right-0.5*screen_size.x*zoom.x)
@@ -195,9 +195,13 @@ func _interp_position(new_pos: Vector2, clamped_pos: Vector2) -> Vector2:
 	#when falling
 #	if current_state == movement_states.FALL:
 #		vs = vertical_fast_smoothing
+	vs = vertical_fast_smoothing
 
 	output.x = lerp(global_position.x,clamped_pos.x,hs/zoom.x)
 	output.y = lerp(global_position.y,clamped_pos.y,vs/zoom.y)
+	
+	print("cam: (%.00f,%.00f)\nclamp: (%.00f,%.00f)\nbounds: L=%.00f R=%.00f\n        T=%.00f B=%.00f"
+		%[output.x,output.y,clamped_pos.x,clamped_pos.y,bounds.left,bounds.right,bounds.top,bounds.bottom])
 	
 	return output
 

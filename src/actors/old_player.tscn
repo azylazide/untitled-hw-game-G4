@@ -1,0 +1,28 @@
+[gd_scene load_steps=4 format=3 uid="uid://cwkild55vtoco"]
+
+[ext_resource type="Script" path="res://src/actors/old_player.gd" id="1_rewph"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_t77ea"]
+size = Vector2(32, 80)
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_qkth8"]
+radius = 47.0106
+
+[node name="Player" type="CharacterBody2D"]
+collision_layer = 2
+script = ExtResource("1_rewph")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+position = Vector2(0, -40)
+shape = SubResource("RectangleShape2D_t77ea")
+
+[node name="CameraBBoxDetector" type="Area2D" parent="."]
+position = Vector2(0, -40)
+collision_layer = 0
+collision_mask = 16
+
+[node name="DetectorShape" type="CollisionShape2D" parent="CameraBBoxDetector"]
+shape = SubResource("CircleShape2D_qkth8")
+
+[node name="CameraCenter" type="Marker2D" parent="."]
+position = Vector2(36, -40)

@@ -20,7 +20,9 @@ class_name CameraBoundBox
 ##Limit camera scrolling to the bottom
 @export var limit_bottom := true
 
+const camera_region_mask:= 5
+
 func _init():
 	monitoring = false
 	set_collision_layer_value(1,false)
-	set_collision_layer_value(5,true)
+	set_collision_layer_value(camera_region_mask,true)
