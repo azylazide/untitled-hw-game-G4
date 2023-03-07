@@ -3,7 +3,7 @@
 ## [color=yellow]Warning:[/color] Provide the player scene with 
 ## a [Node2D] to be the camera center.
 ## [br][color=yellow]Warning:[/color] Provide the player scene with 
-## an [Area2D] to be the region detector.
+## an [Area2D] named CameraBBoxDetector to be the region detector.
 extends Camera2D
 
 ## Player nodepath the camera follows.

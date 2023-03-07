@@ -1,3 +1,37 @@
-[gd_scene format=3 uid="uid://b7q83ufyyd08e"]
+[gd_scene load_steps=5 format=3 uid="uid://b7q83ufyyd08e"]
+
+[ext_resource type="Script" path="res://src/actors/player.gd" id="1_7v7v0"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_p3dhm"]
+size = Vector2(24, 60)
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_343fi"]
+radius = 52.0865
+
+[sub_resource type="SegmentShape2D" id="SegmentShape2D_txw7r"]
+a = Vector2(-12, 0)
+b = Vector2(12, 0)
 
 [node name="Player" type="CharacterBody2D"]
+collision_layer = 2
+platform_floor_layers = 4294967277
+script = ExtResource("1_7v7v0")
+jump_height = 3.0
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+position = Vector2(0, -30)
+shape = SubResource("RectangleShape2D_p3dhm")
+debug_color = Color(0, 0.647059, 0.176471, 0.419608)
+
+[node name="CameraBBoxDetector" type="Area2D" parent="."]
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="CameraBBoxDetector"]
+position = Vector2(0, -30)
+shape = SubResource("CircleShape2D_343fi")
+
+[node name="CameraCenter" type="Marker2D" parent="."]
+position = Vector2(32, -29)
+
+[node name="GroundDetector" type="ShapeCast2D" parent="."]
+shape = SubResource("SegmentShape2D_txw7r")
+target_position = Vector2(0, 2)
