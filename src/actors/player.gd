@@ -2,7 +2,7 @@ extends ActorBase
 
 @export_group("Initial Values")
 ## Change the initial facing direction
-@export_range(-1,1) var initial_direction:= 1
+@export_enum("LEFT","RIGHT") var initial_direction:= 1
 ## Initial movement state on ready
 @export var initial_movement_state: MovementStates.STATES = MovementStates.STATES.IDLE
 
@@ -19,6 +19,10 @@ extends ActorBase
 
 @onready var camera_center := $CameraCenter
 
+@onready var coyote_timer:= $Timers/CoyoteTimer
+
+@onready var jump_buffer_timer:= $Timers/JumpBufferTimer
+
 ## If on floor on previous frame
 @onready var was_on_floor:= true
 
@@ -33,15 +37,20 @@ var on_floor: bool
 ## MovementStates object that stores states information
 var Move: MovementStates
 
-## Stores the movement states
+## Stores movement states information
 class MovementStates:
 	## Movement states
 	enum STATES {IDLE,RUN,FALL,JUMP}
+	## Dictionary storing the names of the states in pascal case
+	var state_name = STATES.keys().map(func(elem):return elem.to_pascal_case())
 	const NULL:= -1
 	var current: int
 	var previous:= -1
 	var next:= -1
 	var previous_frame:= -1
+	
+	func _init(current_state) -> void:
+		current = current_state
 
 func _setup_movement() -> void:
 	jump_gravity = Globals._gravity(jump_height,max_run_tile,gap_length)
@@ -52,32 +61,37 @@ func _setup_movement() -> void:
 	
 	speed = max_run_tile*Globals.TILE_UNITS
 	
+	
 	face_direction = 1
+
+func _setup_timers() -> void:
+	coyote_timer.wait_time = coyote_time
+	jump_buffer_timer.wait_time = jump_buffer_time
+	pass
 
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
 	#create movementstates object
-	Move = MovementStates.new()
-	Move.current = initial_movement_state
+	Move = MovementStates.new(initial_movement_state)
 	
 	_setup_movement()
+	_setup_timers()
 	pass # Replace with function body.
 
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(delta: float) -> void:
-#	print(Move.current)
 	pass
 
 func _physics_process(delta: float) -> void:
 	#MOVEMENT STATEMACHINE
 	_movement_statemachine(delta)
-	SignalBus.player_updated.emit()
+	SignalBus.player_updated.emit(face_direction,camera_center.global_position)
 	
-	DebugTexts.get_node("Label").text = "velocity: (%.00f,%.00f)" %[velocity.x,velocity.y]
-	DebugTexts.get_node("Label2").text = "MOVEMENT STATES\nprev: %d\ncurrent: %d\n(next: %d)" %[Move.previous,Move.current,Move.next]
-	DebugTexts.get_node("Label3").text = "floor: %s" %on_floor
-
+	
+	DebugTexts.get_node("Control/HBoxContainer/VBoxContainer/Label").text = "velocity: (%.00f,%.00f)\nposition: (%.00f,%.00f)" %[velocity.x,velocity.y,global_position.x,global_position.y]
+	DebugTexts.get_node("Control/HBoxContainer/VBoxContainer/Label2").text = "MOVEMENT STATES\nprev: %s\ncurrent: %s\n(next: %s)" %[Move.state_name[Move.previous],Move.state_name[Move.current],Move.state_name[Move.next]]
+	DebugTexts.get_node("Control/HBoxContainer/VBoxContainer2/Label3").text = "floor: %s" %on_floor
 ## Movement state machine
 func _movement_statemachine(delta: float) -> void:
 	#Coming from a different state in previous frame
@@ -101,6 +115,8 @@ func _initial_movement_state(delta: float) -> int:
 func _enter_movement_state(delta: float) -> void:
 	match Move.current:
 		Move.STATES.JUMP:
+			coyote_timer.stop()
+			jump_buffer_timer.stop()
 			_enter_jump()
 	pass
 
@@ -121,8 +137,15 @@ func _run_movement_state(delta: float) -> int:
 				return Move.STATES.RUN
 			
 			if not on_floor:
-				return Move.STATES.FALL
-				
+				if was_on_floor:
+					coyote_timer.start()
+				else:
+					return Move.STATES.FALL
+			
+			if not jump_buffer_timer.is_stopped() and on_floor:
+				jump_buffer_timer.stop()
+				return Move.STATES.JUMP
+			
 			return Move.STATES.IDLE
 			
 		Move.STATES.RUN:
@@ -138,7 +161,14 @@ func _run_movement_state(delta: float) -> int:
 				return Move.STATES.IDLE
 			
 			if not on_floor:
-				return Move.STATES.FALL
+				if was_on_floor:
+					coyote_timer.start()
+				else:
+					return Move.STATES.FALL
+			
+			if not jump_buffer_timer.is_stopped() and on_floor:
+				jump_buffer_timer.stop()
+				return Move.STATES.JUMP
 				
 			return Move.STATES.RUN
 		
@@ -189,7 +219,6 @@ func change_movement_state(next_state: int) -> void:
 
 ## Setup jump
 func _enter_jump() -> void:
-	print("jump")
 	velocity.y = -jump_force
 
 func get_direction() -> float:
@@ -211,7 +240,7 @@ func _apply_movement(dir: float) -> void:
 
 ## Check floor with coyote
 func check_floor() -> bool:
-	return is_on_floor()
+	return is_on_floor_only() or not coyote_timer.is_stopped()
 
 func _unhandled_input(event: InputEvent) -> void:
 	match Move.current:
@@ -223,3 +252,14 @@ func _unhandled_input(event: InputEvent) -> void:
 			if event.is_action_pressed("jump"):
 				if on_floor:
 					change_movement_state(Move.STATES.JUMP)
+		Move.STATES.JUMP:
+			if event.is_action_released("jump"):
+				if velocity.y < min_jump_force:
+					velocity.y = -min_jump_force
+					printt(velocity.y, "cut jump")
+					change_movement_state(Move.STATES.FALL)
+		Move.STATES.FALL:
+			if event.is_action_pressed("jump"):
+				if velocity.y > 0:
+					jump_buffer_timer.start()
+					

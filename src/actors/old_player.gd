@@ -2,6 +2,7 @@ extends CharacterBody2D
 
 
 @onready var camera_bbox_detector := $CameraBBoxDetector
+
 @onready var camera_center := $CameraCenter
 
 const SPEED = 300.0

@@ -8,6 +8,10 @@ extends Camera2D
 
 ## Player nodepath the camera follows.
 @export_node_path("CharacterBody2D") var player_path
+## Enable camera following player
+@export var follow_player:= true
+## Initial position when not following player
+@export var initial_pos:= Vector2.ZERO
 
 @export var x_offset_tiles := 0.8
 #@export var down_bias_tiles := 0.8
@@ -55,6 +59,9 @@ var player_camera_center: Node2D
 
 func _ready() -> void:
 	
+	#wait for player to ready
+	await player_node.ready
+	
 	#connect detector to camera
 	player_node.camera_bbox_detector.area_entered.connect(on_CameraBBoxDetector_area_entered)
 	player_node.camera_bbox_detector.area_exited.connect(on_CameraBBoxDetector_area_exited)
@@ -68,20 +75,24 @@ func _ready() -> void:
 	player_camera_center = player_node.camera_center
 	player_camera_center_pos = player_camera_center.global_position
 	
-	#set initial position
-	global_position = _update_position()
+	if follow_player:
+		#set initial position
+		global_position = _update_position()
+	else:
+		global_position = initial_pos
 
 
 
 func _physics_process(delta: float) -> void:
-	#get new position
-	var new_position:= _update_position()
-	#get clamped position
-	var clamped_position:= _clamp_position(new_position)
-	#interp new position
-	var interped_position:= _interp_position(new_position,clamped_position)
-	#update position
-	global_position = interped_position
+	if follow_player:
+		#get new position
+		var new_position:= _update_position()
+		#get clamped position
+		var clamped_position:= _clamp_position(new_position)
+		#interp new position
+		var interped_position:= _interp_position(new_position,clamped_position)
+		#update position
+		global_position = interped_position
 
 
 ## Clamps position of camera within all overlapping bounding regions
@@ -200,8 +211,11 @@ func _interp_position(new_pos: Vector2, clamped_pos: Vector2) -> Vector2:
 	output.x = lerp(global_position.x,clamped_pos.x,hs/zoom.x)
 	output.y = lerp(global_position.y,clamped_pos.y,vs/zoom.y)
 	
-	print("cam: (%.00f,%.00f)\nclamp: (%.00f,%.00f)\nbounds: L=%.00f R=%.00f\n        T=%.00f B=%.00f"
-		%[output.x,output.y,clamped_pos.x,clamped_pos.y,bounds.left,bounds.right,bounds.top,bounds.bottom])
+#	print("cam: (%.00f,%.00f)\nclamp: (%.00f,%.00f)\nbounds: L=%.00f R=%.00f\n        T=%.00f B=%.00f"
+#		%[output.x,output.y,clamped_pos.x,clamped_pos.y,bounds.left,bounds.right,bounds.top,bounds.bottom])
+	
+	DebugTexts.get_node("Control/HBoxContainer/VBoxContainer2/Label4").text = \
+	"cam: (%.00f,%.00f)\nclamp: (%.00f,%.00f)\nbounds: L=%.00f R=%.00f\nT=%.00f B=%.00f" %[output.x,output.y,clamped_pos.x,clamped_pos.y,bounds.left,bounds.right,bounds.top,bounds.bottom]
 	
 	return output
 
