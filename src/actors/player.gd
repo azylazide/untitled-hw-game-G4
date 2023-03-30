@@ -300,6 +300,10 @@ func _run_movement_state(delta: float) -> int:
 					return Move.STATES.FALL
 			
 			return Move.STATES.ADASH
+			
+		Move.STATES.WALL:
+			pass
+		
 	return 0
 
 ## Clean up when transitioning out to
@@ -392,4 +396,11 @@ func _unhandled_input(event: InputEvent) -> void:
 			if event.is_action_pressed("dash"):
 				if dash_cooldown_timer.is_stopped() and can_adash:
 					change_movement_state(Move.STATES.ADASH)
+		Move.STATES.GDASH:
+			if event.is_action_pressed("jump"):
+				if on_floor:
+					change_movement_state(Move.STATES.JUMP)
+			if event.is_action_pressed("dash"):
+				if dash_cooldown_timer.is_stopped():
+					change_movement_state(Move.STATES.GDASH)
 		
