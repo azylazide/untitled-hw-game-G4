@@ -45,9 +45,9 @@ class MovementStates:
 	var state_name = STATES.keys().map(func(elem):return elem.to_pascal_case())
 	const NULL:= -1
 	var current: int
-	var previous:= -1
-	var next:= -1
-	var previous_frame:= -1
+	var previous:= NULL
+	var next:= NULL
+	var previous_frame:= NULL
 	
 	func _init(current_state) -> void:
 		current = current_state
@@ -60,7 +60,6 @@ func _setup_movement() -> void:
 	min_jump_force = Globals._jump_vel(max_run_tile,min_jump_height,gap_length/2.0)
 	
 	speed = max_run_tile*Globals.TILE_UNITS
-	
 	
 	face_direction = 1
 
@@ -227,6 +226,7 @@ func get_direction() -> float:
 func _apply_gravity(delta: float) -> void:
 	if velocity.y > 0:
 		velocity.y += fall_gravity*delta
+		
 	else:
 		velocity.y += jump_gravity*delta
 
@@ -240,7 +240,7 @@ func _apply_movement(dir: float) -> void:
 
 ## Check floor with coyote
 func check_floor() -> bool:
-	printt(is_on_floor(),is_on_floor_only(),on_floor)
+	#printt(is_on_floor(),is_on_floor_only(),on_floor)
 	return is_on_floor() or not coyote_timer.is_stopped()
 
 func _unhandled_input(event: InputEvent) -> void:
@@ -255,7 +255,7 @@ func _unhandled_input(event: InputEvent) -> void:
 					change_movement_state(Move.STATES.JUMP)
 		Move.STATES.JUMP:
 			if event.is_action_released("jump"):
-				if velocity.y < min_jump_force:
+				if velocity.y < -min_jump_force:
 					velocity.y = -min_jump_force
 					#printt(velocity.y, "cut jump")
 					change_movement_state(Move.STATES.FALL)
