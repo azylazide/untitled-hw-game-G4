@@ -65,7 +65,7 @@ var player_camera_center: Node2D
 
 
 func _ready() -> void:
-	
+
 	#wait for player to ready
 	await player_node.ready
 	

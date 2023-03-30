@@ -1,8 +1,8 @@
 [gd_scene load_steps=10 format=3 uid="uid://bgijdlkmeivq3"]
 
+[ext_resource type="PackedScene" uid="uid://b7q83ufyyd08e" path="res://src/actors/player.tscn" id="1_ox13q"]
 [ext_resource type="Texture2D" uid="uid://cr34hq0rgeh0l" path="res://assets/temp tiles.png" id="2_vqklc"]
 [ext_resource type="Script" path="res://src/camera_bound_box.gd" id="3_0nohp"]
-[ext_resource type="PackedScene" uid="uid://cwkild55vtoco" path="res://src/actors/old_player.tscn" id="4_sgp5g"]
 [ext_resource type="Script" path="res://src/remote_cam.gd" id="4_ujvay"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_hftcy"]
@@ -162,5 +162,5 @@ script = ExtResource("4_ujvay")
 player_path = NodePath("../Player")
 x_offset_tiles = 1.2
 
-[node name="Player" parent="." instance=ExtResource("4_sgp5g")]
-position = Vector2(601, 551)
+[node name="Player" parent="." instance=ExtResource("1_ox13q")]
+position = Vector2(572, 527)

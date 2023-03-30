@@ -127,7 +127,7 @@ func _run_movement_state(delta: float) -> int:
 		Move.STATES.IDLE:
 			var dir = get_direction()
 			velocity.x = 0
-			_apply_gravity(delta)
+			#_apply_gravity(delta)
 			
 			was_on_floor = check_floor()
 			_apply_movement(dir)
@@ -151,7 +151,7 @@ func _run_movement_state(delta: float) -> int:
 		Move.STATES.RUN:
 			var dir = get_direction()
 			velocity.x = speed*dir
-			_apply_gravity(delta)
+			#_apply_gravity(delta)
 			
 			was_on_floor = check_floor()
 			_apply_movement(dir)
@@ -240,7 +240,8 @@ func _apply_movement(dir: float) -> void:
 
 ## Check floor with coyote
 func check_floor() -> bool:
-	return is_on_floor_only() or not coyote_timer.is_stopped()
+	printt(is_on_floor(),is_on_floor_only(),on_floor)
+	return is_on_floor() or not coyote_timer.is_stopped()
 
 func _unhandled_input(event: InputEvent) -> void:
 	match Move.current:
@@ -256,7 +257,7 @@ func _unhandled_input(event: InputEvent) -> void:
 			if event.is_action_released("jump"):
 				if velocity.y < min_jump_force:
 					velocity.y = -min_jump_force
-					printt(velocity.y, "cut jump")
+					#printt(velocity.y, "cut jump")
 					change_movement_state(Move.STATES.FALL)
 		Move.STATES.FALL:
 			if event.is_action_pressed("jump"):
