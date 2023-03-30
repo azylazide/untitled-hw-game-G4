@@ -69,6 +69,8 @@ var dash_force: float
 ## If on floor on current frame
 var on_floor: bool
 
+var on_wall: bool
+
 ## MovementStates object that stores states information
 var Move: MovementStates
 
@@ -132,7 +134,8 @@ func _physics_process(delta: float) -> void:
 	
 	DebugTexts.get_node("Control/HBoxContainer/VBoxContainer/Label").text = "velocity: (%.00f,%.00f)\nposition: (%.00f,%.00f)" %[velocity.x,velocity.y,global_position.x,global_position.y]
 	DebugTexts.get_node("Control/HBoxContainer/VBoxContainer/Label2").text = "MOVEMENT STATES\nprev: %s\ncurrent: %s\n(next: %s)" %[Move.state_name[Move.previous],Move.state_name[Move.current],Move.state_name[Move.next]]
-	DebugTexts.get_node("Control/HBoxContainer/VBoxContainer2/Label3").text = "floor: %s" %on_floor
+	DebugTexts.get_node("Control/HBoxContainer/VBoxContainer2/Label3").text = "floor: %s\nwall: %s" %[on_floor,on_wall]
+	
 
 ## Movement state machine
 func _movement_statemachine(delta: float) -> void:
@@ -193,6 +196,7 @@ func _run_movement_state(delta: float) -> int:
 			was_on_floor = check_floor()
 			_apply_movement(dir)
 			on_floor = check_floor()
+			on_wall = check_wall()
 			
 			if dir != 0:
 				return Move.STATES.RUN
@@ -217,6 +221,7 @@ func _run_movement_state(delta: float) -> int:
 			was_on_floor = check_floor()
 			_apply_movement(dir)
 			on_floor = check_floor()
+			on_wall = check_wall()
 			
 			if dir == 0 and on_floor:
 				return Move.STATES.IDLE
@@ -241,6 +246,9 @@ func _run_movement_state(delta: float) -> int:
 			was_on_floor = check_floor()
 			_apply_movement(dir)
 			on_floor = check_floor()
+			on_wall = check_wall()
+			
+			#wallslide
 			
 			if on_floor:
 				return Move.STATES.IDLE
@@ -255,6 +263,7 @@ func _run_movement_state(delta: float) -> int:
 			was_on_floor = check_floor()
 			_apply_movement(dir)
 			on_floor = check_floor()
+			on_wall = check_wall()
 			
 			if velocity.y > 0:
 				return Move.STATES.FALL
@@ -267,6 +276,7 @@ func _run_movement_state(delta: float) -> int:
 			was_on_floor = check_floor()
 			_apply_movement(dir)
 			on_floor = check_floor()
+			on_wall = check_wall()
 			
 			if not on_floor:
 				if was_on_floor:
@@ -289,6 +299,7 @@ func _run_movement_state(delta: float) -> int:
 			was_on_floor = check_floor()
 			_apply_movement(dir)
 			on_floor = check_floor()
+			on_wall = check_wall()
 			
 			if dash_timer.is_stopped():
 				if on_floor:
@@ -360,6 +371,22 @@ func check_floor() -> bool:
 	#printt(is_on_floor(),is_on_floor_only(),on_floor)
 	return is_on_floor() or not coyote_timer.is_stopped()
 
+func check_wall() -> bool:
+	var left: bool = left_wall_detector.is_colliding()
+	var right: bool = right_wall_detector.is_colliding()
+	
+	if left and right:
+		wall_normal = Vector2.ZERO
+		return true
+	elif left:
+		wall_normal = left_wall_detector.get_collision_normal(0)
+		return true
+	elif right:
+		wall_normal = right_wall_detector.get_collision_normal(0)
+		return true
+	else:
+		return false
+	
 func _unhandled_input(event: InputEvent) -> void:
 	match Move.current:
 		Move.STATES.IDLE:
