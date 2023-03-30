@@ -1,9 +1,16 @@
 ## Remote camera that smoothtly follows the player and is clamped by camera regions.
 ##
-## [color=yellow]Warning:[/color] Provide the player scene with 
+## [color=yellow][b]Warning[/b]:[/color] Provide the player scene with 
 ## a [Node2D] to be the camera center.
-## [br][color=yellow]Warning:[/color] Provide the player scene with 
+## [br][color=yellow][b]Warning[/b]:[/color] Provide the player scene with 
 ## an [Area2D] named CameraBBoxDetector to be the region detector.
+## [br]
+## [br]The remote camera must do the ff:
+## [br] -Idle position with slight bias
+## [br] -Vertical lerp and snap
+## [br] -Horizontal strong and weak lerps
+## [br] -Camera contextually bounded
+## [br]
 extends Camera2D
 
 ## Player nodepath the camera follows.
@@ -27,7 +34,7 @@ extends Camera2D
 @onready var player_node: CharacterBody2D = get_node(player_path)
 
 
-@onready var x_offset: float = x_offset_tiles*32
+@onready var x_offset: float = x_offset_tiles*Globals.TILE_UNITS
 
 @onready var current_offset:= Vector2(x_offset,0)
 
@@ -227,6 +234,7 @@ func on_CameraBBoxDetector_area_entered(area: Area2D) -> void:
 func on_CameraBBoxDetector_area_exited(area: Area2D) -> void:
 	bbox_array.erase(area)
 
+## When player node is queue freed and its area detector exits the tree
 func on_area_detector_exiting() -> void:
 	detector_exited = true
 	

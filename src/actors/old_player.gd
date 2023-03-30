@@ -6,7 +6,7 @@ extends CharacterBody2D
 @onready var camera_center := $CameraCenter
 
 const SPEED = 300.0
-const JUMP_VELOCITY = -400.0
+const JUMP_VELOCITY = -600.0
 
 # Get the gravity from the project settings to be synced with RigidBody nodes.
 var gravity = ProjectSettings.get_setting("physics/2d/default_gravity")
@@ -15,6 +15,7 @@ var face_direction := 1.0
 
 
 func _physics_process(delta):
+	
 	# Add the gravity.
 	if not is_on_floor():
 		velocity.y += gravity * delta
@@ -35,8 +36,13 @@ func _physics_process(delta):
 	
 	if direction == 0:
 		SignalBus.player_updated.emit(0,camera_center.global_position)
-		return
 	else:
 		face_direction = -1 if direction < 0 else 1
+	
+	DebugTexts.get_node("Control/HBoxContainer/VBoxContainer/Label").text = \
+	"velocity: (%.00f,%.00f)\nposition: (%.00f,%.00f)" %[velocity.x,velocity.y,global_position.x,global_position.y]
+	
+	DebugTexts.get_node("Control/HBoxContainer/VBoxContainer2/Label3").text = \
+	"floor: %s" %is_on_floor()
 	
 	SignalBus.player_updated.emit(face_direction,camera_center.global_position)

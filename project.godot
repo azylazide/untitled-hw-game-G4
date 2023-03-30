@@ -21,6 +21,10 @@ SignalBus="*res://src/signal_bus.gd"
 Globals="*res://src/Globals.gd"
 DebugTexts="*res://src/debug_texts.tscn"
 
+[display]
+
+window/stretch/mode="canvas_items"
+
 [input]
 
 left={
