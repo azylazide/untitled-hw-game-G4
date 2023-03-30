@@ -138,7 +138,7 @@ func _physics_process(delta: float) -> void:
 	DebugTexts.get_node("Control/HBoxContainer/VBoxContainer/Label").text = "velocity: (%.00f,%.00f)\nposition: (%.00f,%.00f)" %[velocity.x,velocity.y,global_position.x,global_position.y]
 	DebugTexts.get_node("Control/HBoxContainer/VBoxContainer/Label2").text = "MOVEMENT STATES\nprev: %s\ncurrent: %s\n(next: %s)" %[Move.state_name[Move.previous],Move.state_name[Move.current],Move.state_name[Move.next]]
 	DebugTexts.get_node("Control/HBoxContainer/VBoxContainer2/Label3").text = "floor: %s\nwall: %s" %[on_floor,on_wall]
-	
+	DebugTexts.get_node("Control/HBoxContainer/VBoxContainer2/Label4").text = "can_ajump: %s\ncan_adash: %s" %[can_ajump,can_adash]
 
 ## Movement state machine
 func _movement_statemachine(delta: float) -> void:
@@ -267,6 +267,12 @@ func _run_movement_state(delta: float) -> int:
 			
 			if on_floor:
 				return Move.STATES.IDLE
+			else:
+				printt(jump_buffer_timer.is_stopped(),can_ajump)
+				if not jump_buffer_timer.is_stopped() and can_ajump:
+					can_ajump = false
+					jump_buffer_timer.stop()
+					return Move.STATES.JUMP
 			
 			return Move.STATES.FALL
 		
@@ -280,15 +286,7 @@ func _run_movement_state(delta: float) -> int:
 			_apply_movement(dir)
 			on_floor = check_floor()
 			on_wall = check_wall()
-			
-			if on_wall:
-				if dir != 0:
-					if wall_normal != Vector2.ZERO and dir*wall_normal.x < 0 and wall_cooldown_timer.is_stopped():
-						return Move.STATES.WALL
-					elif wall_normal.x == 0:
-						#edge case review later
-						pass
-			
+						
 			if velocity.y > 0:
 				return Move.STATES.FALL
 			
@@ -464,6 +462,10 @@ func _unhandled_input(event: InputEvent) -> void:
 				if dash_cooldown_timer.is_stopped():
 					change_movement_state(Move.STATES.GDASH)
 		Move.STATES.JUMP:
+			if event.is_action_pressed("jump"):
+				if can_ajump:
+					print("buffer double")
+					jump_buffer_timer.start()
 			if event.is_action_released("jump"):
 				if velocity.y < -min_jump_force:
 					velocity.y = -min_jump_force
