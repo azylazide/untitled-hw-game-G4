@@ -64,6 +64,7 @@ var jump_gravity: float
 var min_jump_force: float
 var fall_gravity: float
 var dash_force: float
+var wall_kick_force: float
 
 
 ## If on floor on current frame
@@ -99,6 +100,8 @@ func _setup_movement() -> void:
 	speed = max_run_tile*Globals.TILE_UNITS
 	
 	dash_force = Globals._dash_speed(dash_length,dash_time)
+	
+	wall_kick_force = Globals._wall_kick(wall_kick_power,wall_kick_time)
 	
 	face_direction = 1
 
@@ -248,7 +251,13 @@ func _run_movement_state(delta: float) -> int:
 			on_floor = check_floor()
 			on_wall = check_wall()
 			
-			#wallslide
+			if on_wall:
+				if dir != 0:
+					if wall_normal != Vector2.ZERO and dir*wall_normal.x < 0 and wall_cooldown_timer.is_stopped():
+						return Move.STATES.WALL
+					elif wall_normal.x == 0:
+						#edge case review later
+						pass
 			
 			if on_floor:
 				return Move.STATES.IDLE
@@ -258,7 +267,8 @@ func _run_movement_state(delta: float) -> int:
 		Move.STATES.JUMP:
 			_apply_gravity(delta)
 			var dir = get_direction()
-			velocity.x = speed*dir
+			if wall_jump_hold_timer.is_stopped():
+				velocity.x = speed*dir
 			
 			was_on_floor = check_floor()
 			_apply_movement(dir)
@@ -313,9 +323,32 @@ func _run_movement_state(delta: float) -> int:
 			return Move.STATES.ADASH
 			
 		Move.STATES.WALL:
-			pass
+			#snap?
+			var dir = get_direction()
+			velocity.y += 0.1*fall_gravity*delta
+			velocity.y = min(velocity.y,0.5*max_fall_tile*Globals.TILE_UNITS) 
+			
+			was_on_floor = check_floor()
+			_apply_movement(dir)
+			on_floor = check_floor()
+			on_wall = check_wall()
+			
+			if wall_slide_timer.is_stopped():
+					if dir*wall_normal.x > 0:
+						return Move.STATES.FALL
+			
+			if on_floor:
+				face_direction = signf(wall_normal.x)
+				return Move.STATES.IDLE
+			
+			if not on_wall:
+				face_direction = signf(wall_normal.x)
+				return Move.STATES.FALL
+			
+			face_direction = signf(wall_normal.x)
+			return Move.STATES.WALL
 		
-	return 0
+	return Move.NULL
 
 ## Clean up when transitioning out to
 func _exit_movement_state(delta: float, current: int) -> int:
@@ -336,10 +369,21 @@ func change_movement_state(next_state: int) -> void:
 func _enter_jump() -> void:
 	match Move.previous:
 		Move.STATES.FALL:
-			#walljump
-			
-			velocity.y = -jump_force*0.8
-		
+			if on_wall:
+				if wall_normal != Vector2.ZERO and wall_cooldown_timer.is_stopped():
+					wall_jump_hold_timer.start()
+					face_direction = signf(wall_normal.x)
+					velocity.x = wall_kick_force*face_direction
+					velocity.y = -jump_force
+			else:
+				velocity.y = -jump_force*0.8
+		Move.STATES.GDASH:
+			velocity.y = -jump_force*1.2
+		Move.STATES.WALL:
+			wall_jump_hold_timer.start()
+			face_direction = signf(wall_normal.x)
+			velocity.x = wall_kick_force*face_direction
+			velocity.y = -jump_force
 		_:
 			velocity.y = -jump_force
 
@@ -357,6 +401,8 @@ func _apply_gravity(delta: float) -> void:
 		
 	else:
 		velocity.y += jump_gravity*delta
+	
+	velocity.y = minf(velocity.y,max_fall_tile*Globals.TILE_UNITS)
 
 ## Apply movement and save the current direction
 func _apply_movement(dir: float) -> void:
@@ -407,7 +453,6 @@ func _unhandled_input(event: InputEvent) -> void:
 			if event.is_action_released("jump"):
 				if velocity.y < -min_jump_force:
 					velocity.y = -min_jump_force
-					#printt(velocity.y, "cut jump")
 					change_movement_state(Move.STATES.FALL)
 			if event.is_action_pressed("dash"):
 				if dash_cooldown_timer.is_stopped() and can_adash:
@@ -416,7 +461,9 @@ func _unhandled_input(event: InputEvent) -> void:
 			if event.is_action_pressed("jump"):
 				if velocity.y > 0:
 					jump_buffer_timer.start()
-				if can_ajump: #and not on wall
+				if on_wall:
+					change_movement_state(Move.STATES.JUMP)
+				elif not on_wall and can_ajump:
 					can_ajump = false
 					jump_buffer_timer.stop()
 					change_movement_state(Move.STATES.JUMP)
@@ -430,4 +477,10 @@ func _unhandled_input(event: InputEvent) -> void:
 			if event.is_action_pressed("dash"):
 				if dash_cooldown_timer.is_stopped():
 					change_movement_state(Move.STATES.GDASH)
+		Move.STATES.WALL:
+			if event.is_action_pressed("jump"):
+				change_movement_state(Move.STATES.JUMP)
+			if event.is_action_pressed("dash"):
+				face_direction = signf(wall_normal.x)
+				change_movement_state(Move.STATES.ADASH)
 		
