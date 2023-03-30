@@ -63,6 +63,7 @@ extends ActorBase
 var jump_gravity: float
 var min_jump_force: float
 var fall_gravity: float
+var dash_force: float
 
 
 ## If on floor on current frame
@@ -94,6 +95,8 @@ func _setup_movement() -> void:
 	min_jump_force = Globals._jump_vel(max_run_tile,min_jump_height,gap_length/2.0)
 	
 	speed = max_run_tile*Globals.TILE_UNITS
+	
+	dash_force = Globals._dash_speed(dash_length,dash_time)
 	
 	face_direction = 1
 
@@ -130,6 +133,7 @@ func _physics_process(delta: float) -> void:
 	DebugTexts.get_node("Control/HBoxContainer/VBoxContainer/Label").text = "velocity: (%.00f,%.00f)\nposition: (%.00f,%.00f)" %[velocity.x,velocity.y,global_position.x,global_position.y]
 	DebugTexts.get_node("Control/HBoxContainer/VBoxContainer/Label2").text = "MOVEMENT STATES\nprev: %s\ncurrent: %s\n(next: %s)" %[Move.state_name[Move.previous],Move.state_name[Move.current],Move.state_name[Move.next]]
 	DebugTexts.get_node("Control/HBoxContainer/VBoxContainer2/Label3").text = "floor: %s" %on_floor
+
 ## Movement state machine
 func _movement_statemachine(delta: float) -> void:
 	#Coming from a different state in previous frame
@@ -162,6 +166,19 @@ func _enter_movement_state(delta: float) -> void:
 			coyote_timer.stop()
 			jump_buffer_timer.stop()
 			_enter_jump()
+			return
+		Move.STATES.GDASH:
+			dash_cooldown_timer.start()
+			velocity.x = dash_force*face_direction
+			dash_timer.start()
+			return
+		Move.STATES.ADASH:
+			dash_cooldown_timer.start()
+			can_adash = false
+			velocity.x = dash_force*face_direction
+			velocity.y = 0
+			dash_timer.start()
+			return
 	pass
 
 ## Main states code that runs per frame
@@ -245,9 +262,44 @@ func _run_movement_state(delta: float) -> int:
 			return Move.STATES.JUMP
 		
 		Move.STATES.GDASH:
+			var dir = get_direction()
+			
+			was_on_floor = check_floor()
+			_apply_movement(dir)
+			on_floor = check_floor()
+			
+			if not on_floor:
+				if was_on_floor:
+					coyote_timer.start()
+			
+			if dash_timer.is_stopped():
+				if on_floor:
+					if dir != 0:
+						return Move.STATES.RUN
+					else:
+						return Move.STATES.IDLE
+				elif not on_floor and not was_on_floor:
+					return Move.STATES.FALL
 			
 			return Move.STATES.GDASH
-	
+		
+		Move.STATES.ADASH:
+			var dir = get_direction()
+			
+			was_on_floor = check_floor()
+			_apply_movement(dir)
+			on_floor = check_floor()
+			
+			if dash_timer.is_stopped():
+				if on_floor:
+					if dir != 0:
+						return Move.STATES.RUN
+					else:
+						return Move.STATES.IDLE
+				else:
+					return Move.STATES.FALL
+			
+			return Move.STATES.ADASH
 	return 0
 
 ## Clean up when transitioning out to
@@ -310,16 +362,25 @@ func _unhandled_input(event: InputEvent) -> void:
 			if event.is_action_pressed("jump"):
 				if on_floor:
 					change_movement_state(Move.STATES.JUMP)
+			if event.is_action_pressed("dash"):
+				if dash_cooldown_timer.is_stopped():
+					change_movement_state(Move.STATES.GDASH)
 		Move.STATES.RUN:
 			if event.is_action_pressed("jump"):
 				if on_floor:
 					change_movement_state(Move.STATES.JUMP)
+			if event.is_action_pressed("dash"):
+				if dash_cooldown_timer.is_stopped():
+					change_movement_state(Move.STATES.GDASH)
 		Move.STATES.JUMP:
 			if event.is_action_released("jump"):
 				if velocity.y < -min_jump_force:
 					velocity.y = -min_jump_force
 					#printt(velocity.y, "cut jump")
 					change_movement_state(Move.STATES.FALL)
+			if event.is_action_pressed("dash"):
+				if dash_cooldown_timer.is_stopped() and can_adash:
+					change_movement_state(Move.STATES.ADASH)
 		Move.STATES.FALL:
 			if event.is_action_pressed("jump"):
 				if velocity.y > 0:
@@ -328,4 +389,7 @@ func _unhandled_input(event: InputEvent) -> void:
 					can_ajump = false
 					jump_buffer_timer.stop()
 					change_movement_state(Move.STATES.JUMP)
-					
+			if event.is_action_pressed("dash"):
+				if dash_cooldown_timer.is_stopped() and can_adash:
+					change_movement_state(Move.STATES.ADASH)
+		
