@@ -7,13 +7,31 @@ extends ActorBase
 @export var initial_movement_state: MovementStates.STATES = MovementStates.STATES.IDLE
 
 @export_group("Platformer Values")
+@export_subgroup("Jump")
 ## Coyote time to temporarily float in seconds
 @export var coyote_time:= 0.1
 ## Time jump inputs are remembered just before landing from falling in seconds
 @export var jump_buffer_time:= 0.1
 
+@export_subgroup("Dash")
+## Dash duration in seconds
+@export var dash_time:= 0.2
+## Duration until player can dash again
+@export var dash_cooldown_time:= 0.2
+## Distance travelled by dash
+@export var dash_length:= 2.0
+
+@export_subgroup("Wall")
+@export var wall_kick_time:= 0.5
+@export var wall_kick_power:= 2.5
+@export var wall_cooldown_time:= 0.2
+
 
 @onready var ground_cast:= $GroundDetector
+
+@onready var left_wall_detector:= $WallDetectors/Left
+
+@onready var right_wall_detector:= $WallDetectors/Right
 
 @onready var camera_bbox_detector := $CameraBBoxDetector
 
@@ -23,8 +41,24 @@ extends ActorBase
 
 @onready var jump_buffer_timer:= $Timers/JumpBufferTimer
 
+@onready var dash_timer:= $Timers/DashTimer
+
+@onready var dash_cooldown_timer:= $Timers/DashCooldownTimer
+
+@onready var wall_slide_timer:= $Timers/WallSlideTimer
+
+@onready var wall_cooldown_timer:= $Timers/WallCooldownTimer
+
+@onready var wall_jump_hold_timer:= $Timers/WallJumpHoldTimer
+
 ## If on floor on previous frame
 @onready var was_on_floor:= true
+
+@onready var can_adash:= true
+
+@onready var can_ajump:= true
+
+@onready var wall_normal:= Vector2.ZERO
 
 var jump_gravity: float
 var min_jump_force: float
@@ -40,7 +74,7 @@ var Move: MovementStates
 ## Stores movement states information
 class MovementStates:
 	## Movement states
-	enum STATES {IDLE,RUN,FALL,JUMP}
+	enum STATES {IDLE,RUN,FALL,JUMP,GDASH,ADASH,WALL}
 	## Dictionary storing the names of the states in pascal case
 	var state_name = STATES.keys().map(func(elem):return elem.to_pascal_case())
 	const NULL:= -1
@@ -66,6 +100,11 @@ func _setup_movement() -> void:
 func _setup_timers() -> void:
 	coyote_timer.wait_time = coyote_time
 	jump_buffer_timer.wait_time = jump_buffer_time
+	dash_timer.wait_time = dash_time
+	dash_cooldown_timer.wait_time = dash_cooldown_time
+	wall_slide_timer.wait_time = 0.1
+	wall_cooldown_timer.wait_time = wall_cooldown_time
+	wall_jump_hold_timer.wait_time = 0.5
 	pass
 
 # Called when the node enters the scene tree for the first time.
@@ -113,6 +152,12 @@ func _initial_movement_state(delta: float) -> int:
 ## States setup when transitioning into
 func _enter_movement_state(delta: float) -> void:
 	match Move.current:
+		Move.STATES.IDLE:
+			_ground_reset()
+			return
+		Move.STATES.RUN:
+			_ground_reset()
+			return
 		Move.STATES.JUMP:
 			coyote_timer.stop()
 			jump_buffer_timer.stop()
@@ -198,6 +243,10 @@ func _run_movement_state(delta: float) -> int:
 				return Move.STATES.FALL
 			
 			return Move.STATES.JUMP
+		
+		Move.STATES.GDASH:
+			
+			return Move.STATES.GDASH
 	
 	return 0
 
@@ -218,7 +267,19 @@ func change_movement_state(next_state: int) -> void:
 
 ## Setup jump
 func _enter_jump() -> void:
-	velocity.y = -jump_force
+	match Move.previous:
+		Move.STATES.FALL:
+			#walljump
+			
+			velocity.y = -jump_force*0.8
+		
+		_:
+			velocity.y = -jump_force
+
+## Reset values upon touching ground
+func _ground_reset() -> void:
+	can_adash = true
+	can_ajump = true
 
 func get_direction() -> float:
 	return Input.get_axis("left","right")
@@ -263,4 +324,8 @@ func _unhandled_input(event: InputEvent) -> void:
 			if event.is_action_pressed("jump"):
 				if velocity.y > 0:
 					jump_buffer_timer.start()
+				if can_ajump: #and not on wall
+					can_ajump = false
+					jump_buffer_timer.stop()
+					change_movement_state(Move.STATES.JUMP)
 					

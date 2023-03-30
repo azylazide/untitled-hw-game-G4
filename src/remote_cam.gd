@@ -208,6 +208,7 @@ func _interp_position(new_pos: Vector2, clamped_pos: Vector2) -> Vector2:
 #		if abs(player_velocity.x) > player_speed*0.5:
 #			hs = horizontal_fast_smoothing
 	
+	hs = horizontal_fast_smoothing
 	#vertical
 	var vs: float = vertical_slow_smoothing
 	#when falling

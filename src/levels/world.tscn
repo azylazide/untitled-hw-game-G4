@@ -9,7 +9,7 @@
 size = Vector2(1332, 784)
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_4tlqb"]
-size = Vector2(2849, 784)
+size = Vector2(2849, 1402)
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_acqml"]
 size = Vector2(581, 253)
@@ -122,7 +122,7 @@ script = ExtResource("3_0nohp")
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="CameraBoundBox4"]
 modulate = Color(1, 1, 1, 0.2)
-position = Vector2(-758.5, 0)
+position = Vector2(-758.5, -114)
 shape = SubResource("RectangleShape2D_4tlqb")
 
 [node name="CameraBoundBox5" type="Area2D" parent="."]

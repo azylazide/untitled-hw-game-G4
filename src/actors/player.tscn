@@ -1,4 +1,4 @@
-[gd_scene load_steps=5 format=3 uid="uid://b7q83ufyyd08e"]
+[gd_scene load_steps=7 format=3 uid="uid://b7q83ufyyd08e"]
 
 [ext_resource type="Script" path="res://src/actors/player.gd" id="1_7v7v0"]
 
@@ -11,6 +11,12 @@ radius = 119.419
 [sub_resource type="SegmentShape2D" id="SegmentShape2D_txw7r"]
 a = Vector2(-35, 0)
 b = Vector2(35, 0)
+
+[sub_resource type="SegmentShape2D" id="SegmentShape2D_le0uv"]
+b = Vector2(0, 95)
+
+[sub_resource type="SegmentShape2D" id="SegmentShape2D_y7x6n"]
+b = Vector2(0, 95)
 
 [node name="Player" type="CharacterBody2D"]
 collision_layer = 2
@@ -50,6 +56,40 @@ one_shot = true
 process_callback = 0
 one_shot = true
 
+[node name="DashTimer" type="Timer" parent="Timers"]
+process_callback = 0
+one_shot = true
+
+[node name="DashCooldownTimer" type="Timer" parent="Timers"]
+process_callback = 0
+one_shot = true
+
+[node name="WallSlideTimer" type="Timer" parent="Timers"]
+process_callback = 0
+one_shot = true
+
+[node name="WallCooldownTimer" type="Timer" parent="Timers"]
+process_callback = 0
+one_shot = true
+
+[node name="WallJumpHoldTimer" type="Timer" parent="Timers"]
+process_callback = 0
+one_shot = true
+
 [node name="Camera2D" type="Camera2D" parent="."]
 enabled = false
 zoom = Vector2(0.5, 0.5)
+
+[node name="WallDetectors" type="Node2D" parent="."]
+position = Vector2(0, -95)
+
+[node name="Left" type="ShapeCast2D" parent="WallDetectors"]
+position = Vector2(-35, 0)
+shape = SubResource("SegmentShape2D_le0uv")
+target_position = Vector2(-5, 0)
+max_results = 10
+
+[node name="Right" type="ShapeCast2D" parent="WallDetectors"]
+position = Vector2(35, 0)
+shape = SubResource("SegmentShape2D_y7x6n")
+target_position = Vector2(5, 0)
