@@ -185,6 +185,12 @@ func _enter_movement_state(delta: float) -> void:
 			velocity.y = 0
 			dash_timer.start()
 			return
+		Move.STATES.WALL:
+			can_adash = true
+			velocity.x = 0
+			velocity.y = 0
+			wall_cooldown_timer.start()
+			wall_slide_timer.start()
 	pass
 
 ## Main states code that runs per frame
