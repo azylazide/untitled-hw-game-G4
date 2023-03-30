@@ -281,6 +281,14 @@ func _run_movement_state(delta: float) -> int:
 			on_floor = check_floor()
 			on_wall = check_wall()
 			
+			if on_wall:
+				if dir != 0:
+					if wall_normal != Vector2.ZERO and dir*wall_normal.x < 0 and wall_cooldown_timer.is_stopped():
+						return Move.STATES.WALL
+					elif wall_normal.x == 0:
+						#edge case review later
+						pass
+			
 			if velocity.y > 0:
 				return Move.STATES.FALL
 			
