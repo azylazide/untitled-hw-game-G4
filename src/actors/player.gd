@@ -26,50 +26,69 @@ extends ActorBase
 @export var wall_kick_power:= 2.5
 @export var wall_cooldown_time:= 0.2
 
-
+## Ground shapecast
 @onready var ground_cast:= $GroundDetector
 
+## Left wall shapecast
 @onready var left_wall_detector:= $WallDetectors/Left
 
+## Right wall shapecast
 @onready var right_wall_detector:= $WallDetectors/Right
 
+## Camera detector area
 @onready var camera_bbox_detector := $CameraBBoxDetector
 
+## Camera center marker
 @onready var camera_center := $CameraCenter
 
+## Coyote duration timer
 @onready var coyote_timer:= $Timers/CoyoteTimer
 
+## Jump buffer timer
 @onready var jump_buffer_timer:= $Timers/JumpBufferTimer
 
+## Dash duration timer
 @onready var dash_timer:= $Timers/DashTimer
 
+## Dash cooldown duration timer
 @onready var dash_cooldown_timer:= $Timers/DashCooldownTimer
 
+## Wall slide duration timer
 @onready var wall_slide_timer:= $Timers/WallSlideTimer
 
+## Wall stick cooldown timer
 @onready var wall_cooldown_timer:= $Timers/WallCooldownTimer
 
+## Wall jump duration timer
 @onready var wall_jump_hold_timer:= $Timers/WallJumpHoldTimer
 
 ## If on floor on previous frame
 @onready var was_on_floor:= true
 
+## Air dash is allowed
 @onready var can_adash:= true
 
+## Double jump is allowed
 @onready var can_ajump:= true
 
+## Wall normal for wall jumps and face directions
 @onready var wall_normal:= Vector2.ZERO
 
+## Gravity applied to the player when in jump state
 var jump_gravity: float
+## Jump speed applied for interrupted jumping
 var min_jump_force: float
+## Gravity apllied to the player when falling
 var fall_gravity: float
+## Horizontal speed applied to dash states
 var dash_force: float
+## Horizontal speed applied to wall jumps
 var wall_kick_force: float
 
 
 ## If on floor on current frame
 var on_floor: bool
-
+## If on wall on current frame
 var on_wall: bool
 
 ## MovementStates object that stores states information
@@ -81,15 +100,21 @@ class MovementStates:
 	enum STATES {IDLE,RUN,FALL,JUMP,GDASH,ADASH,WALL}
 	## Dictionary storing the names of the states in pascal case
 	var state_name = STATES.keys().map(func(elem):return elem.to_pascal_case())
+	## Null state
 	const NULL:= -1
+	## Current frame state
 	var current: int
+	## Previous set state
 	var previous:= NULL
+	## Next state to set
 	var next:= NULL
+	## Previous frame state that can be same as the current state
 	var previous_frame:= NULL
 	
 	func _init(current_state) -> void:
 		current = current_state
 
+## Setup movement values
 func _setup_movement() -> void:
 	jump_gravity = Globals._gravity(jump_height,max_run_tile,gap_length)
 	fall_gravity = Globals._gravity(1.5*jump_height,max_run_tile,0.8*gap_length)
@@ -105,6 +130,7 @@ func _setup_movement() -> void:
 	
 	face_direction = 1
 
+## Setup timer durations
 func _setup_timers() -> void:
 	coyote_timer.wait_time = coyote_time
 	jump_buffer_timer.wait_time = jump_buffer_time
@@ -141,6 +167,10 @@ func _physics_process(delta: float) -> void:
 	DebugTexts.get_node("Control/HBoxContainer/VBoxContainer2/Label4").text = "can_ajump: %s\ncan_adash: %s" %[can_ajump,can_adash]
 
 ## Movement state machine
+## [br]-Checks if entering a new state
+## [br]-Runs the set state and saves the next state to run
+## [br]-Exit the state if different from current
+## [br]-Handle the state swap
 func _movement_statemachine(delta: float) -> void:
 	#Coming from a different state in previous frame
 	if Move.previous_frame != Move.current:
@@ -375,9 +405,7 @@ func change_movement_state(next_state: int) -> void:
 	Move.previous = Move.current
 	Move.current = next_state
 
-#	printt(Move.previous,Move.current)
-
-## Setup jump
+## Setup jump based on previous state for the jump enter setup
 func _enter_jump() -> void:
 	match Move.previous:
 		Move.STATES.FALL:
@@ -407,6 +435,7 @@ func _ground_reset() -> void:
 func get_direction() -> float:
 	return Input.get_axis("left","right")
 
+## Apply gravity based on falling, jumping and terminal situations
 func _apply_gravity(delta: float) -> void:
 	if velocity.y > 0:
 		velocity.y += fall_gravity*delta
@@ -429,6 +458,7 @@ func check_floor() -> bool:
 	#printt(is_on_floor(),is_on_floor_only(),on_floor)
 	return is_on_floor() or not coyote_timer.is_stopped()
 
+## Check walls using the shapecasts
 func check_wall() -> bool:
 	var left: bool = left_wall_detector.is_colliding()
 	var right: bool = right_wall_detector.is_colliding()
