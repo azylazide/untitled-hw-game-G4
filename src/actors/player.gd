@@ -490,6 +490,8 @@ func _unhandled_input(event: InputEvent) -> void:
 				if velocity.y < -min_jump_force:
 					velocity.y = -min_jump_force
 					change_movement_state(Move.STATES.FALL)
+				else:
+					change_movement_state(Move.STATES.FALL)
 			if event.is_action_pressed("dash"):
 				if dash_cooldown_timer.is_stopped() and can_adash:
 					change_movement_state(Move.STATES.ADASH)
