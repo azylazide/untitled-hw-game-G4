@@ -16,6 +16,8 @@ extends ActorBase
 @export_subgroup("Dash")
 ## Dash duration in seconds
 @export var dash_time:= 0.2
+## Jump buffer time for jumping just before air dash stops
+@export var dash_jump_buffer_time:= 0.2
 ## Duration until player can dash again
 @export var dash_cooldown_time:= 0.2
 ## Distance travelled by dash
@@ -49,6 +51,9 @@ extends ActorBase
 
 ## Dash duration timer
 @onready var dash_timer:= $Timers/DashTimer
+
+## Dash duration timer
+@onready var dash_jump_buffer_timer:= $Timers/DashJumpBufferTimer
 
 ## Dash cooldown duration timer
 @onready var dash_cooldown_timer:= $Timers/DashCooldownTimer
@@ -135,6 +140,7 @@ func _setup_timers() -> void:
 	coyote_timer.wait_time = coyote_time
 	jump_buffer_timer.wait_time = jump_buffer_time
 	dash_timer.wait_time = dash_time
+	dash_jump_buffer_timer.wait_time = dash_jump_buffer_time
 	dash_cooldown_timer.wait_time = dash_cooldown_time
 	wall_slide_timer.wait_time = 0.1
 	wall_cooldown_timer.wait_time = wall_cooldown_time
@@ -354,7 +360,11 @@ func _run_movement_state(delta: float) -> int:
 					else:
 						return Move.STATES.IDLE
 				else:
-					return Move.STATES.FALL
+					if not dash_jump_buffer_timer.is_stopped():
+						can_ajump = false
+						return Move.STATES.JUMP
+					else:
+						return Move.STATES.FALL
 			
 			return Move.STATES.ADASH
 			
@@ -387,7 +397,7 @@ func _run_movement_state(delta: float) -> int:
 	return Move.NULL
 
 ## Clean up when transitioning out to
-func _exit_movement_state(delta: float, current: int) -> int:
+func _exit_movement_state(delta: float, current: int) -> int:	
 	return 0
 
 ## Transitioning states	
@@ -413,6 +423,8 @@ func _enter_jump() -> void:
 				velocity.y = -jump_force*0.8
 		Move.STATES.GDASH:
 			velocity.y = -jump_force*1.2
+		Move.STATES.ADASH:
+			velocity.y = -jump_force*0.8
 		Move.STATES.WALL:
 			wall_jump_hold_timer.start()
 			face_direction = signf(wall_normal.x)
@@ -515,6 +527,9 @@ func _unhandled_input(event: InputEvent) -> void:
 			if event.is_action_pressed("dash"):
 				if dash_cooldown_timer.is_stopped():
 					change_movement_state(Move.STATES.GDASH)
+		Move.STATES.ADASH:
+			if event.is_action_pressed("jump"):
+				dash_jump_buffer_timer.start()
 		Move.STATES.WALL:
 			if event.is_action_pressed("jump"):
 				change_movement_state(Move.STATES.JUMP)

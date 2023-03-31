@@ -62,6 +62,10 @@ one_shot = true
 process_callback = 0
 one_shot = true
 
+[node name="DashJumpBufferTimer" type="Timer" parent="Timers"]
+process_callback = 0
+one_shot = true
+
 [node name="DashCooldownTimer" type="Timer" parent="Timers"]
 process_callback = 0
 one_shot = true
