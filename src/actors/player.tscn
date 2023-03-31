@@ -20,6 +20,7 @@ b = Vector2(0, 95)
 
 [node name="Player" type="CharacterBody2D"]
 collision_layer = 2
+floor_snap_length = 5.0
 platform_floor_layers = 4294967277
 script = ExtResource("1_7v7v0")
 dash_length = 4.0
