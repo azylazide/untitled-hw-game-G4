@@ -228,7 +228,7 @@ func _run_movement_state(delta: float) -> int:
 	
 	match Move.current:
 		Move.STATES.IDLE:
-			var dir = get_direction()
+			var dir:= get_direction()
 			velocity.x = 0
 			#_apply_gravity(delta)
 			
@@ -253,7 +253,7 @@ func _run_movement_state(delta: float) -> int:
 			return Move.STATES.IDLE
 			
 		Move.STATES.RUN:
-			var dir = get_direction()
+			var dir:= get_direction()
 			velocity.x = speed*dir
 			#_apply_gravity(delta)
 			
@@ -278,7 +278,7 @@ func _run_movement_state(delta: float) -> int:
 			return Move.STATES.RUN
 		
 		Move.STATES.FALL:
-			var dir = get_direction()
+			var dir:= get_direction()
 			velocity.x = speed*dir
 			_apply_gravity(delta)
 			
@@ -302,7 +302,7 @@ func _run_movement_state(delta: float) -> int:
 		
 		Move.STATES.JUMP:
 			_apply_gravity(delta)
-			var dir = get_direction()
+			var dir:= get_direction()
 			if wall_jump_hold_timer.is_stopped():
 				velocity.x = speed*dir
 			
@@ -317,7 +317,7 @@ func _run_movement_state(delta: float) -> int:
 			return Move.STATES.JUMP
 		
 		Move.STATES.GDASH:
-			var dir = get_direction()
+			var dir:= get_direction()
 			
 			was_on_floor = check_floor()
 			_apply_movement(dir)
@@ -340,7 +340,7 @@ func _run_movement_state(delta: float) -> int:
 			return Move.STATES.GDASH
 		
 		Move.STATES.ADASH:
-			var dir = get_direction()
+			var dir:= get_direction()
 			
 			was_on_floor = check_floor()
 			_apply_movement(dir)
@@ -360,7 +360,7 @@ func _run_movement_state(delta: float) -> int:
 			
 		Move.STATES.WALL:
 			#snap?
-			var dir = get_direction()
+			var dir:= get_direction()
 			velocity.y += 0.1*fall_gravity*delta
 			velocity.y = min(velocity.y,0.5*max_fall_tile*Globals.TILE_UNITS) 
 			
