@@ -29,43 +29,43 @@ extends ActorBase
 @export var wall_cooldown_time:= 0.2
 
 ## Ground shapecast
-@onready var ground_cast:= $GroundDetector
+@onready var ground_cast:= $GroundDetector as ShapeCast2D
 
 ## Left wall shapecast
-@onready var left_wall_detector:= $WallDetectors/Left
+@onready var left_wall_detector:= $WallDetectors/Left as ShapeCast2D
 
 ## Right wall shapecast
-@onready var right_wall_detector:= $WallDetectors/Right
+@onready var right_wall_detector:= $WallDetectors/Right as ShapeCast2D
 
 ## Camera detector area
-@onready var camera_bbox_detector := $CameraBBoxDetector
+@onready var camera_bbox_detector := $CameraBBoxDetector as Area2D
 
 ## Camera center marker
-@onready var camera_center := $CameraCenter
+@onready var camera_center := $CameraCenter as Marker2D
 
 ## Coyote duration timer
-@onready var coyote_timer:= $Timers/CoyoteTimer
+@onready var coyote_timer:= $Timers/CoyoteTimer as Timer
 
 ## Jump buffer timer
-@onready var jump_buffer_timer:= $Timers/JumpBufferTimer
+@onready var jump_buffer_timer:= $Timers/JumpBufferTimer as Timer
 
 ## Dash duration timer
-@onready var dash_timer:= $Timers/DashTimer
+@onready var dash_timer:= $Timers/DashTimer as Timer
 
 ## Dash duration timer
-@onready var dash_jump_buffer_timer:= $Timers/DashJumpBufferTimer
+@onready var dash_jump_buffer_timer:= $Timers/DashJumpBufferTimer as Timer
 
 ## Dash cooldown duration timer
-@onready var dash_cooldown_timer:= $Timers/DashCooldownTimer
+@onready var dash_cooldown_timer:= $Timers/DashCooldownTimer as Timer
 
 ## Wall slide duration timer
-@onready var wall_slide_timer:= $Timers/WallSlideTimer
+@onready var wall_slide_timer:= $Timers/WallSlideTimer as Timer
 
 ## Wall stick cooldown timer
-@onready var wall_cooldown_timer:= $Timers/WallCooldownTimer
+@onready var wall_cooldown_timer:= $Timers/WallCooldownTimer as Timer
 
 ## Wall jump duration timer
-@onready var wall_jump_hold_timer:= $Timers/WallJumpHoldTimer
+@onready var wall_jump_hold_timer:= $Timers/WallJumpHoldTimer as Timer
 
 ## If on floor on previous frame
 @onready var was_on_floor:= true
