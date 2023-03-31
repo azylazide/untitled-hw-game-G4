@@ -297,12 +297,6 @@ func _run_movement_state(delta: float) -> int:
 			
 			if on_floor:
 				return Move.STATES.IDLE
-			else:
-				printt(jump_buffer_timer.is_stopped(),can_ajump)
-				if not jump_buffer_timer.is_stopped() and can_ajump:
-					can_ajump = false
-					jump_buffer_timer.stop()
-					return Move.STATES.JUMP
 			
 			return Move.STATES.FALL
 		
@@ -492,10 +486,6 @@ func _unhandled_input(event: InputEvent) -> void:
 				if dash_cooldown_timer.is_stopped():
 					change_movement_state(Move.STATES.GDASH)
 		Move.STATES.JUMP:
-			if event.is_action_pressed("jump"):
-				if can_ajump and velocity.y > -300:
-					print("buffer double")
-					jump_buffer_timer.start()
 			if event.is_action_released("jump"):
 				if velocity.y < -min_jump_force:
 					velocity.y = -min_jump_force
