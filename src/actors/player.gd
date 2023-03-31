@@ -463,7 +463,7 @@ func _unhandled_input(event: InputEvent) -> void:
 					change_movement_state(Move.STATES.GDASH)
 		Move.STATES.JUMP:
 			if event.is_action_pressed("jump"):
-				if can_ajump:
+				if can_ajump and velocity.y > -300:
 					print("buffer double")
 					jump_buffer_timer.start()
 			if event.is_action_released("jump"):

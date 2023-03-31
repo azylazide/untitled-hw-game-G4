@@ -95,3 +95,4 @@ max_results = 10
 position = Vector2(35, 0)
 shape = SubResource("SegmentShape2D_y7x6n")
 target_position = Vector2(5, 0)
+max_results = 10
