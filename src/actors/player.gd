@@ -108,7 +108,7 @@ var on_wall: bool
 ## MovementStates object that stores states information
 var Move: MovementStates
 
-var Action
+var Action: ActionStates
 
 ## Stores movement states information
 class MovementStates:
@@ -162,6 +162,7 @@ func _setup_timers() -> void:
 func _ready() -> void:
 	#create movementstates object
 	Move = MovementStates.new(initial_movement_state)
+	Action = ActionStates.new(0)
 	
 	_setup_movement()
 	_setup_timers()

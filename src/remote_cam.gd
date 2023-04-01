@@ -222,7 +222,7 @@ func _interp_position(new_pos: Vector2, clamped_pos: Vector2) -> Vector2:
 #	print("cam: (%.00f,%.00f)\nclamp: (%.00f,%.00f)\nbounds: L=%.00f R=%.00f\n        T=%.00f B=%.00f"
 #		%[output.x,output.y,clamped_pos.x,clamped_pos.y,bounds.left,bounds.right,bounds.top,bounds.bottom])
 	
-	DebugTexts.get_node("Control/HBoxContainer/VBoxContainer2/Label4").text = \
+	DebugTexts.get_node("Control/HBoxContainer/VBoxContainer2/Label5").text = \
 	"cam: (%.00f,%.00f)\nclamp: (%.00f,%.00f)\nbounds: L=%.00f R=%.00f\nT=%.00f B=%.00f" %[output.x,output.y,clamped_pos.x,clamped_pos.y,bounds.left,bounds.right,bounds.top,bounds.bottom]
 	
 	return output

@@ -1,7 +1,12 @@
-[gd_scene load_steps=2 format=3 uid="uid://r3rsyu068oxw"]
+[gd_scene load_steps=3 format=3 uid="uid://r3rsyu068oxw"]
 
 [sub_resource type="LabelSettings" id="LabelSettings_h2jt3"]
 font_size = 32
+outline_size = 6
+outline_color = Color(0, 0, 0, 1)
+
+[sub_resource type="LabelSettings" id="LabelSettings_mnjb8"]
+font_size = 24
 outline_size = 6
 outline_color = Color(0, 0, 0, 1)
 
@@ -51,4 +56,10 @@ horizontal_alignment = 2
 layout_mode = 2
 text = "TEST"
 label_settings = SubResource("LabelSettings_h2jt3")
+horizontal_alignment = 2
+
+[node name="Label5" type="Label" parent="Control/HBoxContainer/VBoxContainer2"]
+layout_mode = 2
+text = "TEST"
+label_settings = SubResource("LabelSettings_mnjb8")
 horizontal_alignment = 2
