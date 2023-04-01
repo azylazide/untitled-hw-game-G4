@@ -1,10 +1,10 @@
-[gd_scene load_steps=9 format=3 uid="uid://b7q83ufyyd08e"]
+[gd_scene load_steps=9 format=3 uid="uid://b3xsy3bblplxe"]
 
 [ext_resource type="Script" path="res://src/actors/player.gd" id="1_7v7v0"]
-[ext_resource type="Script" path="res://player_resource.gd" id="2_fjqpe"]
+[ext_resource type="Script" path="res://src/actors/player_resource.gd" id="2_r65xl"]
 
 [sub_resource type="Resource" id="Resource_pv50y"]
-script = ExtResource("2_fjqpe")
+script = ExtResource("2_r65xl")
 abilities = 7
 max_health = 100.0
 health = 100.0
