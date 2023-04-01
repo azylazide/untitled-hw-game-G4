@@ -166,11 +166,7 @@ func _physics_process(delta: float) -> void:
 	_movement_statemachine(delta)
 	SignalBus.player_updated.emit(face_direction,camera_center.global_position)
 	
-	
-	DebugTexts.get_node("Control/HBoxContainer/VBoxContainer/Label").text = "velocity: (%.00f,%.00f)\nposition: (%.00f,%.00f)" %[velocity.x,velocity.y,global_position.x,global_position.y]
-	DebugTexts.get_node("Control/HBoxContainer/VBoxContainer/Label2").text = "MOVEMENT STATES\nprev: %s\ncurrent: %s\n(next: %s)" %[Move.state_name[Move.previous],Move.state_name[Move.current],Move.state_name[Move.next]]
-	DebugTexts.get_node("Control/HBoxContainer/VBoxContainer2/Label3").text = "floor: %s\nwall: %s" %[on_floor,on_wall]
-	DebugTexts.get_node("Control/HBoxContainer/VBoxContainer2/Label4").text = "can_ajump: %s\ncan_adash: %s" %[can_ajump,can_adash]
+	debug_text()
 
 ## Movement state machine
 ## [br]-Checks if entering a new state
@@ -538,3 +534,9 @@ func _unhandled_input(event: InputEvent) -> void:
 				face_direction = signf(wall_normal.x)
 				change_movement_state(Move.STATES.ADASH)
 		
+func debug_text() -> void:
+	DebugTexts.get_node("Control/HBoxContainer/VBoxContainer/Label").text = "velocity: (%.00f,%.00f)\nposition: (%.00f,%.00f)" %[velocity.x,velocity.y,global_position.x,global_position.y]
+	DebugTexts.get_node("Control/HBoxContainer/VBoxContainer/Label2").text = "MOVEMENT STATES\nprev: %s\ncurrent: %s\n(next: %s)" %[Move.state_name[Move.previous],Move.state_name[Move.current],Move.state_name[Move.next]]
+	DebugTexts.get_node("Control/HBoxContainer/VBoxContainer2/Label3").text = "floor: %s\nwall: %s" %[on_floor,on_wall]
+	DebugTexts.get_node("Control/HBoxContainer/VBoxContainer2/Label4").text = "can_ajump: %s\ncan_adash: %s" %[can_ajump,can_adash]
+
