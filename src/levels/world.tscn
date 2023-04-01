@@ -167,7 +167,7 @@ x_offset_tiles = 1.2
 position = Vector2(572, 527)
 
 [node name="StaticBody2D" type="StaticBody2D" parent="."]
-position = Vector2(-358, 712)
+position = Vector2(-348, 719)
 
 [node name="CollisionPolygon2D" type="CollisionPolygon2D" parent="StaticBody2D"]
 polygon = PackedVector2Array(-1914, -537, -1919, -401, -1071, -393)

@@ -12,6 +12,10 @@ extends ActorBase
 @export var coyote_time:= 0.1
 ## Time jump inputs are remembered just before landing from falling in seconds
 @export var jump_buffer_time:= 0.1
+## Multiplier for air jump speed
+@export var air_jump_multiplier:= 0.8
+## Multiplier for ground dash jump speed
+@export var dash_jump_multiplier:= 1.2
 
 @export_subgroup("Dash")
 ## Dash duration in seconds
@@ -417,11 +421,11 @@ func _enter_jump() -> void:
 					velocity.y = -jump_force
 				#if both walls use face direction as the focused wall
 			else:
-				velocity.y = -jump_force*0.8
+				velocity.y = -jump_force*air_jump_multiplier
 		Move.STATES.GDASH:
-			velocity.y = -jump_force*1.2
+			velocity.y = -jump_force*dash_jump_multiplier
 		Move.STATES.ADASH:
-			velocity.y = -jump_force*0.8
+			velocity.y = -jump_force*air_jump_multiplier
 		Move.STATES.WALL:
 			wall_jump_hold_timer.start()
 			face_direction = signf(wall_normal.x)
