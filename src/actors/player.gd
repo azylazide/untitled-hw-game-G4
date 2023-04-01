@@ -28,9 +28,14 @@ extends ActorBase
 @export var dash_length:= 2.0
 
 @export_subgroup("Wall")
+## Duration of full wall kick air time
 @export var wall_kick_time:= 0.5
+## Velocity applied horizontally in wall kick
 @export var wall_kick_power:= 2.5
+## Cooldown time until another wall kick is allowed
 @export var wall_cooldown_time:= 0.2
+## Multiplier for gravity in wall sliding
+@export var wall_slide_multiplier:= 0.1
 
 ## Ground shapecast
 @onready var ground_cast:= $GroundDetector as ShapeCast2D
@@ -371,7 +376,7 @@ func _run_movement_state(delta: float) -> int:
 		Move.STATES.WALL:
 			#snap?
 			var dir:= get_direction()
-			velocity.y += 0.1*fall_gravity*delta
+			velocity.y += wall_slide_multiplier*fall_gravity*delta
 			velocity.y = min(velocity.y,0.5*max_fall_tile*Globals.TILE_UNITS) 
 			
 			was_on_floor = check_floor()

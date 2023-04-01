@@ -1,6 +1,13 @@
-[gd_scene load_steps=7 format=3 uid="uid://b7q83ufyyd08e"]
+[gd_scene load_steps=9 format=3 uid="uid://b7q83ufyyd08e"]
 
 [ext_resource type="Script" path="res://src/actors/player.gd" id="1_7v7v0"]
+[ext_resource type="Script" path="res://player_resource.gd" id="2_fjqpe"]
+
+[sub_resource type="Resource" id="Resource_pv50y"]
+script = ExtResource("2_fjqpe")
+abilities = 7
+max_health = 100.0
+health = 100.0
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_p3dhm"]
 size = Vector2(70, 150)
@@ -29,6 +36,7 @@ max_run_tile = 10.0
 jump_height = 2.5
 min_jump_height = 0.8
 gap_length = 12.0
+stats = SubResource("Resource_pv50y")
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
 position = Vector2(0, -75)

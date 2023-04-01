@@ -14,6 +14,10 @@ extends CharacterBody2D
 ## Max length of gap for a leap
 @export var gap_length:= 12.5
 
+@export_category("Characteristics")
+## Actor specific characteristics resource
+@export var stats: ActorResource
+
 ## Current direction of movement
 var direction: float
 ## Current facing direction
