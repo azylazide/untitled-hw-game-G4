@@ -7,7 +7,7 @@ extends Area2D
 
 class_name CameraBoundBox
 
-##Priority to use limits of camera area against other overlapping areaas.
+## Priority to use limits of camera area against other overlapping areas.
 @export var priority_level := 0
 
 @export_group("Limits")

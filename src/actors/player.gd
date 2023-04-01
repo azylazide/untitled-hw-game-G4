@@ -298,7 +298,7 @@ func _run_movement_state(delta: float) -> int:
 					if wall_normal != Vector2.ZERO and dir*wall_normal.x < 0 and wall_cooldown_timer.is_stopped():
 						return Move.STATES.WALL
 					elif wall_normal.x == 0:
-						#edge case review later
+						#edge case review later; use face direction
 						pass
 			
 			if on_floor:
@@ -419,6 +419,7 @@ func _enter_jump() -> void:
 					face_direction = signf(wall_normal.x)
 					velocity.x = wall_kick_force*face_direction
 					velocity.y = -jump_force
+				#if both walls use face direction as the focused wall
 			else:
 				velocity.y = -jump_force*0.8
 		Move.STATES.GDASH:

@@ -1,3 +1,4 @@
+## Base class for actors
 class_name ActorBase
 extends CharacterBody2D
 
