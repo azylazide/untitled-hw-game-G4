@@ -112,43 +112,23 @@ var Action
 
 ## Stores movement states information
 class MovementStates:
-	## Movement states
+	extends StateContainer
+	## Declare movement states
 	enum STATES {IDLE,RUN,FALL,JUMP,GDASH,ADASH,WALL}
-	## Dictionary storing the names of the states in pascal case
-	var state_name = STATES.keys().map(func(elem):return elem.to_pascal_case())
-	## Null state
-	const NULL:= -1
-	## Current frame state
-	var current: int
-	## Previous set state
-	var previous:= NULL
-	## Next state to set
-	var next:= NULL
-	## Previous frame state that can be same as the current state
-	var previous_frame:= NULL
 	
 	func _init(current_state) -> void:
-		current = current_state
+		super._init(current_state)
+		_name_dict(STATES)
 
-## Stores movement states information
+## Stores action states information
 class ActionStates:
-	## Movement states
+	extends StateContainer
+	## Declare action states
 	enum STATES {NEUTRAL,ATTACK,DEATH}
-	## Dictionary storing the names of the states in pascal case
-	var state_name = STATES.keys().map(func(elem):return elem.to_pascal_case())
-	## Null state
-	const NULL:= -1
-	## Current frame state
-	var current: int
-	## Previous set state
-	var previous:= NULL
-	## Next state to set
-	var next:= NULL
-	## Previous frame state that can be same as the current state
-	var previous_frame:= NULL
 	
 	func _init(current_state) -> void:
-		current = current_state
+		super._init(current_state)
+		_name_dict(STATES)
 
 ## Setup movement values
 func _setup_movement() -> void:
