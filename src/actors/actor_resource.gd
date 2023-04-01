@@ -1,3 +1,6 @@
+## Base class to store basic actor information
+##
+## Stores health and general actor stats or information
 extends Resource
 class_name ActorResource
 
