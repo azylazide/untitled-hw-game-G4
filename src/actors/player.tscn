@@ -92,6 +92,7 @@ process_callback = 0
 one_shot = true
 
 [node name="Camera2D" type="Camera2D" parent="."]
+visible = false
 enabled = false
 zoom = Vector2(0.5, 0.5)
 
