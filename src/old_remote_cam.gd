@@ -114,7 +114,9 @@ func _draw() -> void:
 	#cam center bounded
 	if display_bound:
 		if not current_bounds.is_empty():
-			for i in current_bounds:
+			for line in current_bounds:
+				printt(to_local(line[0]),to_local(line[1]))
+				draw_line(to_local(line[0]+Vector2(0.5*screen_size.x,0)),to_local(line[1]-Vector2(0.5*screen_size.x,0)),Color(0.95294117927551, 0.95294117927551, 0))
 				pass
 			pass
 		
@@ -173,11 +175,6 @@ func _clamp_position(pos: Vector2) -> Vector2:
 			append_to_array.call(right_array,area,Vector2.RIGHT)
 			append_to_array.call(bottom_array,area,Vector2.DOWN)
 			
-#			left_array.append(int(collision.global_position.x-extents.x) if area.limit_left else left_limit)
-#			top_array.append(int(collision.global_position.y-extents.y) if area.limit_top else top_limit)
-#			right_array.append(int(collision.global_position.x+extents.x) if area.limit_right else right_limit)
-#			bottom_array.append(int(collision.global_position.y+extents.y) if area.limit_bottom else bottom_limit)
-
 			priorities.append(area.priority_level)
 
 		#find the highest priority area
@@ -219,6 +216,12 @@ func _clamp_position(pos: Vector2) -> Vector2:
 		
 		#print(bbox_array[0].global_position)
 		display_bound = true
+		
+		if bounds.left != -bridge_inf:
+			var test_temp_top = temp_top if bounds.top > -bridge_inf else 0.5*screen_size.y*zoom.y
+			var test_temp_bottom = temp_bottom if bounds.bottom < bridge_inf else -0.5*screen_size.y*zoom.y
+			current_bounds.append([Vector2(bounds.left,test_temp_top),Vector2(bounds.left,test_temp_bottom)])
+			pass
 		
 #		print("cam: (%.00f,%.00f)\nL: %.00f R: %.00f\nT: %.00f B: %.00f" 
 #				%[output.x,output.y,temp_left,temp_right,temp_top,temp_bottom])

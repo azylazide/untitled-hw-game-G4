@@ -1,9 +1,9 @@
-[gd_scene load_steps=8 format=3 uid="uid://bgijdlkmeivq3"]
+[gd_scene load_steps=8 format=3 uid="uid://bq8d6t3v3t1lr"]
 
 [ext_resource type="PackedScene" uid="uid://b3xsy3bblplxe" path="res://src/actors/player.tscn" id="1_ox13q"]
 [ext_resource type="TileSet" uid="uid://dsgrixorcwhe3" path="res://src/levels/debugtileset.tres" id="2_u8b1s"]
 [ext_resource type="Script" path="res://src/camera_bound_box.gd" id="3_0nohp"]
-[ext_resource type="Script" path="res://src/remote_cam.gd" id="4_ujvay"]
+[ext_resource type="Script" path="res://src/old_remote_cam.gd" id="3_y1rhk"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_hftcy"]
 size = Vector2(1332, 784)
@@ -62,8 +62,6 @@ collision_layer = 16
 monitoring = false
 script = ExtResource("3_0nohp")
 priority_level = 2
-limit_left = false
-limit_right = false
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="CameraBoundBox3"]
 modulate = Color(1, 1, 1, 0.2)
@@ -78,7 +76,7 @@ layer_0/tile_data = PackedInt32Array(786451, 65536, 1, 720915, 65536, 1, 655379,
 [node name="Camera2D" type="Camera2D" parent="."]
 zoom = Vector2(0.5, 0.5)
 process_callback = 0
-script = ExtResource("4_ujvay")
+script = ExtResource("3_y1rhk")
 player_path = NodePath("../Player")
 x_offset_tiles = 1.2
 

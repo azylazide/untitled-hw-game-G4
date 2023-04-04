@@ -2,6 +2,8 @@ extends Node
 
 const TILE_UNITS:= 64.0
 
+const CAMERA_REGION_LAYER:= 5
+
 func _gravity(h: float, vx: float, x: float) -> float:
 	var output: float = 2*(h*TILE_UNITS*pow(vx*TILE_UNITS,2))/(pow(x*TILE_UNITS/2.0,2))
 	return output
