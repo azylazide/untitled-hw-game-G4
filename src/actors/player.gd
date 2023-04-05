@@ -5,6 +5,7 @@ extends ActorBase
 @export_enum("LEFT","RIGHT") var initial_direction:= 1
 ## Initial movement state on ready
 @export var initial_movement_state: MovementStates.STATES = MovementStates.STATES.IDLE
+@export var initial_action_state: ActionStates.STATES = ActionStates.STATES.NEUTRAL
 
 @export_group("Platformer Values")
 @export_subgroup("Jump")
@@ -124,7 +125,7 @@ class MovementStates:
 class ActionStates:
 	extends StateContainer
 	## Declare action states
-	enum STATES {NEUTRAL,ATTACK,DEATH}
+	enum STATES {NEUTRAL,ATTACK,HURT,DEATH}
 	
 	func _init(current_state) -> void:
 		super._init(current_state)
@@ -162,7 +163,7 @@ func _setup_timers() -> void:
 func _ready() -> void:
 	#create movementstates object
 	Move = MovementStates.new(initial_movement_state)
-	Action = ActionStates.new(0)
+	Action = ActionStates.new(initial_action_state)
 	
 	_setup_movement()
 	_setup_timers()
@@ -176,6 +177,7 @@ func _process(delta: float) -> void:
 func _physics_process(delta: float) -> void:
 	#MOVEMENT STATEMACHINE
 	_movement_statemachine(delta)
+	_action_statemachine(delta)
 	SignalBus.player_updated.emit(face_direction,camera_center.global_position)
 	
 	debug_text()
@@ -199,9 +201,25 @@ func _movement_statemachine(delta: float) -> void:
 	change_movement_state(Move.next)
 	pass
 
+func _action_statemachine(delta: float) -> void:
+	#Coming from a different state in previous frame
+	if Action.previous_frame != Action.current:
+		_enter_action_state(delta)
+	#Run the state depending if initial or not
+	Action.next = (_initial_action_state(delta) if Action.previous_frame == Action.NULL 
+							else _run_action_state(delta))
+	#If transitioning, run exit code
+	if Action.next != Action.current:
+		_exit_action_state(delta,Action.current)
+	#transition
+	change_action_state(Action.next)
+
 ## Initial states that run first
 func _initial_movement_state(delta: float) -> int:
 	return Move.STATES.IDLE
+
+func _initial_action_state(delta: float) -> int:
+	return Action.STATES.NEUTRAL
 
 ## States setup when transitioning into
 func _enter_movement_state(delta: float) -> void:
@@ -235,6 +253,9 @@ func _enter_movement_state(delta: float) -> void:
 			velocity.y = 0
 			wall_cooldown_timer.start()
 			wall_slide_timer.start()
+	pass
+
+func _enter_action_state(delta: float) -> void:
 	pass
 
 ## Main states code that runs per frame
@@ -404,8 +425,21 @@ func _run_movement_state(delta: float) -> int:
 		
 	return Move.NULL
 
+func _run_action_state(delta: float) -> int:
+	match Action.current:
+		Action.STATES.NEUTRAL:
+			pass
+		Action.STATES.ATTACK:
+			pass
+		Action.STATES.DEATH:
+			pass
+	return Action.NULL
+
 ## Clean up when transitioning out to
-func _exit_movement_state(delta: float, current: int) -> int:	
+func _exit_movement_state(delta: float, current: int) -> int:
+	return 0
+
+func _exit_action_state(delta: float, current: int) -> int:
 	return 0
 
 ## Transitioning states	
@@ -416,6 +450,14 @@ func change_movement_state(next_state: int) -> void:
 	
 	Move.previous = Move.current
 	Move.current = next_state
+
+func change_action_state(next_state: int) -> void:
+	Action.previous_frame = Action.current
+	if next_state == Action.current:
+		return
+	
+	Action.previous = Action.current
+	Action.current = next_state
 
 ## Setup jump based on previous state for the jump enter setup
 func _enter_jump() -> void:
