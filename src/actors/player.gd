@@ -469,12 +469,17 @@ func _enter_jump() -> void:
 	match Move.previous:
 		Move.STATES.FALL:
 			if on_wall:
-				if wall_normal != Vector2.ZERO and wall_cooldown_timer.is_stopped():
+				if wall_normal != Vector2.ZERO and wall_cooldown_timer.is_stopped()   and (stats.abilities & 0b100):
 					wall_jump_hold_timer.start()
 					face_direction = signf(wall_normal.x)
 					velocity.x = wall_kick_force*face_direction
 					velocity.y = -jump_force
 				#if both walls use face direction as the focused wall
+				
+				#if no wall jump ability but must ajump
+				elif can_ajump:
+					can_ajump = false
+					velocity.y = -jump_force*air_jump_multiplier
 			else:
 				velocity.y = -jump_force*air_jump_multiplier
 		Move.STATES.GDASH:
@@ -581,7 +586,7 @@ func _unhandled_input(event: InputEvent) -> void:
 			if event.is_action_pressed("jump"):
 				if velocity.y > 0:
 					jump_buffer_timer.start()
-				if on_wall and (stats.abilities & 0b100):
+				if on_wall:
 					Move.next = Move.STATES.JUMP
 					Move.change_state()
 	
