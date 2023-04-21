@@ -213,7 +213,7 @@ func _action_statemachine(delta: float) -> void:
 	if Action.next != Action.current:
 		_exit_action_state(delta,Action.current)
 	#transition
-	change_action_state(Action.next)
+	Action.change_state()
 
 ## Initial states that run first
 func _initial_movement_state(delta: float) -> int:
@@ -271,168 +271,173 @@ func _run_movement_state(delta: float) -> int:
 	if Action.current in [Action.STATES.DEATH]:
 		return Move.AUTO
 	
-	match Move.current:
-		Move.STATES.IDLE:
-			var dir:= get_direction()
-			velocity.x = 0
-			#_apply_gravity(delta)
-			
-			was_on_floor = check_floor()
-			_apply_movement(dir)
-			on_floor = check_floor()
-			on_wall = check_wall()
-			
-			if dir != 0:
+	if not Action.current == Action.STATES.HURT:
+		match Move.current:
+			Move.STATES.IDLE:
+				var dir:= get_direction()
+				velocity.x = 0
+				#_apply_gravity(delta)
+				
+				was_on_floor = check_floor()
+				_apply_movement(dir)
+				on_floor = check_floor()
+				on_wall = check_wall()
+				
+				if dir != 0:
+					return Move.STATES.RUN
+				
+				if not on_floor:
+					if was_on_floor:
+						coyote_timer.start()
+					else:
+						return Move.STATES.FALL
+				
+				if not jump_buffer_timer.is_stopped() and on_floor:
+					jump_buffer_timer.stop()
+					return Move.STATES.JUMP
+				
+				return Move.STATES.IDLE
+				
+			Move.STATES.RUN:
+				var dir:= get_direction()
+				velocity.x = speed*dir
+				#_apply_gravity(delta)
+				
+				was_on_floor = check_floor()
+				_apply_movement(dir)
+				on_floor = check_floor()
+				on_wall = check_wall()
+				
+				if dir == 0 and on_floor:
+					return Move.STATES.IDLE
+				
+				if not on_floor:
+					if was_on_floor:
+						coyote_timer.start()
+					else:
+						return Move.STATES.FALL
+				
+				if not jump_buffer_timer.is_stopped() and on_floor:
+					jump_buffer_timer.stop()
+					return Move.STATES.JUMP
+					
 				return Move.STATES.RUN
 			
-			if not on_floor:
-				if was_on_floor:
-					coyote_timer.start()
-				else:
-					return Move.STATES.FALL
-			
-			if not jump_buffer_timer.is_stopped() and on_floor:
-				jump_buffer_timer.stop()
-				return Move.STATES.JUMP
-			
-			return Move.STATES.IDLE
-			
-		Move.STATES.RUN:
-			var dir:= get_direction()
-			velocity.x = speed*dir
-			#_apply_gravity(delta)
-			
-			was_on_floor = check_floor()
-			_apply_movement(dir)
-			on_floor = check_floor()
-			on_wall = check_wall()
-			
-			if dir == 0 and on_floor:
-				return Move.STATES.IDLE
-			
-			if not on_floor:
-				if was_on_floor:
-					coyote_timer.start()
-				else:
-					return Move.STATES.FALL
-			
-			if not jump_buffer_timer.is_stopped() and on_floor:
-				jump_buffer_timer.stop()
-				return Move.STATES.JUMP
-				
-			return Move.STATES.RUN
-		
-		Move.STATES.FALL:
-			var dir:= get_direction()
-			velocity.x = speed*dir
-			_apply_gravity(delta)
-			
-			was_on_floor = check_floor()
-			_apply_movement(dir)
-			on_floor = check_floor()
-			on_wall = check_wall()
-			
-			if on_wall:
-				if dir != 0:
-					if wall_normal != Vector2.ZERO and dir*wall_normal.x < 0 and wall_cooldown_timer.is_stopped():
-						return Move.STATES.WALL
-					elif wall_normal.x == 0:
-						#edge case review later; use face direction
-						pass
-			
-			if on_floor:
-				return Move.STATES.IDLE
-			
-			return Move.STATES.FALL
-		
-		Move.STATES.JUMP:
-			_apply_gravity(delta)
-			var dir:= get_direction()
-			if wall_jump_hold_timer.is_stopped():
+			Move.STATES.FALL:
+				var dir:= get_direction()
 				velocity.x = speed*dir
-			
-			was_on_floor = check_floor()
-			_apply_movement(dir)
-			on_floor = check_floor()
-			on_wall = check_wall()
-						
-			if velocity.y > 0:
+				_apply_gravity(delta)
+				
+				was_on_floor = check_floor()
+				_apply_movement(dir)
+				on_floor = check_floor()
+				on_wall = check_wall()
+				
+				if on_wall:
+					if dir != 0:
+						if wall_normal != Vector2.ZERO and dir*wall_normal.x < 0 and wall_cooldown_timer.is_stopped():
+							return Move.STATES.WALL
+						elif wall_normal.x == 0:
+							#edge case review later; use face direction
+							pass
+				
+				if on_floor:
+					return Move.STATES.IDLE
+				
 				return Move.STATES.FALL
 			
-			return Move.STATES.JUMP
-		
-		Move.STATES.GDASH:
-			var dir:= get_direction()
-			
-			was_on_floor = check_floor()
-			_apply_movement(dir)
-			on_floor = check_floor()
-			on_wall = check_wall()
-			
-			if not on_floor:
-				if was_on_floor:
-					coyote_timer.start()
-			
-			if dash_timer.is_stopped():
-				if on_floor:
-					if dir != 0:
-						return Move.STATES.RUN
-					else:
-						return Move.STATES.IDLE
-				elif not on_floor and not was_on_floor:
+			Move.STATES.JUMP:
+				_apply_gravity(delta)
+				var dir:= get_direction()
+				if wall_jump_hold_timer.is_stopped():
+					velocity.x = speed*dir
+				
+				was_on_floor = check_floor()
+				_apply_movement(dir)
+				on_floor = check_floor()
+				on_wall = check_wall()
+							
+				if velocity.y > 0:
 					return Move.STATES.FALL
+				
+				return Move.STATES.JUMP
 			
-			return Move.STATES.GDASH
-		
-		Move.STATES.ADASH:
-			var dir:= get_direction()
+			Move.STATES.GDASH:
+				var dir:= get_direction()
+				
+				was_on_floor = check_floor()
+				_apply_movement(dir)
+				on_floor = check_floor()
+				on_wall = check_wall()
+				
+				if not on_floor:
+					if was_on_floor:
+						coyote_timer.start()
+				
+				if dash_timer.is_stopped():
+					if on_floor:
+						if dir != 0:
+							return Move.STATES.RUN
+						else:
+							return Move.STATES.IDLE
+					elif not on_floor and not was_on_floor:
+						return Move.STATES.FALL
+				
+				return Move.STATES.GDASH
 			
-			was_on_floor = check_floor()
-			_apply_movement(dir)
-			on_floor = check_floor()
-			on_wall = check_wall()
-			
-			if dash_timer.is_stopped():
+			Move.STATES.ADASH:
+				var dir:= get_direction()
+				
+				was_on_floor = check_floor()
+				_apply_movement(dir)
+				on_floor = check_floor()
+				on_wall = check_wall()
+				
+				if dash_timer.is_stopped():
+					if on_floor:
+						if dir != 0:
+							return Move.STATES.RUN
+						else:
+							return Move.STATES.IDLE
+					else:
+						if not dash_jump_buffer_timer.is_stopped():
+							can_ajump = false
+							return Move.STATES.JUMP
+						else:
+							return Move.STATES.FALL
+				
+				return Move.STATES.ADASH
+				
+			Move.STATES.WALL:
+				#snap?
+				var dir:= get_direction()
+				velocity.y += wall_slide_multiplier*fall_gravity*delta
+				velocity.y = min(velocity.y,0.5*max_fall_tile*Globals.TILE_UNITS) 
+				
+				was_on_floor = check_floor()
+				_apply_movement(dir)
+				on_floor = check_floor()
+				on_wall = check_wall()
+				
+				if wall_slide_timer.is_stopped():
+						if dir*wall_normal.x > 0:
+							return Move.STATES.FALL
+				
 				if on_floor:
-					if dir != 0:
-						return Move.STATES.RUN
-					else:
-						return Move.STATES.IDLE
-				else:
-					if not dash_jump_buffer_timer.is_stopped():
-						can_ajump = false
-						return Move.STATES.JUMP
-					else:
-						return Move.STATES.FALL
-			
-			return Move.STATES.ADASH
-			
-		Move.STATES.WALL:
-			#snap?
-			var dir:= get_direction()
-			velocity.y += wall_slide_multiplier*fall_gravity*delta
-			velocity.y = min(velocity.y,0.5*max_fall_tile*Globals.TILE_UNITS) 
-			
-			was_on_floor = check_floor()
-			_apply_movement(dir)
-			on_floor = check_floor()
-			on_wall = check_wall()
-			
-			if wall_slide_timer.is_stopped():
-					if dir*wall_normal.x > 0:
-						return Move.STATES.FALL
-			
-			if on_floor:
+					face_direction = signf(wall_normal.x)
+					return Move.STATES.IDLE
+				
+				if not on_wall:
+					face_direction = signf(wall_normal.x)
+					return Move.STATES.FALL
+				
 				face_direction = signf(wall_normal.x)
-				return Move.STATES.IDLE
-			
-			if not on_wall:
-				face_direction = signf(wall_normal.x)
-				return Move.STATES.FALL
-			
-			face_direction = signf(wall_normal.x)
-			return Move.STATES.WALL
-		
+				return Move.STATES.WALL
+	
+	elif Action.current == Action.STATES.HURT:
+		#knockback
+		pass
+	#-------------
 	return Move.NULL
 
 func _run_action_state(delta: float) -> int:
@@ -440,9 +445,16 @@ func _run_action_state(delta: float) -> int:
 		Action.STATES.NEUTRAL:
 			return Action.STATES.NEUTRAL
 		Action.STATES.ATTACK:
+			print("attack")
+			if $Timers/testtimer.is_stopped():
+				return Action.STATES.NEUTRAL
+			return Action.STATES.ATTACK
+		Action.STATES.HURT:
+			#invincibility timer & knockback
 			return Action.STATES.NEUTRAL
 		Action.STATES.DEATH:
 			return Action.STATES.DEATH
+					
 	return Action.NULL
 
 ## Clean up when transitioning out to
@@ -451,23 +463,6 @@ func _exit_movement_state(delta: float, current: int) -> int:
 
 func _exit_action_state(delta: float, current: int) -> int:
 	return 0
-
-## Transitioning states	
-func change_movement_state(next_state: int) -> void:
-	Move.previous_frame = Move.current
-	if next_state == Move.current:
-		return
-	
-	Move.previous = Move.current
-	Move.current = next_state
-
-func change_action_state(next_state: int) -> void:
-	Action.previous_frame = Action.current
-	if next_state == Action.current:
-		return
-	
-	Action.previous = Action.current
-	Action.current = next_state
 
 ## Setup jump based on previous state for the jump enter setup
 func _enter_jump() -> void:
@@ -547,57 +542,91 @@ func _unhandled_input(event: InputEvent) -> void:
 		Move.STATES.IDLE:
 			if event.is_action_pressed("jump"):
 				if on_floor:
-					change_movement_state(Move.STATES.JUMP)
+					Move.next = Move.STATES.JUMP
+					Move.change_state()
+	
 			if event.is_action_pressed("dash"):
 				if dash_cooldown_timer.is_stopped():
-					change_movement_state(Move.STATES.GDASH)
+					Move.next = Move.STATES.GDASH
+					Move.change_state()
+	
 		Move.STATES.RUN:
 			if event.is_action_pressed("jump"):
 				if on_floor:
-					change_movement_state(Move.STATES.JUMP)
+					Move.next = Move.STATES.JUMP
+					Move.change_state()
+	
 			if event.is_action_pressed("dash"):
 				if dash_cooldown_timer.is_stopped():
-					change_movement_state(Move.STATES.GDASH)
+					Move.next = Move.STATES.GDASH
+					Move.change_state()
+	
 		Move.STATES.JUMP:
 			if event.is_action_released("jump"):
 				if velocity.y < -min_jump_force:
 					velocity.y = -min_jump_force
-					change_movement_state(Move.STATES.FALL)
+					Move.next = Move.STATES.FALL
+					Move.change_state()
+	
 				else:
-					change_movement_state(Move.STATES.FALL)
+					Move.next = Move.STATES.FALL
+					Move.change_state()
+	
 			if event.is_action_pressed("dash"):
 				if dash_cooldown_timer.is_stopped() and can_adash:
-					change_movement_state(Move.STATES.ADASH)
+					Move.next = Move.STATES.ADASH
+					Move.change_state()
+	
 		Move.STATES.FALL:
 			if event.is_action_pressed("jump"):
 				if velocity.y > 0:
 					jump_buffer_timer.start()
 				if on_wall:
-					change_movement_state(Move.STATES.JUMP)
+					Move.next = Move.STATES.JUMP
+					Move.change_state()
+	
 				elif not on_wall and can_ajump:
 					can_ajump = false
 					jump_buffer_timer.stop()
-					change_movement_state(Move.STATES.JUMP)
+					Move.next = Move.STATES.JUMP
+					Move.change_state()
+	
 			if event.is_action_pressed("dash"):
 				if dash_cooldown_timer.is_stopped() and can_adash:
-					change_movement_state(Move.STATES.ADASH)
+					Move.next = Move.STATES.ADASH
+					Move.change_state()
+	
 		Move.STATES.GDASH:
 			if event.is_action_pressed("jump"):
 				if on_floor:
-					change_movement_state(Move.STATES.JUMP)
+					Move.next = Move.STATES.JUMP
+					Move.change_state()
+	
 			if event.is_action_pressed("dash"):
 				if dash_cooldown_timer.is_stopped():
-					change_movement_state(Move.STATES.GDASH)
+					Move.next = Move.STATES.GDASH
+					Move.change_state()
+	
 		Move.STATES.ADASH:
 			if event.is_action_pressed("jump"):
 				dash_jump_buffer_timer.start()
 		Move.STATES.WALL:
 			if event.is_action_pressed("jump"):
-				change_movement_state(Move.STATES.JUMP)
+				Move.next = Move.STATES.JUMP
+				Move.change_state()
+
 			if event.is_action_pressed("dash"):
 				face_direction = signf(wall_normal.x)
-				change_movement_state(Move.STATES.ADASH)
-		
+				Move.next = Move.STATES.ADASH
+				Move.change_state()
+	
+	match Action.current:
+		Action.STATES.NEUTRAL:
+			if event.is_action_pressed("attack"):
+				$Timers/testtimer.start()
+				Action.next = Action.STATES.ATTACK
+				Action.change_state()
+
 func debug_text() -> void:
 	DebugTexts.get_node("Control/HBoxContainer/VBoxContainer/Label").text = "velocity: (%.00f,%.00f)\nposition: (%.00f,%.00f)" %[velocity.x,velocity.y,global_position.x,global_position.y]
 	DebugTexts.get_node("Control/HBoxContainer/VBoxContainer/Label2").text = "MOVEMENT STATES\nprev: %s\ncurrent: %s\n(next: %s)" %[Move.state_name[Move.previous],Move.state_name[Move.current],Move.state_name[Move.next]]

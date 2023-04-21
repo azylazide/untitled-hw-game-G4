@@ -23,6 +23,8 @@ func _init(current_state) -> void:
 
 func _name_dict(enum_dic) -> void:
 	state_name = enum_dic.keys().map(func(elem):return elem.to_pascal_case())
+	state_name[-2] = "NULL"
+	state_name[-1] = "AUTO"
 	
 func change_state() -> void:
 	self.previous_frame = self.current

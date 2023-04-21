@@ -1,4 +1,4 @@
-[gd_scene load_steps=10 format=3 uid="uid://b3xsy3bblplxe"]
+[gd_scene load_steps=11 format=3 uid="uid://b3xsy3bblplxe"]
 
 [ext_resource type="Script" path="res://src/actors/player.gd" id="1_7v7v0"]
 [ext_resource type="Script" path="res://src/actors/player_resource.gd" id="2_r65xl"]
@@ -25,6 +25,9 @@ b = Vector2(0, 95)
 
 [sub_resource type="SegmentShape2D" id="SegmentShape2D_y7x6n"]
 b = Vector2(0, 95)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_j7eh3"]
+size = Vector2(82, 158)
 
 [node name="Player" type="CharacterBody2D"]
 collision_layer = 2
@@ -92,6 +95,11 @@ one_shot = true
 process_callback = 0
 one_shot = true
 
+[node name="testtimer" type="Timer" parent="Timers"]
+process_callback = 0
+wait_time = 0.2
+one_shot = true
+
 [node name="Camera2D" type="Camera2D" parent="."]
 visible = false
 enabled = false
@@ -111,3 +119,12 @@ position = Vector2(35, 0)
 shape = SubResource("SegmentShape2D_y7x6n")
 target_position = Vector2(5, 0)
 max_results = 10
+
+[node name="Hitbox" type="Area2D" parent="."]
+position = Vector2(0, -79)
+collision_layer = 0
+collision_mask = 8
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Hitbox"]
+shape = SubResource("RectangleShape2D_j7eh3")
+debug_color = Color(0.92549, 0, 0.0823529, 0.27451)
