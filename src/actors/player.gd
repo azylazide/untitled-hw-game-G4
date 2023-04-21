@@ -468,7 +468,9 @@ func _exit_action_state(delta: float, current: int) -> int:
 func _enter_jump() -> void:
 	match Move.previous:
 		Move.STATES.FALL:
+			#against the wall
 			if on_wall:
+				#wall kick
 				if wall_normal != Vector2.ZERO and wall_cooldown_timer.is_stopped()   and (stats.abilities & 0b100):
 					wall_jump_hold_timer.start()
 					face_direction = signf(wall_normal.x)
@@ -480,6 +482,7 @@ func _enter_jump() -> void:
 				elif can_ajump:
 					can_ajump = false
 					velocity.y = -jump_force*air_jump_multiplier
+			#regular air jump
 			else:
 				velocity.y = -jump_force*air_jump_multiplier
 		Move.STATES.GDASH:
@@ -491,6 +494,8 @@ func _enter_jump() -> void:
 			face_direction = signf(wall_normal.x)
 			velocity.x = wall_kick_force*face_direction
 			velocity.y = -jump_force
+			
+		#regular jump
 		_:
 			velocity.y = -jump_force
 
@@ -545,38 +550,46 @@ func check_wall() -> bool:
 func _unhandled_input(event: InputEvent) -> void:
 	match Move.current:
 		Move.STATES.IDLE:
+			#regular jump
 			if event.is_action_pressed("jump"):
 				if on_floor:
 					Move.next = Move.STATES.JUMP
 					Move.change_state()
-	
+			
+			#dash
 			if event.is_action_pressed("dash") and (stats.abilities & 0b001):
 				if dash_cooldown_timer.is_stopped():
 					Move.next = Move.STATES.GDASH
 					Move.change_state()
 	
 		Move.STATES.RUN:
+			#regular jump
 			if event.is_action_pressed("jump"):
 				if on_floor:
 					Move.next = Move.STATES.JUMP
 					Move.change_state()
-	
+			
+			#dash
 			if event.is_action_pressed("dash") and (stats.abilities & 0b001):
 				if dash_cooldown_timer.is_stopped():
 					Move.next = Move.STATES.GDASH
 					Move.change_state()
 	
 		Move.STATES.JUMP:
+			#jump interrupt
 			if event.is_action_released("jump"):
+				#minimal jump
 				if velocity.y < -min_jump_force:
 					velocity.y = -min_jump_force
 					Move.next = Move.STATES.FALL
 					Move.change_state()
-	
+				
+				#interrupt
 				else:
 					Move.next = Move.STATES.FALL
 					Move.change_state()
-	
+			
+			#air dash
 			if event.is_action_pressed("dash") and (stats.abilities & 0b001):
 				if dash_cooldown_timer.is_stopped() and can_adash:
 					Move.next = Move.STATES.ADASH
@@ -584,42 +597,47 @@ func _unhandled_input(event: InputEvent) -> void:
 	
 		Move.STATES.FALL:
 			if event.is_action_pressed("jump"):
+				#buffer jump
 				if velocity.y > 0:
 					jump_buffer_timer.start()
+				#either wall jump or air jump depending on ability
 				if on_wall:
 					Move.next = Move.STATES.JUMP
 					Move.change_state()
-	
+				#air jump
 				elif not on_wall and can_ajump and (stats.abilities & 0b010):
 					can_ajump = false
 					jump_buffer_timer.stop()
 					Move.next = Move.STATES.JUMP
 					Move.change_state()
-	
+			#air dash
 			if event.is_action_pressed("dash") and (stats.abilities & 0b001):
 				if dash_cooldown_timer.is_stopped() and can_adash:
 					Move.next = Move.STATES.ADASH
 					Move.change_state()
 	
 		Move.STATES.GDASH:
+			#dashed jump
 			if event.is_action_pressed("jump"):
 				if on_floor:
 					Move.next = Move.STATES.JUMP
 					Move.change_state()
-	
+			#dash
 			if event.is_action_pressed("dash"):
 				if dash_cooldown_timer.is_stopped():
 					Move.next = Move.STATES.GDASH
 					Move.change_state()
 	
 		Move.STATES.ADASH:
+			#air dash
 			if event.is_action_pressed("jump")  and (stats.abilities & 0b010):
 				dash_jump_buffer_timer.start()
 		Move.STATES.WALL:
+			#wall jump
 			if event.is_action_pressed("jump"):
 				Move.next = Move.STATES.JUMP
 				Move.change_state()
-
+			#wall dash in air
 			if event.is_action_pressed("dash") and (stats.abilities & 0b001):
 				face_direction = signf(wall_normal.x)
 				Move.next = Move.STATES.ADASH
