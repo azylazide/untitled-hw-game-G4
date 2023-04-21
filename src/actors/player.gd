@@ -198,7 +198,8 @@ func _movement_statemachine(delta: float) -> void:
 	if Move.next != Move.current:
 		_exit_movement_state(delta,Move.current)
 	#transition
-	change_movement_state(Move.next)
+	#change_movement_state(Move.next)
+	Move.change_state()
 	pass
 
 func _action_statemachine(delta: float) -> void:
@@ -219,6 +220,12 @@ func _initial_movement_state(delta: float) -> int:
 	return Move.STATES.IDLE
 
 func _initial_action_state(delta: float) -> int:
+	match Action.current:
+		Action.STATES.NEUTRAL:
+			return Action.STATES.NEUTRAL
+		Action.STATES.DEATH:
+			return Action.STATES.DEATH
+	
 	return Action.STATES.NEUTRAL
 
 ## States setup when transitioning into
@@ -260,6 +267,9 @@ func _enter_action_state(delta: float) -> void:
 
 ## Main states code that runs per frame
 func _run_movement_state(delta: float) -> int:
+	
+	if Action.current in [Action.STATES.DEATH]:
+		return Move.AUTO
 	
 	match Move.current:
 		Move.STATES.IDLE:
@@ -428,11 +438,11 @@ func _run_movement_state(delta: float) -> int:
 func _run_action_state(delta: float) -> int:
 	match Action.current:
 		Action.STATES.NEUTRAL:
-			pass
+			return Action.STATES.NEUTRAL
 		Action.STATES.ATTACK:
-			pass
+			return Action.STATES.NEUTRAL
 		Action.STATES.DEATH:
-			pass
+			return Action.STATES.DEATH
 	return Action.NULL
 
 ## Clean up when transitioning out to
@@ -593,4 +603,4 @@ func debug_text() -> void:
 	DebugTexts.get_node("Control/HBoxContainer/VBoxContainer/Label2").text = "MOVEMENT STATES\nprev: %s\ncurrent: %s\n(next: %s)" %[Move.state_name[Move.previous],Move.state_name[Move.current],Move.state_name[Move.next]]
 	DebugTexts.get_node("Control/HBoxContainer/VBoxContainer2/Label3").text = "floor: %s\nwall: %s" %[on_floor,on_wall]
 	DebugTexts.get_node("Control/HBoxContainer/VBoxContainer2/Label4").text = "can_ajump: %s\ncan_adash: %s" %[can_ajump,can_adash]
-
+	DebugTexts.get_node("Control/HBoxContainer/VBoxContainer/Label6").text = "ACTION STATES\nprev: %s\ncurrent: %s\n(next: %s)" %[Action.state_name[Action.previous],Action.state_name[Action.current],Action.state_name[Action.next]]

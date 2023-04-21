@@ -6,7 +6,9 @@ class_name StateContainer
 ## Dictionary storing the names of the states in pascal case
 var state_name = {}
 ## Null state
-const NULL:= -1
+const NULL:= -2
+## Auto state
+const AUTO:= -1
 ## Current frame state
 var current: int
 ## Previous set state
@@ -21,3 +23,11 @@ func _init(current_state) -> void:
 
 func _name_dict(enum_dic) -> void:
 	state_name = enum_dic.keys().map(func(elem):return elem.to_pascal_case())
+	
+func change_state() -> void:
+	self.previous_frame = self.current
+	if self.next == self.current:
+		return
+	
+	self.previous = self.current
+	self.current = self.next

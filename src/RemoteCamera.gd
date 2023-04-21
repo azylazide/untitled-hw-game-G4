@@ -69,7 +69,7 @@ var detector_exited:= false
 func _ready() -> void:
 #	await playernode.ready
 #	await cameraboundcontainer.ready
-	print(player)
+#	print(player)
 	player.camera_bbox_detector.area_entered.connect(on_CameraBBoxDetector_area_entered)
 	player.camera_bbox_detector.area_exited.connect(on_CameraBBoxDetector_area_exited)
 	player.camera_bbox_detector.tree_exiting.connect(on_area_detector_exiting)

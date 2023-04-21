@@ -1,7 +1,7 @@
 [gd_scene load_steps=3 format=3 uid="uid://r3rsyu068oxw"]
 
 [sub_resource type="LabelSettings" id="LabelSettings_h2jt3"]
-font_size = 32
+font_size = 24
 outline_size = 6
 outline_color = Color(0, 0, 0, 1)
 
@@ -38,6 +38,11 @@ text = "TEST"
 label_settings = SubResource("LabelSettings_h2jt3")
 
 [node name="Label2" type="Label" parent="Control/HBoxContainer/VBoxContainer"]
+layout_mode = 2
+text = "TEST"
+label_settings = SubResource("LabelSettings_h2jt3")
+
+[node name="Label6" type="Label" parent="Control/HBoxContainer/VBoxContainer"]
 layout_mode = 2
 text = "TEST"
 label_settings = SubResource("LabelSettings_h2jt3")
