@@ -545,7 +545,7 @@ func _unhandled_input(event: InputEvent) -> void:
 					Move.next = Move.STATES.JUMP
 					Move.change_state()
 	
-			if event.is_action_pressed("dash"):
+			if event.is_action_pressed("dash") and (stats.abilities & 0b001):
 				if dash_cooldown_timer.is_stopped():
 					Move.next = Move.STATES.GDASH
 					Move.change_state()
@@ -556,7 +556,7 @@ func _unhandled_input(event: InputEvent) -> void:
 					Move.next = Move.STATES.JUMP
 					Move.change_state()
 	
-			if event.is_action_pressed("dash"):
+			if event.is_action_pressed("dash") and (stats.abilities & 0b001):
 				if dash_cooldown_timer.is_stopped():
 					Move.next = Move.STATES.GDASH
 					Move.change_state()
@@ -572,7 +572,7 @@ func _unhandled_input(event: InputEvent) -> void:
 					Move.next = Move.STATES.FALL
 					Move.change_state()
 	
-			if event.is_action_pressed("dash"):
+			if event.is_action_pressed("dash") and (stats.abilities & 0b001):
 				if dash_cooldown_timer.is_stopped() and can_adash:
 					Move.next = Move.STATES.ADASH
 					Move.change_state()
@@ -591,7 +591,7 @@ func _unhandled_input(event: InputEvent) -> void:
 					Move.next = Move.STATES.JUMP
 					Move.change_state()
 	
-			if event.is_action_pressed("dash"):
+			if event.is_action_pressed("dash") and (stats.abilities & 0b001):
 				if dash_cooldown_timer.is_stopped() and can_adash:
 					Move.next = Move.STATES.ADASH
 					Move.change_state()
@@ -615,7 +615,7 @@ func _unhandled_input(event: InputEvent) -> void:
 				Move.next = Move.STATES.JUMP
 				Move.change_state()
 
-			if event.is_action_pressed("dash"):
+			if event.is_action_pressed("dash") and (stats.abilities & 0b001):
 				face_direction = signf(wall_normal.x)
 				Move.next = Move.STATES.ADASH
 				Move.change_state()
