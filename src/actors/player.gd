@@ -333,7 +333,7 @@ func _run_movement_state(delta: float) -> int:
 				on_floor = check_floor()
 				on_wall = check_wall()
 				
-				if on_wall:
+				if on_wall and (stats.abilities & 0b100):
 					if dir != 0:
 						if wall_normal != Vector2.ZERO and dir*wall_normal.x < 0 and wall_cooldown_timer.is_stopped():
 							return Move.STATES.WALL
@@ -581,11 +581,11 @@ func _unhandled_input(event: InputEvent) -> void:
 			if event.is_action_pressed("jump"):
 				if velocity.y > 0:
 					jump_buffer_timer.start()
-				if on_wall:
+				if on_wall and (stats.abilities & 0b100):
 					Move.next = Move.STATES.JUMP
 					Move.change_state()
 	
-				elif not on_wall and can_ajump:
+				elif not on_wall and can_ajump and (stats.abilities & 0b010):
 					can_ajump = false
 					jump_buffer_timer.stop()
 					Move.next = Move.STATES.JUMP
@@ -608,7 +608,7 @@ func _unhandled_input(event: InputEvent) -> void:
 					Move.change_state()
 	
 		Move.STATES.ADASH:
-			if event.is_action_pressed("jump"):
+			if event.is_action_pressed("jump")  and (stats.abilities & 0b010):
 				dash_jump_buffer_timer.start()
 		Move.STATES.WALL:
 			if event.is_action_pressed("jump"):
