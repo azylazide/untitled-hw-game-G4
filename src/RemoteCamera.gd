@@ -101,7 +101,7 @@ func _physics_process(delta: float) -> void:
 						bounds.top,
 						bounds.bottom]
 
-	DebugTexts.get_node("Control/HBoxContainer/VBoxContainer2/Label5").text = debug_string %format_array
+	DebugTexts.get_node("%camera").text = debug_string %format_array
 	
 ## Get new camera target position
 func _update_position() -> Vector2:

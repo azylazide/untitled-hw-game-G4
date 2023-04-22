@@ -651,8 +651,26 @@ func _unhandled_input(event: InputEvent) -> void:
 				Action.change_state()
 
 func debug_text() -> void:
-	DebugTexts.get_node("Control/HBoxContainer/VBoxContainer/Label").text = "velocity: (%.00f,%.00f)\nposition: (%.00f,%.00f)" %[velocity.x,velocity.y,global_position.x,global_position.y]
-	DebugTexts.get_node("Control/HBoxContainer/VBoxContainer/Label2").text = "MOVEMENT STATES\nprev: %s\ncurrent: %s\n(next: %s)" %[Move.state_name[Move.previous],Move.state_name[Move.current],Move.state_name[Move.next]]
-	DebugTexts.get_node("Control/HBoxContainer/VBoxContainer2/Label3").text = "floor: %s\nwall: %s" %[on_floor,on_wall]
-	DebugTexts.get_node("Control/HBoxContainer/VBoxContainer2/Label4").text = "can_ajump: %s\ncan_adash: %s" %[can_ajump,can_adash]
-	DebugTexts.get_node("Control/HBoxContainer/VBoxContainer/Label6").text = "ACTION STATES\nprev: %s\ncurrent: %s\n(next: %s)" %[Action.state_name[Action.previous],Action.state_name[Action.current],Action.state_name[Action.next]]
+	var debug_text_vel = "velocity: (%.00f,%.00f)" %[velocity.x,velocity.y]
+	var debug_text_pos = "position: (%.00f,%.00f)" %[global_position.x,global_position.y]
+	var format_movementstates = [Move.state_name[Move.previous],
+		Move.state_name[Move.current],
+		Move.state_name[Move.next]]
+	var debug_text_movementstates = "MOVEMENT STATES\nprev: %s\ncurrent: %s\n(next: %s)" %format_movementstates
+	var debug_text_onfloor = "on floor: %s" %on_floor
+	var debug_text_onwall = "on wall: %s" %on_wall
+	var debug_text_canajump = "can ajump: %s" %can_ajump
+	var debug_text_canadash = "can adash: %s" %can_adash
+	var format_actionstates = [Action.state_name[Action.previous],
+		Action.state_name[Action.current],
+		Action.state_name[Action.next]]
+	var debug_text_actionstates = "ACTION STATES\nprev: %s\ncurrent: %s\n(next: %s)" %format_actionstates
+	
+	DebugTexts.get_node("%velocity").text = debug_text_vel
+	DebugTexts.get_node("%position").text = debug_text_pos
+	DebugTexts.get_node("%movementstates").text = debug_text_movementstates
+	DebugTexts.get_node("%onfloor").text = debug_text_onfloor
+	DebugTexts.get_node("%onwall").text = debug_text_onwall
+	DebugTexts.get_node("%canajump").text = debug_text_canajump
+	DebugTexts.get_node("%canadash").text = debug_text_canadash
+	DebugTexts.get_node("%actionstates").text = debug_text_actionstates

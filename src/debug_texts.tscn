@@ -32,17 +32,26 @@ offset_bottom = 100.0
 layout_mode = 2
 size_flags_horizontal = 2
 
-[node name="Label" type="Label" parent="Control/HBoxContainer/VBoxContainer"]
+[node name="velocity" type="Label" parent="Control/HBoxContainer/VBoxContainer"]
+unique_name_in_owner = true
 layout_mode = 2
 text = "TEST"
 label_settings = SubResource("LabelSettings_h2jt3")
 
-[node name="Label2" type="Label" parent="Control/HBoxContainer/VBoxContainer"]
+[node name="position" type="Label" parent="Control/HBoxContainer/VBoxContainer"]
+unique_name_in_owner = true
 layout_mode = 2
 text = "TEST"
 label_settings = SubResource("LabelSettings_h2jt3")
 
-[node name="Label6" type="Label" parent="Control/HBoxContainer/VBoxContainer"]
+[node name="movementstates" type="Label" parent="Control/HBoxContainer/VBoxContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "TEST"
+label_settings = SubResource("LabelSettings_h2jt3")
+
+[node name="actionstates" type="Label" parent="Control/HBoxContainer/VBoxContainer"]
+unique_name_in_owner = true
 layout_mode = 2
 text = "TEST"
 label_settings = SubResource("LabelSettings_h2jt3")
@@ -51,19 +60,36 @@ label_settings = SubResource("LabelSettings_h2jt3")
 layout_mode = 2
 size_flags_horizontal = 10
 
-[node name="Label3" type="Label" parent="Control/HBoxContainer/VBoxContainer2"]
+[node name="onfloor" type="Label" parent="Control/HBoxContainer/VBoxContainer2"]
+unique_name_in_owner = true
 layout_mode = 2
 text = "TEST"
 label_settings = SubResource("LabelSettings_h2jt3")
 horizontal_alignment = 2
 
-[node name="Label4" type="Label" parent="Control/HBoxContainer/VBoxContainer2"]
+[node name="onwall" type="Label" parent="Control/HBoxContainer/VBoxContainer2"]
+unique_name_in_owner = true
 layout_mode = 2
 text = "TEST"
 label_settings = SubResource("LabelSettings_h2jt3")
 horizontal_alignment = 2
 
-[node name="Label5" type="Label" parent="Control/HBoxContainer/VBoxContainer2"]
+[node name="canajump" type="Label" parent="Control/HBoxContainer/VBoxContainer2"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "TEST"
+label_settings = SubResource("LabelSettings_h2jt3")
+horizontal_alignment = 2
+
+[node name="canadash" type="Label" parent="Control/HBoxContainer/VBoxContainer2"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "TEST"
+label_settings = SubResource("LabelSettings_h2jt3")
+horizontal_alignment = 2
+
+[node name="camera" type="Label" parent="Control/HBoxContainer/VBoxContainer2"]
+unique_name_in_owner = true
 layout_mode = 2
 text = "TEST"
 label_settings = SubResource("LabelSettings_mnjb8")
