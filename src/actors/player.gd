@@ -77,6 +77,9 @@ extends ActorBase
 ## Wall jump duration timer
 @onready var wall_jump_hold_timer:= $Timers/WallJumpHoldTimer as Timer
 
+## Hurt duration timer
+@onready var hurt_timer:= $Timers/HurtTimer as Timer
+
 ## If on floor on previous frame
 @onready var was_on_floor:= true
 
@@ -179,7 +182,7 @@ func _physics_process(delta: float) -> void:
 	_movement_statemachine(delta)
 	_action_statemachine(delta)
 	SignalBus.player_updated.emit(face_direction,camera_center.global_position)
-	
+	print(is_on_wall())
 	debug_text()
 
 ## Movement state machine
@@ -268,10 +271,22 @@ func _enter_action_state(delta: float) -> void:
 ## Main states code that runs per frame
 func _run_movement_state(delta: float) -> int:
 	
-	if Action.current in [Action.STATES.DEATH]:
+	if Action.current in [Action.STATES.DEATH,Action.STATES.HURT]:
+		match Action.STATES:
+			Action.STATES.HURT:
+				#ignore player input
+				#apply knockback while hurt time is active
+				#return AUTO
+				#when done change AUTO to IDLE or RUN or FALL
+				pass
+			Action.STATES.DEATH:
+				#ignore player input
+				#apply simple physics for gravity or knockback
+				#always stay as AUTO
+				pass
 		return Move.AUTO
 	
-	if not Action.current == Action.STATES.HURT:
+	else:
 		match Move.current:
 			Move.STATES.IDLE:
 				var dir:= get_direction()
@@ -433,10 +448,7 @@ func _run_movement_state(delta: float) -> int:
 				
 				face_direction = signf(wall_normal.x)
 				return Move.STATES.WALL
-	
-	elif Action.current == Action.STATES.HURT:
-		#knockback
-		pass
+
 	#-------------
 	return Move.NULL
 
@@ -450,7 +462,7 @@ func _run_action_state(delta: float) -> int:
 				return Action.STATES.NEUTRAL
 			return Action.STATES.ATTACK
 		Action.STATES.HURT:
-			#invincibility timer & knockback
+			#invincibility timer
 			return Action.STATES.NEUTRAL
 		Action.STATES.DEATH:
 			return Action.STATES.DEATH
@@ -665,6 +677,11 @@ func debug_text() -> void:
 		Action.state_name[Action.current],
 		Action.state_name[Action.next]]
 	var debug_text_actionstates = "ACTION STATES\nprev: %s\ncurrent: %s\n(next: %s)" %format_actionstates
+	
+	var debug_text_health = "Player Health: %0.f/%0.f" %[stats.health,stats.max_health]
+	
+	if stats:
+		DebugTexts.get_node("%health").text = debug_text_health
 	
 	DebugTexts.get_node("%velocity").text = debug_text_vel
 	DebugTexts.get_node("%position").text = debug_text_pos

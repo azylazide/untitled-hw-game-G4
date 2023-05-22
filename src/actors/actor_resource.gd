@@ -4,6 +4,7 @@
 extends Resource
 class_name ActorResource
 
+@export_group("General")
 @export var max_health:=100.0
 @export var health:= 100.0:
 	set(value):

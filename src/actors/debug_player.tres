@@ -1,0 +1,10 @@
+[gd_resource type="Resource" script_class="PlayerResource" load_steps=2 format=3 uid="uid://0m1f0hoinpvg"]
+
+[ext_resource type="Script" path="res://src/actors/player_resource.gd" id="1_80jor"]
+
+[resource]
+script = ExtResource("1_80jor")
+abilities = 7
+hurt_time = 0.8
+max_health = 100.0
+health = 100.0

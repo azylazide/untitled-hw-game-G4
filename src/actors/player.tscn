@@ -1,14 +1,8 @@
-[gd_scene load_steps=11 format=3 uid="uid://b3xsy3bblplxe"]
+[gd_scene load_steps=10 format=3 uid="uid://b3xsy3bblplxe"]
 
 [ext_resource type="Script" path="res://src/actors/player.gd" id="1_7v7v0"]
-[ext_resource type="Script" path="res://src/actors/player_resource.gd" id="2_r65xl"]
+[ext_resource type="Resource" uid="uid://0m1f0hoinpvg" path="res://src/actors/debug_player.tres" id="2_kvtdh"]
 [ext_resource type="Script" path="res://src/actors/CameraBBoxDetector.gd" id="3_q5wf3"]
-
-[sub_resource type="Resource" id="Resource_pv50y"]
-script = ExtResource("2_r65xl")
-abilities = 7
-max_health = 100.0
-health = 100.0
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_p3dhm"]
 size = Vector2(70, 150)
@@ -40,7 +34,7 @@ max_run_tile = 10.0
 jump_height = 2.5
 min_jump_height = 0.8
 gap_length = 12.0
-stats = SubResource("Resource_pv50y")
+stats = ExtResource("2_kvtdh")
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
 position = Vector2(0, -75)
@@ -53,6 +47,7 @@ script = ExtResource("3_q5wf3")
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="CameraBBoxDetector"]
 shape = SubResource("CircleShape2D_i8aq0")
+debug_color = Color(0.733333, 0.945098, 1, 0.337255)
 
 [node name="CameraCenter" type="Marker2D" parent="."]
 position = Vector2(0, -75)
@@ -100,6 +95,10 @@ process_callback = 0
 wait_time = 0.2
 one_shot = true
 
+[node name="HurtTimer" type="Timer" parent="Timers"]
+wait_time = 0.8
+one_shot = true
+
 [node name="Camera2D" type="Camera2D" parent="."]
 visible = false
 enabled = false
@@ -128,3 +127,5 @@ collision_mask = 8
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Hitbox"]
 shape = SubResource("RectangleShape2D_j7eh3")
 debug_color = Color(0.92549, 0, 0.0823529, 0.27451)
+
+[node name="AnimationPlayer" type="AnimationPlayer" parent="."]
