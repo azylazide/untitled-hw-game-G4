@@ -98,6 +98,8 @@ var jump_gravity: float
 var min_jump_force: float
 ## Gravity apllied to the player when falling
 var fall_gravity: float
+## Max fall speed
+var max_fall_speed: float
 ## Horizontal speed applied to dash states
 var dash_force: float
 ## Horizontal speed applied to wall jumps
@@ -111,8 +113,9 @@ var on_wall: bool
 
 ## MovementStates object that stores states information
 var Move: MovementStates
-
+var move_states_ref: Dictionary
 var Action: ActionStates
+var action_states_ref: Dictionary
 
 ## Stores movement states information
 class MovementStates:
@@ -141,6 +144,7 @@ func _setup_movement() -> void:
 	
 	jump_force = Globals._jump_vel(max_run_tile,jump_height,gap_length)
 	min_jump_force = Globals._jump_vel(max_run_tile,min_jump_height,gap_length/2.0)
+	max_fall_speed = max_fall_tile*Globals.TILE_UNITS
 	
 	speed = max_run_tile*Globals.TILE_UNITS
 	
@@ -166,7 +170,9 @@ func _setup_timers() -> void:
 func _ready() -> void:
 	#create movementstates object
 	Move = MovementStates.new(initial_movement_state)
+	move_states_ref = Move.STATES
 	Action = ActionStates.new(initial_action_state)
+	action_states_ref = Action.STATES
 	
 	_setup_movement()
 	_setup_timers()
@@ -181,8 +187,8 @@ func _physics_process(delta: float) -> void:
 	#MOVEMENT STATEMACHINE
 	_movement_statemachine(delta)
 	_action_statemachine(delta)
-	SignalBus.player_updated.emit(face_direction,camera_center.global_position)
-	print(is_on_wall())
+	SignalBus.player_updated.emit(face_direction,camera_center.global_position,velocity,Move.current,Action.current)
+#	print(is_on_wall())
 	debug_text()
 
 ## Movement state machine
@@ -527,7 +533,7 @@ func _apply_gravity(delta: float) -> void:
 	else:
 		velocity.y += jump_gravity*delta
 	
-	velocity.y = minf(velocity.y,max_fall_tile*Globals.TILE_UNITS)
+	velocity.y = minf(velocity.y,max_fall_speed)
 
 ## Apply movement and save the current direction
 func _apply_movement(dir: float) -> void:

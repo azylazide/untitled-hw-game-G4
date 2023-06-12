@@ -61,3 +61,4 @@ shape = SubResource("RectangleShape2D_b5hyq")
 zoom = Vector2(0.65, 0.65)
 script = ExtResource("5_oftha")
 player = NodePath("../Player")
+wall_jump_smoothing = 0.358

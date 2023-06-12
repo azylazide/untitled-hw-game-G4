@@ -196,9 +196,15 @@ func _interp_pos(pos: Vector2) -> Vector2:
 	var output: Vector2
 
 	var hs:= horizontal_slow_smoothing
-
+	if prev_state == player.move_states_ref.WALL and current_state == player.move_states_ref.JUMP:
+		hs = wall_jump_smoothing
+	else:
+		if abs(player_velocity.x) > player.speed*0.5:
+			hs = horizontal_fast_smoothing
 
 	var vs:= vertical_slow_smoothing
+	if current_state == player.move_states_ref.FALL and player_velocity.y == player.max_fall_speed:
+		vs = vertical_fast_smoothing
 	
 	output.x = lerpf(global_position.x,clamped_pos.x,hs)
 	output.y = lerpf(global_position.y,clamped_pos.y,vs)
@@ -228,6 +234,9 @@ func on_area_detector_exiting() -> void:
 	detector_exited = true
 
 ## Update stored [member player] information after its physics step.
-func _on_player_node_updated(facing: float, cam_pos: Vector2) -> void:
+func _on_player_node_updated(facing: float, cam_pos: Vector2, velocity: Vector2, move: int, action: int) -> void:
 	player_facing = facing
 	player_camera_center_pos = cam_pos
+	player_velocity = velocity
+	prev_state = current_state
+	current_state = move
