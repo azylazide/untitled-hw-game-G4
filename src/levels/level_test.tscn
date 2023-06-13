@@ -19,6 +19,8 @@ size = Vector2(2238.5, 721)
 [node name="LevelTest" type="Node2D"]
 script = ExtResource("1_f8yqe")
 metadata/_edit_lock_ = true
+metadata/_edit_horizontal_guides_ = [721.0]
+metadata/_edit_vertical_guides_ = [1300.0]
 
 [node name="SampleTestScale" type="Sprite2D" parent="."]
 position = Vector2(0, -757)
