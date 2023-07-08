@@ -385,6 +385,7 @@ func _run_movement_state(delta: float) -> int:
 							pass
 				
 				if on_floor:
+					anim_tree.set("parameters/land/blend_position",face_direction)
 					anim_sm.travel("idle")
 					return Move.STATES.IDLE
 				
@@ -433,7 +434,7 @@ func _run_movement_state(delta: float) -> int:
 						anim_sm.travel("fall")
 						return Move.STATES.FALL
 				
-				anim_tree.set("parameters/jump/blend_position",face_direction)
+				anim_tree.set("parameters/gdash/blend_position",face_direction)
 				return Move.STATES.GDASH
 			
 			Move.STATES.ADASH:
@@ -461,7 +462,7 @@ func _run_movement_state(delta: float) -> int:
 							anim_sm.travel("fall")
 							return Move.STATES.FALL
 				
-				anim_tree.set("parameters/jump/blend_position",face_direction)
+				anim_tree.set("parameters/adash/blend_position",face_direction)
 				return Move.STATES.ADASH
 				
 			Move.STATES.WALL:
@@ -618,7 +619,7 @@ func _unhandled_input(event: InputEvent) -> void:
 			if event.is_action_pressed("dash") and (stats.abilities & 0b001):
 				if dash_cooldown_timer.is_stopped():
 					Move.next = Move.STATES.GDASH
-					anim_sm.travel("jump")
+					anim_sm.travel("gdash")
 					Move.change_state()
 	
 		Move.STATES.RUN:
@@ -633,7 +634,7 @@ func _unhandled_input(event: InputEvent) -> void:
 			if event.is_action_pressed("dash") and (stats.abilities & 0b001):
 				if dash_cooldown_timer.is_stopped():
 					Move.next = Move.STATES.GDASH
-					anim_sm.travel("jump")
+					anim_sm.travel("gdash")
 					Move.change_state()
 	
 		Move.STATES.JUMP:
@@ -656,7 +657,7 @@ func _unhandled_input(event: InputEvent) -> void:
 			if event.is_action_pressed("dash") and (stats.abilities & 0b001):
 				if dash_cooldown_timer.is_stopped() and can_adash:
 					Move.next = Move.STATES.ADASH
-					anim_sm.travel("jump")
+					anim_sm.travel("adash")
 					Move.change_state()
 	
 		Move.STATES.FALL:
@@ -680,7 +681,7 @@ func _unhandled_input(event: InputEvent) -> void:
 			if event.is_action_pressed("dash") and (stats.abilities & 0b001):
 				if dash_cooldown_timer.is_stopped() and can_adash:
 					Move.next = Move.STATES.ADASH
-					anim_sm.travel("jump")
+					anim_sm.travel("adash")
 					Move.change_state()
 	
 		Move.STATES.GDASH:
@@ -694,7 +695,7 @@ func _unhandled_input(event: InputEvent) -> void:
 			if event.is_action_pressed("dash"):
 				if dash_cooldown_timer.is_stopped():
 					Move.next = Move.STATES.GDASH
-					anim_sm.travel("jump")
+					anim_sm.travel("gdash")
 					Move.change_state()
 	
 		Move.STATES.ADASH:
@@ -711,7 +712,7 @@ func _unhandled_input(event: InputEvent) -> void:
 			if event.is_action_pressed("dash") and (stats.abilities & 0b001):
 				face_direction = signf(wall_normal.x)
 				Move.next = Move.STATES.ADASH
-				anim_sm.travel("jump")
+				anim_sm.travel("adash")
 				Move.change_state()
 	
 	match Action.current:
@@ -763,6 +764,10 @@ func debug_text() -> void:
 			blend_pos = anim_tree.get("parameters/jump/blend_position")
 		"fall":
 			blend_pos = anim_tree.get("parameters/fall/blend_position")
+		"gdash":
+			blend_pos = anim_tree.get("parameters/gdash/blend_position")
+		"adash":
+			blend_pos = anim_tree.get("parameters/adash/blend_position")
 		"attack":
 			blend_pos = anim_tree.get("parameters/attack/blend_position")
 		"death":
