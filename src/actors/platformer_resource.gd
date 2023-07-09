@@ -1,3 +1,5 @@
+## Stores player extra platformer parameters to be computed by the player node
+
 extends Resource
 class_name PlatformerResource
 

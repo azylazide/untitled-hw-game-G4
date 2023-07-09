@@ -8,6 +8,7 @@ extends ActorBase
 @export var initial_action_state: ActionStates.STATES = ActionStates.STATES.NEUTRAL
 
 @export_category("Platformer Values")
+## Stores movement related parameters
 @export var platformer_settings: PlatformerResource
 
 ## Ground shapecast
@@ -152,3 +153,22 @@ func _setup_timers() -> void:
 
 func _setup_anim() -> void:
 	anim_sm = anim_tree.get("parameters/playback")
+
+func _ready() -> void:
+	pass
+
+func _physics_process(delta: float) -> void:
+	pass
+
+func _unhandled_input(event: InputEvent) -> void:
+	pass
+
+func _on_animation_tree_animation_finished(anim_name: StringName) -> void:
+	pass
+
+func _ready_statemachine() -> void:
+	#collect the states
+	pass
+
+func _physics_statemachine(delta: float) -> void:
+	pass

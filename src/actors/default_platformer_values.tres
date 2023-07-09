@@ -1,0 +1,18 @@
+[gd_resource type="Resource" script_class="PlatformerResource" load_steps=2 format=3 uid="uid://b3navy4ajj7ji"]
+
+[ext_resource type="Script" path="res://src/actors/platformer_resource.gd" id="1_gtg8a"]
+
+[resource]
+script = ExtResource("1_gtg8a")
+coyote_time = 0.1
+jump_buffer_time = 0.1
+air_jump_multiplier = 0.8
+dash_jump_multiplier = 1.2
+dash_time = 0.2
+dash_jump_buffer_time = 0.2
+dash_cooldown_time = 0.2
+dash_length = 2.0
+wall_kick_time = 0.5
+wall_kick_power = 2.5
+wall_cooldown_time = 0.2
+wall_slide_multiplier = 0.1
