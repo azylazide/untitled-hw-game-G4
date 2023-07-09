@@ -126,6 +126,9 @@ var action_states_ref: Dictionary
 
 var anim_sm: AnimationNodeStateMachinePlayback
 
+## bool state changed by signal
+var attack_finished:= true
+
 ## Stores movement states information
 class MovementStates:
 	extends StateContainer
@@ -504,8 +507,21 @@ func _run_action_state(delta: float) -> int:
 			return Action.STATES.NEUTRAL
 		Action.STATES.ATTACK:
 			print("attack")
-			if $Timers/testtimer.is_stopped():
+#			if $Timers/testtimer.is_stopped():
+#				return Action.STATES.NEUTRAL
+			if attack_finished:
+				match Move.current:
+					Move.STATES.IDLE:
+						anim_sm.travel("idle")
+						anim_tree.set("parameters/idle/blend_position",face_direction)
+					Move.STATES.RUN:
+						anim_sm.travel("run")
+						anim_tree.set("parameters/run/blend_position",face_direction)
+					_: #TEMP
+						anim_sm.travel("idle")
+						anim_tree.set("parameters/idle/blend_position",face_direction)
 				return Action.STATES.NEUTRAL
+			anim_tree.set("parameters/attack/blend_position",face_direction)
 			return Action.STATES.ATTACK
 		Action.STATES.HURT:
 			#invincibility timer
@@ -717,10 +733,17 @@ func _unhandled_input(event: InputEvent) -> void:
 	
 	match Action.current:
 		Action.STATES.NEUTRAL:
-			if event.is_action_pressed("attack"):
+			if event.is_action_pressed("attack") and attack_finished:
 				$Timers/testtimer.start()
 				Action.next = Action.STATES.ATTACK
+				anim_sm.travel("attack")
+				attack_finished = false
 				Action.change_state()
+
+func _on_animation_tree_animation_finished(anim_name: StringName) -> void:
+	print(anim_name)
+	if anim_name in ["attack_right","attack_left"]:
+		attack_finished = true
 
 func debug_text() -> void:
 	var debug_text_vel = "velocity: (%.00f,%.00f)" %[velocity.x,velocity.y]
