@@ -203,6 +203,7 @@ func _physics_process(delta: float) -> void:
 	#MOVEMENT STATEMACHINE
 	_movement_statemachine(delta)
 	_action_statemachine(delta)
+	_resolve_animations()
 	SignalBus.player_updated.emit(face_direction,camera_center.global_position,velocity,Move.current,Action.current)
 #	print(is_on_wall())
 	debug_text()
@@ -622,114 +623,116 @@ func check_wall() -> bool:
 		return false
 	
 func _unhandled_input(event: InputEvent) -> void:
-	match Move.current:
-		Move.STATES.IDLE:
-			#regular jump
-			if event.is_action_pressed("jump"):
-				if on_floor:
-					Move.next = Move.STATES.JUMP
-					anim_sm.travel("jump")
-					Move.change_state()
-			
-			#dash
-			if event.is_action_pressed("dash") and (stats.abilities & 0b001):
-				if dash_cooldown_timer.is_stopped():
-					Move.next = Move.STATES.GDASH
-					anim_sm.travel("gdash")
-					Move.change_state()
-	
-		Move.STATES.RUN:
-			#regular jump
-			if event.is_action_pressed("jump"):
-				if on_floor:
-					Move.next = Move.STATES.JUMP
-					anim_sm.travel("jump")
-					Move.change_state()
-			
-			#dash
-			if event.is_action_pressed("dash") and (stats.abilities & 0b001):
-				if dash_cooldown_timer.is_stopped():
-					Move.next = Move.STATES.GDASH
-					anim_sm.travel("gdash")
-					Move.change_state()
-	
-		Move.STATES.JUMP:
-			#jump interrupt
-			if event.is_action_released("jump"):
-				#minimal jump
-				if velocity.y < -min_jump_force:
-					velocity.y = -min_jump_force
-					Move.next = Move.STATES.FALL
-					anim_sm.travel("fall")
-					Move.change_state()
+	# attack states ignores this states (TEMP)
+	if Action.current == Action.STATES.NEUTRAL:
+		match Move.current:
+			Move.STATES.IDLE:
+				#regular jump
+				if event.is_action_pressed("jump"):
+					if on_floor:
+						Move.next = Move.STATES.JUMP
+						anim_sm.travel("jump")
+						Move.change_state()
 				
-				#interrupt
-				else:
-					Move.next = Move.STATES.FALL
-					anim_sm.travel("fall")
+				#dash
+				if event.is_action_pressed("dash") and (stats.abilities & 0b001):
+					if dash_cooldown_timer.is_stopped():
+						Move.next = Move.STATES.GDASH
+						anim_sm.travel("gdash")
+						Move.change_state()
+		
+			Move.STATES.RUN:
+				#regular jump
+				if event.is_action_pressed("jump"):
+					if on_floor:
+						Move.next = Move.STATES.JUMP
+						anim_sm.travel("jump")
+						Move.change_state()
+				
+				#dash
+				if event.is_action_pressed("dash") and (stats.abilities & 0b001):
+					if dash_cooldown_timer.is_stopped():
+						Move.next = Move.STATES.GDASH
+						anim_sm.travel("gdash")
+						Move.change_state()
+		
+			Move.STATES.JUMP:
+				#jump interrupt
+				if event.is_action_released("jump"):
+					#minimal jump
+					if velocity.y < -min_jump_force:
+						velocity.y = -min_jump_force
+						Move.next = Move.STATES.FALL
+						anim_sm.travel("fall")
+						Move.change_state()
+					
+					#interrupt
+					else:
+						Move.next = Move.STATES.FALL
+						anim_sm.travel("fall")
+						Move.change_state()
+				
+				#air dash
+				if event.is_action_pressed("dash") and (stats.abilities & 0b001):
+					if dash_cooldown_timer.is_stopped() and can_adash:
+						Move.next = Move.STATES.ADASH
+						anim_sm.travel("adash")
+						Move.change_state()
+		
+			Move.STATES.FALL:
+				if event.is_action_pressed("jump"):
+					#buffer jump
+					if velocity.y > 0:
+						jump_buffer_timer.start()
+					#either wall jump or air jump depending on ability
+					if on_wall:
+						Move.next = Move.STATES.JUMP
+						anim_sm.travel("jump")
+						Move.change_state()
+					#air jump
+					elif not on_wall and can_ajump and (stats.abilities & 0b010):
+						can_ajump = false
+						jump_buffer_timer.stop()
+						Move.next = Move.STATES.JUMP
+						anim_sm.travel("jump")
+						Move.change_state()
+				#air dash
+				if event.is_action_pressed("dash") and (stats.abilities & 0b001):
+					if dash_cooldown_timer.is_stopped() and can_adash:
+						Move.next = Move.STATES.ADASH
+						anim_sm.travel("adash")
+						Move.change_state()
+		
+			Move.STATES.GDASH:
+				#dashed jump
+				if event.is_action_pressed("jump"):
+					if on_floor:
+						Move.next = Move.STATES.JUMP
+						anim_sm.travel("jump")
+						Move.change_state()
+				#dash
+				if event.is_action_pressed("dash"):
+					if dash_cooldown_timer.is_stopped():
+						Move.next = Move.STATES.GDASH
+						anim_sm.travel("gdash")
+						Move.change_state()
+		
+			Move.STATES.ADASH:
+				#air dash
+				if event.is_action_pressed("jump")  and (stats.abilities & 0b010):
+					dash_jump_buffer_timer.start()
+			Move.STATES.WALL:
+				#wall jump
+				if event.is_action_pressed("jump"):
+					Move.next = Move.STATES.JUMP
+					anim_sm.travel("jump")
 					Move.change_state()
-			
-			#air dash
-			if event.is_action_pressed("dash") and (stats.abilities & 0b001):
-				if dash_cooldown_timer.is_stopped() and can_adash:
+				#wall dash in air
+				if event.is_action_pressed("dash") and (stats.abilities & 0b001):
+					face_direction = signf(wall_normal.x)
 					Move.next = Move.STATES.ADASH
 					anim_sm.travel("adash")
 					Move.change_state()
-	
-		Move.STATES.FALL:
-			if event.is_action_pressed("jump"):
-				#buffer jump
-				if velocity.y > 0:
-					jump_buffer_timer.start()
-				#either wall jump or air jump depending on ability
-				if on_wall:
-					Move.next = Move.STATES.JUMP
-					anim_sm.travel("jump")
-					Move.change_state()
-				#air jump
-				elif not on_wall and can_ajump and (stats.abilities & 0b010):
-					can_ajump = false
-					jump_buffer_timer.stop()
-					Move.next = Move.STATES.JUMP
-					anim_sm.travel("jump")
-					Move.change_state()
-			#air dash
-			if event.is_action_pressed("dash") and (stats.abilities & 0b001):
-				if dash_cooldown_timer.is_stopped() and can_adash:
-					Move.next = Move.STATES.ADASH
-					anim_sm.travel("adash")
-					Move.change_state()
-	
-		Move.STATES.GDASH:
-			#dashed jump
-			if event.is_action_pressed("jump"):
-				if on_floor:
-					Move.next = Move.STATES.JUMP
-					anim_sm.travel("jump")
-					Move.change_state()
-			#dash
-			if event.is_action_pressed("dash"):
-				if dash_cooldown_timer.is_stopped():
-					Move.next = Move.STATES.GDASH
-					anim_sm.travel("gdash")
-					Move.change_state()
-	
-		Move.STATES.ADASH:
-			#air dash
-			if event.is_action_pressed("jump")  and (stats.abilities & 0b010):
-				dash_jump_buffer_timer.start()
-		Move.STATES.WALL:
-			#wall jump
-			if event.is_action_pressed("jump"):
-				Move.next = Move.STATES.JUMP
-				anim_sm.travel("jump")
-				Move.change_state()
-			#wall dash in air
-			if event.is_action_pressed("dash") and (stats.abilities & 0b001):
-				face_direction = signf(wall_normal.x)
-				Move.next = Move.STATES.ADASH
-				anim_sm.travel("adash")
-				Move.change_state()
 	
 	match Action.current:
 		Action.STATES.NEUTRAL:
@@ -739,6 +742,59 @@ func _unhandled_input(event: InputEvent) -> void:
 				anim_sm.travel("attack")
 				attack_finished = false
 				Action.change_state()
+
+func _resolve_animations() -> void:
+	match Action.current:
+		Action.STATES.NEUTRAL:
+			match Move.current:
+				Move.STATES.IDLE:
+					pass
+				Move.STATES.RUN:
+					pass
+				Move.STATES.FALL:
+					pass
+				Move.STATES.JUMP:
+					pass
+				Move.STATES.GDASH:
+					pass
+				Move.STATES.ADASH:
+					pass
+				Move.STATES.WALL:
+					pass
+			pass
+		Action.STATES.ATTACK:
+			match Move.current:
+				Move.STATES.IDLE:
+					pass
+				Move.STATES.RUN:
+					pass
+				Move.STATES.FALL:
+					pass
+				Move.STATES.JUMP:
+					pass
+				Move.STATES.GDASH:
+					pass
+				Move.STATES.ADASH:
+					pass
+				Move.STATES.WALL:
+					pass
+		Action.STATES.DEATH:
+			match Move.current:
+				Move.STATES.IDLE:
+					pass
+				Move.STATES.RUN:
+					pass
+				Move.STATES.FALL:
+					pass
+				Move.STATES.JUMP:
+					pass
+				Move.STATES.GDASH:
+					pass
+				Move.STATES.ADASH:
+					pass
+				Move.STATES.WALL:
+					pass
+	pass
 
 func _on_animation_tree_animation_finished(anim_name: StringName) -> void:
 	print(anim_name)
