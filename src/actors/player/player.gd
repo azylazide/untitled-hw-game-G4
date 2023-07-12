@@ -524,10 +524,13 @@ func _run_action_state(delta: float) -> int:
 #						anim_sm.travel("idle")
 #						anim_tree.set("parameters/idle/blend_position",face_direction)
 #				return Action.STATES.NEUTRAL
-			if attack_finished or not anim_sm.get_current_node() == "attack":
+			if attack_finished or not (anim_sm.get_current_node() == "attack" or anim_sm.get_current_node() == "attack_air"):
 				attack_finished = true
 				return Action.STATES.NEUTRAL
-			anim_tree.set("parameters/attack/blend_position",face_direction)
+			if anim_sm.get_current_node() == "attack":
+				anim_tree.set("parameters/attack/blend_position",face_direction)
+			else:
+				anim_tree.set("parameters/attack_air/blend_position",face_direction)
 			return Action.STATES.ATTACK
 		Action.STATES.HURT:
 			#invincibility timer
@@ -744,8 +747,12 @@ func _unhandled_input(event: InputEvent) -> void:
 			if event.is_action_pressed("attack"):
 				$Timers/testtimer.start()
 				Action.next = Action.STATES.ATTACK
-				anim_sm.travel("attack")
-				anim_tree.set("parameters/attack/blend_position",face_direction)
+				if Move.current in [Move.STATES.IDLE,Move.STATES.RUN,Move.STATES.GDASH]:
+					anim_sm.travel("attack")
+					anim_tree.set("parameters/attack/blend_position",face_direction)
+				elif Move.current in [Move.STATES.JUMP,Move.STATES.ADASH,Move.STATES.FALL]:
+					anim_sm.travel("attack_air")
+					anim_tree.set("parameters/attack_air/blend_position",face_direction)
 				attack_finished = false
 				Action.change_state()
 
@@ -804,7 +811,7 @@ func _resolve_animations() -> void:
 
 func _on_animation_tree_animation_finished(anim_name: StringName) -> void:
 	print(anim_name)
-	if anim_name in ["attack_right","attack_left"]:
+	if anim_name in ["attack_right","attack_left","attack_air_right","attack_air_left"]:
 		attack_finished = true
 		match Move.current:
 			Move.STATES.IDLE:

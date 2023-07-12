@@ -22,9 +22,14 @@ func _init(current_state) -> void:
 	current = current_state
 
 func _name_dict(enum_dic) -> void:
+	print(state_name)
 	state_name = enum_dic.keys().map(func(elem):return elem.to_pascal_case())
-	state_name[-2] = "NULL"
-	state_name[-1] = "AUTO"
+	
+	
+#	state_name[-2] = "NULL"
+#	state_name[-1] = "AUTO"
+	print(enum_dic)
+	print(state_name)
 	
 func change_state() -> void:
 	self.previous_frame = self.current
