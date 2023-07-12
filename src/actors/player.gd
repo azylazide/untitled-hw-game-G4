@@ -180,6 +180,7 @@ func _setup_timers() -> void:
 
 func _setup_anim() -> void:
 	anim_sm = anim_tree.get("parameters/playback")
+	anim_tree.active = true
 
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
@@ -508,21 +509,22 @@ func _run_action_state(delta: float) -> int:
 			return Action.STATES.NEUTRAL
 		Action.STATES.ATTACK:
 			print("attack")
-#			if $Timers/testtimer.is_stopped():
-#				return Action.STATES.NEUTRAL
-			if attack_finished:
-				match Move.current:
-					Move.STATES.IDLE:
-						anim_sm.travel("idle")
-						anim_tree.set("parameters/idle/blend_position",face_direction)
-					Move.STATES.RUN:
-						anim_sm.travel("run")
-						anim_tree.set("parameters/run/blend_position",face_direction)
-					_: #TEMP
-						anim_sm.travel("idle")
-						anim_tree.set("parameters/idle/blend_position",face_direction)
+			if $Timers/testtimer.is_stopped():
+				attack_finished = true
 				return Action.STATES.NEUTRAL
-			anim_tree.set("parameters/attack/blend_position",face_direction)
+#			if attack_finished:
+#				match Move.current:
+#					Move.STATES.IDLE:
+#						anim_sm.travel("idle")
+#						anim_tree.set("parameters/idle/blend_position",face_direction)
+#					Move.STATES.RUN:
+#						anim_sm.travel("run")
+#						anim_tree.set("parameters/run/blend_position",face_direction)
+#					_: #TEMP
+#						anim_sm.travel("idle")
+#						anim_tree.set("parameters/idle/blend_position",face_direction)
+#				return Action.STATES.NEUTRAL
+#			anim_tree.set("parameters/attack/blend_position",face_direction)
 			return Action.STATES.ATTACK
 		Action.STATES.HURT:
 			#invincibility timer
@@ -739,7 +741,7 @@ func _unhandled_input(event: InputEvent) -> void:
 			if event.is_action_pressed("attack") and attack_finished:
 				$Timers/testtimer.start()
 				Action.next = Action.STATES.ATTACK
-				anim_sm.travel("attack")
+#				anim_sm.travel("attack")
 				attack_finished = false
 				Action.change_state()
 

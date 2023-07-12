@@ -1126,7 +1126,6 @@ frame = 40
 [node name="AnimationTree" type="AnimationTree" parent="."]
 tree_root = SubResource("AnimationNodeStateMachine_lagf6")
 anim_player = NodePath("../AnimationPlayer")
-active = true
 process_callback = 0
 parameters/playback = SubResource("AnimationNodeStateMachinePlayback_28qgb")
 parameters/adash/blend_position = 1.0
