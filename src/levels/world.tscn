@@ -1,6 +1,6 @@
-[gd_scene load_steps=8 format=3 uid="uid://bq8d6t3v3t1lr"]
+[gd_scene load_steps=8 format=3]
 
-[ext_resource type="PackedScene" uid="uid://b3xsy3bblplxe" path="res://src/actors/player.tscn" id="1_ox13q"]
+[ext_resource type="PackedScene" uid="uid://wnwyyirpcmam" path="res://src/actors/player/player.tscn" id="1_ox13q"]
 [ext_resource type="TileSet" uid="uid://dsgrixorcwhe3" path="res://src/levels/debugtileset.tres" id="2_u8b1s"]
 [ext_resource type="Script" path="res://src/camera_bound_box.gd" id="3_0nohp"]
 [ext_resource type="Script" path="res://src/old_remote_cam.gd" id="3_y1rhk"]
