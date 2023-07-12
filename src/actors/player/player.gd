@@ -509,9 +509,9 @@ func _run_action_state(delta: float) -> int:
 			return Action.STATES.NEUTRAL
 		Action.STATES.ATTACK:
 			print("attack")
-			if $Timers/testtimer.is_stopped():
-				attack_finished = true
-				return Action.STATES.NEUTRAL
+#			if $Timers/testtimer.is_stopped():
+#				attack_finished = true
+#				return Action.STATES.NEUTRAL
 #			if attack_finished:
 #				match Move.current:
 #					Move.STATES.IDLE:
@@ -524,7 +524,10 @@ func _run_action_state(delta: float) -> int:
 #						anim_sm.travel("idle")
 #						anim_tree.set("parameters/idle/blend_position",face_direction)
 #				return Action.STATES.NEUTRAL
-#			anim_tree.set("parameters/attack/blend_position",face_direction)
+			if attack_finished or not anim_sm.get_current_node() == "attack":
+				attack_finished = true
+				return Action.STATES.NEUTRAL
+			anim_tree.set("parameters/attack/blend_position",face_direction)
 			return Action.STATES.ATTACK
 		Action.STATES.HURT:
 			#invincibility timer
@@ -738,10 +741,11 @@ func _unhandled_input(event: InputEvent) -> void:
 	
 	match Action.current:
 		Action.STATES.NEUTRAL:
-			if event.is_action_pressed("attack") and attack_finished:
+			if event.is_action_pressed("attack"):
 				$Timers/testtimer.start()
 				Action.next = Action.STATES.ATTACK
-#				anim_sm.travel("attack")
+				anim_sm.travel("attack")
+				anim_tree.set("parameters/attack/blend_position",face_direction)
 				attack_finished = false
 				Action.change_state()
 
@@ -802,6 +806,16 @@ func _on_animation_tree_animation_finished(anim_name: StringName) -> void:
 	print(anim_name)
 	if anim_name in ["attack_right","attack_left"]:
 		attack_finished = true
+		match Move.current:
+			Move.STATES.IDLE:
+				anim_sm.travel("idle")
+				anim_tree.set("parameters/idle/blend_position",face_direction)
+			Move.STATES.RUN:
+				anim_sm.travel("run")
+				anim_tree.set("parameters/run/blend_position",face_direction)
+			_:
+				anim_sm.travel("idle")
+				anim_tree.set("parameters/idle/blend_position",face_direction)
 
 func debug_text() -> void:
 	var debug_text_vel = "velocity: (%.00f,%.00f)" %[velocity.x,velocity.y]

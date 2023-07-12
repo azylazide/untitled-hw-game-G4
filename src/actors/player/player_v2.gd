@@ -71,6 +71,8 @@ extends ActorBase
 ## AnimationPlayer
 @onready var anim_player:= $AnimationPlayer
 
+## Statemachine
+@onready var statemachine:= $StateMachine
 
 ## Gravity applied to the player when in jump state
 var jump_gravity: float
