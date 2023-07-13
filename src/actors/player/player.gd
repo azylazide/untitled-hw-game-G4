@@ -1,5 +1,7 @@
 extends ActorBase
 
+var frame_count = 0
+
 @export_group("Initial Values")
 ## Change the initial facing direction
 @export_enum("LEFT","RIGHT") var initial_direction:= 1
@@ -180,6 +182,7 @@ func _setup_timers() -> void:
 
 func _setup_anim() -> void:
 	anim_sm = anim_tree.get("parameters/playback")
+	anim_tree.active = true
 
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
@@ -200,6 +203,7 @@ func _process(delta: float) -> void:
 	pass
 
 func _physics_process(delta: float) -> void:
+	print("physics started %d" %frame_count)
 	#MOVEMENT STATEMACHINE
 	_movement_statemachine(delta)
 	_action_statemachine(delta)
@@ -207,6 +211,8 @@ func _physics_process(delta: float) -> void:
 	SignalBus.player_updated.emit(face_direction,camera_center.global_position,velocity,Move.current,Action.current)
 #	print(is_on_wall())
 	debug_text()
+	print("physics ended %d" %frame_count)
+	frame_count += 1
 
 ## Movement state machine
 ## [br]-Checks if entering a new state
@@ -507,22 +513,29 @@ func _run_action_state(delta: float) -> int:
 		Action.STATES.NEUTRAL:
 			return Action.STATES.NEUTRAL
 		Action.STATES.ATTACK:
-			print("attack")
+#			print("attack")
 #			if $Timers/testtimer.is_stopped():
+#				attack_finished = true
 #				return Action.STATES.NEUTRAL
-			if attack_finished:
-				match Move.current:
-					Move.STATES.IDLE:
-						anim_sm.travel("idle")
-						anim_tree.set("parameters/idle/blend_position",face_direction)
-					Move.STATES.RUN:
-						anim_sm.travel("run")
-						anim_tree.set("parameters/run/blend_position",face_direction)
-					_: #TEMP
-						anim_sm.travel("idle")
-						anim_tree.set("parameters/idle/blend_position",face_direction)
+#			if attack_finished:
+#				match Move.current:
+#					Move.STATES.IDLE:
+#						anim_sm.travel("idle")
+#						anim_tree.set("parameters/idle/blend_position",face_direction)
+#					Move.STATES.RUN:
+#						anim_sm.travel("run")
+#						anim_tree.set("parameters/run/blend_position",face_direction)
+#					_: #TEMP
+#						anim_sm.travel("idle")
+#						anim_tree.set("parameters/idle/blend_position",face_direction)
+#				return Action.STATES.NEUTRAL
+			if attack_finished or not (anim_sm.get_current_node() == "attack" or anim_sm.get_current_node() == "attack_air"):
+				attack_finished = true
 				return Action.STATES.NEUTRAL
-			anim_tree.set("parameters/attack/blend_position",face_direction)
+			if anim_sm.get_current_node() == "attack":
+				anim_tree.set("parameters/attack/blend_position",face_direction)
+			else:
+				anim_tree.set("parameters/attack_air/blend_position",face_direction)
 			return Action.STATES.ATTACK
 		Action.STATES.HURT:
 			#invincibility timer
@@ -736,10 +749,16 @@ func _unhandled_input(event: InputEvent) -> void:
 
 	match Action.current:
 		Action.STATES.NEUTRAL:
-			if event.is_action_pressed("attack") and attack_finished:
+			if event.is_action_pressed("attack"):
+				print("ATTACK %d" %frame_count)
 				$Timers/testtimer.start()
 				Action.next = Action.STATES.ATTACK
-				anim_sm.travel("attack")
+				if Move.current in [Move.STATES.IDLE,Move.STATES.RUN,Move.STATES.GDASH]:
+					anim_sm.travel("attack")
+					anim_tree.set("parameters/attack/blend_position",face_direction)
+				elif Move.current in [Move.STATES.JUMP,Move.STATES.ADASH,Move.STATES.FALL]:
+					anim_sm.travel("attack_air")
+					anim_tree.set("parameters/attack_air/blend_position",face_direction)
 				attack_finished = false
 				Action.change_state()
 
@@ -797,9 +816,19 @@ func _resolve_animations() -> void:
 	pass
 
 func _on_animation_tree_animation_finished(anim_name: StringName) -> void:
-	print(anim_name)
-	if anim_name in ["attack_right","attack_left"]:
+#	print(anim_name)
+	if anim_name in ["attack_right","attack_left","attack_air_right","attack_air_left"]:
 		attack_finished = true
+		match Move.current:
+			Move.STATES.IDLE:
+				anim_sm.travel("idle")
+				anim_tree.set("parameters/idle/blend_position",face_direction)
+			Move.STATES.RUN:
+				anim_sm.travel("run")
+				anim_tree.set("parameters/run/blend_position",face_direction)
+			_:
+				anim_sm.travel("idle")
+				anim_tree.set("parameters/idle/blend_position",face_direction)
 
 func debug_text() -> void:
 	var debug_text_vel = "velocity: (%.00f,%.00f)" %[velocity.x,velocity.y]
@@ -830,6 +859,7 @@ func debug_text() -> void:
 	DebugTexts.get_node("%canajump").text = debug_text_canajump
 	DebugTexts.get_node("%canadash").text = debug_text_canadash
 	DebugTexts.get_node("%actionstates").text = debug_text_actionstates
+<<<<<<< HEAD:src/actors/player.gd
 
 
 
@@ -852,4 +882,14 @@ func debug_text() -> void:
 		"death":
 			blend_pos = anim_tree.get("parameters/death/blend_position")
 
+=======
+	
+	var blend_pos: float = anim_tree.get("parameters/%s/blend_position" %anim_sm.get_current_node())
+	
+>>>>>>> 044e42fc1291fb88584c0f5e4659fe798c35cf79:src/actors/player/player.gd
 	DebugTexts.get_node("%anim_state").text = "Anim: %s (%d)" %[anim_sm.get_current_node(),blend_pos]
+	
+	var current_state_node = anim_sm.get_current_node()
+	var travel_path = anim_sm.get_travel_path()
+	
+	DebugTexts.get_node("%anim_playback").text = "%s\n%s" %[current_state_node,travel_path]

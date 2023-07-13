@@ -1,6 +1,6 @@
-[gd_resource type="Resource" script_class="PlatformerResource" load_steps=2 format=3 uid="uid://b3navy4ajj7ji"]
+[gd_resource type="Resource" script_class="PlatformerResource" load_steps=2 format=3]
 
-[ext_resource type="Script" path="res://src/actors/platformer_resource.gd" id="1_gtg8a"]
+[ext_resource type="Script" path="res://src/actors/player/platformer_resource.gd" id="1_gtg8a"]
 
 [resource]
 script = ExtResource("1_gtg8a")

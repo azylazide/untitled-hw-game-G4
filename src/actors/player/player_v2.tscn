@@ -1,9 +1,10 @@
-[gd_scene load_steps=90 format=3 uid="uid://bppmfusprnk4h"]
+[gd_scene load_steps=91 format=3 uid="uid://cv0wiqatm10vs"]
 
-[ext_resource type="Script" path="res://src/actors/player_v2.gd" id="1_wm1sy"]
-[ext_resource type="Resource" uid="uid://b3navy4ajj7ji" path="res://src/actors/default_platformer_values.tres" id="2_e513s"]
-[ext_resource type="Script" path="res://src/actors/CameraBBoxDetector.gd" id="3_0s0g8"]
+[ext_resource type="Script" path="res://src/actors/player/player_v2.gd" id="1_wm1sy"]
+[ext_resource type="Resource" path="res://src/actors/player/default_platformer_values.tres" id="2_e513s"]
+[ext_resource type="Script" path="res://src/actors/player/CameraBBoxDetector.gd" id="3_0s0g8"]
 [ext_resource type="Texture2D" uid="uid://sa6q1jkf07gi" path="res://assets/spritesheet.png" id="4_1l24v"]
+[ext_resource type="Script" path="res://src/actors/player/states/playerstatemachine.gd" id="5_lp6c1"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_p3dhm"]
 size = Vector2(70, 150)
@@ -1126,7 +1127,6 @@ frame = 40
 [node name="AnimationTree" type="AnimationTree" parent="."]
 tree_root = SubResource("AnimationNodeStateMachine_lagf6")
 anim_player = NodePath("../AnimationPlayer")
-active = true
 process_callback = 0
 parameters/playback = SubResource("AnimationNodeStateMachinePlayback_28qgb")
 parameters/adash/blend_position = 1.0
@@ -1143,5 +1143,8 @@ parameters/run/blend_position = 1.0
 libraries = {
 "": SubResource("AnimationLibrary_n4wxi")
 }
+
+[node name="StateMachine" type="Node" parent="."]
+script = ExtResource("5_lp6c1")
 
 [connection signal="animation_finished" from="AnimationTree" to="." method="_on_animation_tree_animation_finished"]

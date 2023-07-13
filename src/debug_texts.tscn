@@ -77,6 +77,12 @@ layout_mode = 2
 text = "TEST"
 label_settings = SubResource("LabelSettings_h2jt3")
 
+[node name="anim_playback" type="Label" parent="Control/MarginContainer/HBoxContainer/VBoxContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "TEST"
+label_settings = SubResource("LabelSettings_h2jt3")
+
 [node name="VBoxContainer2" type="VBoxContainer" parent="Control/MarginContainer/HBoxContainer"]
 layout_mode = 2
 size_flags_horizontal = 10
