@@ -203,7 +203,7 @@ func _process(delta: float) -> void:
 	pass
 
 func _physics_process(delta: float) -> void:
-	print("physics started %d" %frame_count)
+#	print("physics started %d" %frame_count)
 	#MOVEMENT STATEMACHINE
 	_movement_statemachine(delta)
 	_action_statemachine(delta)
@@ -211,7 +211,7 @@ func _physics_process(delta: float) -> void:
 	SignalBus.player_updated.emit(face_direction,camera_center.global_position,velocity,Move.current,Action.current)
 #	print(is_on_wall())
 	debug_text()
-	print("physics ended %d" %frame_count)
+#	print("physics ended %d" %frame_count)
 	frame_count += 1
 
 ## Movement state machine
@@ -388,7 +388,7 @@ func _run_movement_state(delta: float) -> int:
 				if on_wall and (stats.abilities & 0b100):
 					if dir != 0:
 						if wall_normal != Vector2.ZERO and dir*wall_normal.x < 0 and wall_cooldown_timer.is_stopped():
-							anim_sm.travel("jump")
+							anim_sm.travel("wall")
 							return Move.STATES.WALL
 						elif wall_normal.x == 0:
 							#edge case review later; use face direction
@@ -502,7 +502,7 @@ func _run_movement_state(delta: float) -> int:
 					return Move.STATES.FALL
 				
 				face_direction = signf(wall_normal.x)
-				anim_tree.set("parameters/jump/blend_position",face_direction)
+				anim_tree.set("parameters/wall/blend_position",face_direction)
 				return Move.STATES.WALL
 
 	#-------------
@@ -750,13 +750,13 @@ func _unhandled_input(event: InputEvent) -> void:
 	match Action.current:
 		Action.STATES.NEUTRAL:
 			if event.is_action_pressed("attack"):
-				print("ATTACK %d" %frame_count)
+#				print("ATTACK %d" %frame_count)
 				$Timers/testtimer.start()
 				Action.next = Action.STATES.ATTACK
 				if Move.current in [Move.STATES.IDLE,Move.STATES.RUN,Move.STATES.GDASH]:
 					anim_sm.travel("attack")
 					anim_tree.set("parameters/attack/blend_position",face_direction)
-				elif Move.current in [Move.STATES.JUMP,Move.STATES.ADASH,Move.STATES.FALL]:
+				elif Move.current in [Move.STATES.JUMP,Move.STATES.ADASH,Move.STATES.FALL,Move.STATES.WALL]:
 					anim_sm.travel("attack_air")
 					anim_tree.set("parameters/attack_air/blend_position",face_direction)
 				attack_finished = false
