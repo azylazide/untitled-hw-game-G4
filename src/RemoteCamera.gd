@@ -15,7 +15,7 @@ extends Camera2D
 class_name RemoteCamera
 
 ## Player node the camera follows.
-@export var player: ActorBase
+@export var player: CharacterBody2D
 ## Enable camera following player
 @export var follow_player:= true
 ## Initial position when not following player
@@ -208,16 +208,11 @@ func _interp_pos(pos: Vector2) -> Vector2:
 
 	var vs:= vertical_slow_smoothing
 	if current_state == player.move_states_ref.FALL and player_velocity.y == player.max_fall_speed:
-<<<<<<< HEAD
-		vs = vertical_fast_smoothing
-
-=======
 		vs = lerpf(current_vs,vertical_fast_smoothing,0.1)
-	
+
 	current_hs = hs
 	current_vs = vs
-	
->>>>>>> f05956850650f318b215182f461bc90ac222ca06
+
 	output.x = lerpf(global_position.x,clamped_pos.x,hs)
 	output.y = lerpf(global_position.y,clamped_pos.y,vs)
 
