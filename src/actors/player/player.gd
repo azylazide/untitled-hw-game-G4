@@ -883,13 +883,13 @@ func debug_text() -> void:
 			blend_pos = anim_tree.get("parameters/death/blend_position")
 
 =======
-	
+
 	var blend_pos: float = anim_tree.get("parameters/%s/blend_position" %anim_sm.get_current_node())
-	
+
 >>>>>>> 044e42fc1291fb88584c0f5e4659fe798c35cf79:src/actors/player/player.gd
 	DebugTexts.get_node("%anim_state").text = "Anim: %s (%d)" %[anim_sm.get_current_node(),blend_pos]
-	
+
 	var current_state_node = anim_sm.get_current_node()
 	var travel_path = anim_sm.get_travel_path()
-	
+
 	DebugTexts.get_node("%anim_playback").text = "%s\n%s" %[current_state_node,travel_path]

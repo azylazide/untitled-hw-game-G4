@@ -1,8 +1,8 @@
 ## Remote camera that smoothtly follows the player and is clamped by camera regions.
 ##
-## [color=yellow][b]Warning[/b]:[/color] Provide the player scene with 
+## [color=yellow][b]Warning[/b]:[/color] Provide the player scene with
 ## a [Node2D] to be the camera center.
-## [br][color=yellow][b]Warning[/b]:[/color] Provide the player scene with 
+## [br][color=yellow][b]Warning[/b]:[/color] Provide the player scene with
 ## an [Area2D] named CameraBBoxDetector to be the region detector.
 ## [br]
 ## [br]The remote camera must do the ff:
@@ -73,10 +73,10 @@ func _ready() -> void:
 	player.camera_bbox_detector.area_entered.connect(on_CameraBBoxDetector_area_entered)
 	player.camera_bbox_detector.area_exited.connect(on_CameraBBoxDetector_area_exited)
 	player.camera_bbox_detector.tree_exiting.connect(on_area_detector_exiting)
-	
+
 	#connect player physics updates
 	SignalBus.player_updated.connect(_on_player_node_updated)
-	
+
 	#player info
 	player_facing = player.face_direction
 
@@ -90,7 +90,7 @@ func _physics_process(delta: float) -> void:
 	#Set interpolated position as new camera position
 	global_position = interped_pos
 	queue_redraw()
-	
+
 	var debug_string = "cam: (%.00f,%.00f) C(%.00f,%.00f)\nL: %.00f R: %.00f\nT: %.00f B: %.00f"
 	var format_array = [interped_pos.x,
 						interped_pos.y,
@@ -102,7 +102,7 @@ func _physics_process(delta: float) -> void:
 						bounds.bottom]
 
 	DebugTexts.get_node("%camera").text = debug_string %format_array
-	
+
 ## Get new camera target position
 func _update_position() -> Vector2:
 	current_offset = _get_offset()
@@ -111,7 +111,7 @@ func _update_position() -> Vector2:
 ## Clamp the target position
 func _clamp_pos(pos: Vector2) -> Vector2:
 	var output: Vector2
-	
+
 	## Default limits
 	var default_limits = {"left":-bridge_inf,"right":bridge_inf,"top":-bridge_inf,"bottom":bridge_inf}
 
@@ -148,7 +148,7 @@ func _clamp_pos(pos: Vector2) -> Vector2:
 			for i in limit_arrays.priority.size():
 				if limit_arrays.priority[i] == max_priority:
 					max_indices.append(i)
-			
+
 			#loop through all max indices
 			#Check if the current iterated index corresponds to the most limiting region
 			#Overwrite the temp limits if iterated index is more limiting
@@ -205,7 +205,7 @@ func _interp_pos(pos: Vector2) -> Vector2:
 	var vs:= vertical_slow_smoothing
 	if current_state == player.move_states_ref.FALL and player_velocity.y == player.max_fall_speed:
 		vs = vertical_fast_smoothing
-	
+
 	output.x = lerpf(global_position.x,clamped_pos.x,hs)
 	output.y = lerpf(global_position.y,clamped_pos.y,vs)
 
@@ -224,7 +224,7 @@ func _get_offset() -> Vector2:
 ## Append [CameraBoundBox] node to [member bbox_array].
 func on_CameraBBoxDetector_area_entered(area: Area2D) -> void:
 	bbox_array.append(area)
-	
+
 ## Remove [CameraBoundBox] node from [member bbox_array].
 func on_CameraBBoxDetector_area_exited(area: Area2D) -> void:
 	bbox_array.erase(area)
