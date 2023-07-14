@@ -57,6 +57,10 @@ var player_camera_center_pos: Vector2
 var movement_states
 var detector_exited:= false
 
+## Current horizontal camera smoothing
+@onready var current_hs = horizontal_slow_smoothing
+@onready var current_vs = vertical_slow_smoothing
+
 ## Screen size of viewport rect
 @onready var screen_size:= get_viewport_rect().size
 ## Actual spans the camera encompasses with respect to global coordinates taking account zoom
@@ -204,7 +208,10 @@ func _interp_pos(pos: Vector2) -> Vector2:
 
 	var vs:= vertical_slow_smoothing
 	if current_state == player.move_states_ref.FALL and player_velocity.y == player.max_fall_speed:
-		vs = vertical_fast_smoothing
+		vs = lerpf(current_vs,vertical_fast_smoothing,0.1)
+	
+	current_hs = hs
+	current_vs = vs
 	
 	output.x = lerpf(global_position.x,clamped_pos.x,hs)
 	output.y = lerpf(global_position.y,clamped_pos.y,vs)
