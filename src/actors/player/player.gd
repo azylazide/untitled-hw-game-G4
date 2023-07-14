@@ -751,14 +751,17 @@ func _unhandled_input(event: InputEvent) -> void:
 		Action.STATES.NEUTRAL:
 			if event.is_action_pressed("attack"):
 #				print("ATTACK %d" %frame_count)
-				$Timers/testtimer.start()
-				Action.next = Action.STATES.ATTACK
-				if Move.current in [Move.STATES.IDLE,Move.STATES.RUN,Move.STATES.GDASH]:
+				if Move.current in [Move.STATES.IDLE,Move.STATES.RUN]:
 					anim_sm.travel("attack")
 					anim_tree.set("parameters/attack/blend_position",face_direction)
-				elif Move.current in [Move.STATES.JUMP,Move.STATES.ADASH,Move.STATES.FALL,Move.STATES.WALL]:
+				elif Move.current in [Move.STATES.JUMP,Move.STATES.FALL,Move.STATES.WALL]:
 					anim_sm.travel("attack_air")
 					anim_tree.set("parameters/attack_air/blend_position",face_direction)
+				else:
+					return
+
+				$Timers/testtimer.start()
+				Action.next = Action.STATES.ATTACK
 				attack_finished = false
 				Action.change_state()
 
@@ -826,6 +829,12 @@ func _on_animation_tree_animation_finished(anim_name: StringName) -> void:
 			Move.STATES.RUN:
 				anim_sm.travel("run")
 				anim_tree.set("parameters/run/blend_position",face_direction)
+			Move.STATES.FALL:
+				anim_sm.travel("fall")
+				anim_tree.set("parameters/fall/blend_position",face_direction)
+			Move.STATES.WALL:
+				anim_sm.travel("wall")
+				anim_tree.set("parameters/wall/blend_position",face_direction)
 			_:
 				anim_sm.travel("idle")
 				anim_tree.set("parameters/idle/blend_position",face_direction)
