@@ -37,4 +37,4 @@ func change_state() -> void:
 	
 	self.previous = self.current
 	self.current = self.next
-	print("changed")
+#	print("changed")
