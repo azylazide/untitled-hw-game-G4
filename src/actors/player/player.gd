@@ -311,7 +311,7 @@ func _enter_action_state(delta: float) -> void:
 func _run_movement_state(delta: float) -> int:
 
 	if Action.current in [Action.STATES.DEATH,Action.STATES.HURT]:
-		match Action.STATES:
+		match Action.current:
 			Action.STATES.HURT:
 				#ignore player input
 				#apply knockback while hurt time is active
@@ -321,6 +321,12 @@ func _run_movement_state(delta: float) -> int:
 			Action.STATES.DEATH:
 				#ignore player input
 				#apply simple physics for gravity or knockback
+				if not check_floor():
+					velocity.x = -face_direction*speed*2
+				else:
+					velocity.x = lerpf(velocity.x,0,0.2)
+				_apply_gravity(delta)
+				_apply_movement(face_direction)
 				#always stay as AUTO
 				pass
 		return Move.AUTO
@@ -551,6 +557,9 @@ func _run_action_state(delta: float) -> int:
 			#invincibility timer
 			return Action.STATES.NEUTRAL
 		Action.STATES.DEATH:
+			#play death when landed
+			if check_floor():
+				anim_sm.travel("death")
 			anim_tree.set("parameters/death/blend_position",face_direction)
 			return Action.STATES.DEATH
 
@@ -835,11 +844,11 @@ func _player_management() -> void:
 	pass
 
 func _on_player_death() -> void:
-	print("test")
 	is_dead = true
-	anim_sm.travel("death")
 	Action.next = Action.STATES.DEATH
 	Action.change_state()
+	Move.next = Move.AUTO
+	Move.change_state()
 
 func _on_animation_tree_animation_finished(anim_name: StringName) -> void:
 #	print(anim_name)
