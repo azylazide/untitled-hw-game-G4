@@ -115,6 +115,20 @@ text = "TEST"
 label_settings = SubResource("LabelSettings_h2jt3")
 horizontal_alignment = 2
 
+[node name="is_hurt" type="Label" parent="Control/MarginContainer/HBoxContainer/VBoxContainer2"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "TEST"
+label_settings = SubResource("LabelSettings_h2jt3")
+horizontal_alignment = 2
+
+[node name="is_dead" type="Label" parent="Control/MarginContainer/HBoxContainer/VBoxContainer2"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "TEST"
+label_settings = SubResource("LabelSettings_h2jt3")
+horizontal_alignment = 2
+
 [node name="camera" type="Label" parent="Control/MarginContainer/HBoxContainer/VBoxContainer2"]
 unique_name_in_owner = true
 layout_mode = 2

@@ -278,11 +278,15 @@ func _initial_action_state(delta: float) -> int:
 func _enter_movement_state(delta: float) -> void:
 	match Move.current:
 		Move.AUTO:
-			if Action.current == Action.STATES.HURT:
-				print(frame_count)
-				velocity.x = -face_direction*2*speed
-				velocity.y = -1.8*jump_force
-				return
+			match Action.current:
+				Action.STATES.HURT:
+					print(frame_count)
+					velocity.x = -face_direction*speed
+					velocity.y = -0.5*jump_force
+					return
+				Action.STATES.DEATH:
+					velocity.x = -face_direction*speed
+					return
 		Move.STATES.IDLE:
 			anim_sm.travel("idle")
 			_ground_reset()
@@ -351,9 +355,7 @@ func _run_movement_state(delta: float) -> int:
 			Action.STATES.DEATH:
 				#ignore player input
 				#apply simple physics for gravity or knockback
-				if not check_floor():
-					velocity.x = -face_direction*speed*2
-				else:
+				if check_floor():
 					velocity.x = lerpf(velocity.x,0,0.2)
 				_apply_gravity(delta)
 				_apply_movement(face_direction)
@@ -845,7 +847,9 @@ func _on_animation_tree_animation_finished(anim_name: StringName) -> void:
 				anim_sm.travel("idle")
 #				anim_tree.set("parameters/idle/blend_position",face_direction)
 	elif anim_name in ["death_left","death_right"]:
-		queue_free()
+		#in case player slides off after animation
+		if check_floor():
+			queue_free()
 
 func debug_text() -> void:
 	var debug_text_vel = "velocity: (%.00f,%.00f)" %[velocity.x,velocity.y]
@@ -875,6 +879,10 @@ func debug_text() -> void:
 	DebugTexts.get_node("%onwall").text = debug_text_onwall
 	DebugTexts.get_node("%canajump").text = debug_text_canajump
 	DebugTexts.get_node("%canadash").text = debug_text_canadash
+
+	DebugTexts.get_node("%is_hurt").text = "is hurt: %s" %is_hurt
+	DebugTexts.get_node("%is_dead").text = "is dead: %s" %is_dead
+
 	DebugTexts.get_node("%actionstates").text = debug_text_actionstates
 
 	var blend_pos: float = anim_tree.get("parameters/%s/blend_position" %anim_sm.get_current_node())
