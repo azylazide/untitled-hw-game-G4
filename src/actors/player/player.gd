@@ -242,7 +242,7 @@ func _movement_statemachine(delta: float) -> void:
 							else _run_movement_state(delta))
 	#If transitioning, run exit code
 	if Move.next != Move.current:
-		_exit_movement_state(delta,Move.current)
+		_exit_movement_state(delta)
 	#transition
 	#change_movement_state(Move.next)
 	Move.change_state()
@@ -257,7 +257,7 @@ func _action_statemachine(delta: float) -> void:
 							else _run_action_state(delta))
 	#If transitioning, run exit code
 	if Action.next != Action.current:
-		_exit_action_state(delta,Action.current)
+		_exit_action_state(delta)
 	#transition
 	Action.change_state()
 
@@ -389,7 +389,7 @@ func _run_movement_state(delta: float) -> int:
 #					anim_sm.travel("jump")
 					return Move.STATES.JUMP
 
-				anim_tree.set("parameters/idle/blend_position",face_direction)
+#				anim_tree.set("parameters/idle/blend_position",face_direction)
 				return Move.STATES.IDLE
 
 			Move.STATES.RUN:
@@ -418,7 +418,7 @@ func _run_movement_state(delta: float) -> int:
 #					anim_sm.travel("jump")
 					return Move.STATES.JUMP
 
-				anim_tree.set("parameters/run/blend_position",face_direction)
+#				anim_tree.set("parameters/run/blend_position",face_direction)
 				return Move.STATES.RUN
 
 			Move.STATES.FALL:
@@ -445,7 +445,7 @@ func _run_movement_state(delta: float) -> int:
 #					anim_sm.travel("idle")
 					return Move.STATES.IDLE
 
-				anim_tree.set("parameters/fall/blend_position",face_direction)
+#				anim_tree.set("parameters/fall/blend_position",face_direction)
 				return Move.STATES.FALL
 
 			Move.STATES.JUMP:
@@ -463,7 +463,7 @@ func _run_movement_state(delta: float) -> int:
 #					anim_sm.travel("fall")
 					return Move.STATES.FALL
 
-				anim_tree.set("parameters/jump/blend_position",face_direction)
+#				anim_tree.set("parameters/jump/blend_position",face_direction)
 				return Move.STATES.JUMP
 
 			Move.STATES.GDASH:
@@ -490,7 +490,7 @@ func _run_movement_state(delta: float) -> int:
 #						anim_sm.travel("fall")
 						return Move.STATES.FALL
 
-				anim_tree.set("parameters/gdash/blend_position",face_direction)
+#				anim_tree.set("parameters/gdash/blend_position",face_direction)
 				return Move.STATES.GDASH
 
 			Move.STATES.ADASH:
@@ -518,7 +518,7 @@ func _run_movement_state(delta: float) -> int:
 #							anim_sm.travel("fall")
 							return Move.STATES.FALL
 
-				anim_tree.set("parameters/adash/blend_position",face_direction)
+#				anim_tree.set("parameters/adash/blend_position",face_direction)
 				return Move.STATES.ADASH
 
 			Move.STATES.WALL:
@@ -548,7 +548,7 @@ func _run_movement_state(delta: float) -> int:
 					return Move.STATES.FALL
 
 				face_direction = signf(wall_normal.x)
-				anim_tree.set("parameters/wall/blend_position",face_direction)
+#				anim_tree.set("parameters/wall/blend_position",face_direction)
 				return Move.STATES.WALL
 
 	#-------------
@@ -599,11 +599,11 @@ func _run_action_state(delta: float) -> int:
 	return Action.NULL
 
 ## Clean up when transitioning out to
-func _exit_movement_state(delta: float, current: int) -> int:
-	return 0
+func _exit_movement_state(delta: float) -> void:
+	return
 
-func _exit_action_state(delta: float, current: int) -> int:
-	return 0
+func _exit_action_state(delta: float) -> void:
+	return
 
 ## Setup jump based on previous state for the jump enter setup
 func _enter_jump() -> void:
@@ -819,57 +819,9 @@ func _unhandled_input(event: InputEvent) -> void:
 				Action.change_state()
 
 func _resolve_animations() -> void:
-	match Action.current:
-		Action.STATES.NEUTRAL:
-			match Move.current:
-				Move.STATES.IDLE:
-					pass
-				Move.STATES.RUN:
-					pass
-				Move.STATES.FALL:
-					pass
-				Move.STATES.JUMP:
-					pass
-				Move.STATES.GDASH:
-					pass
-				Move.STATES.ADASH:
-					pass
-				Move.STATES.WALL:
-					pass
-			pass
-		Action.STATES.ATTACK:
-			match Move.current:
-				Move.STATES.IDLE:
-					pass
-				Move.STATES.RUN:
-					pass
-				Move.STATES.FALL:
-					pass
-				Move.STATES.JUMP:
-					pass
-				Move.STATES.GDASH:
-					pass
-				Move.STATES.ADASH:
-					pass
-				Move.STATES.WALL:
-					pass
-		Action.STATES.DEATH:
-			match Move.current:
-				Move.STATES.IDLE:
-					pass
-				Move.STATES.RUN:
-					pass
-				Move.STATES.FALL:
-					pass
-				Move.STATES.JUMP:
-					pass
-				Move.STATES.GDASH:
-					pass
-				Move.STATES.ADASH:
-					pass
-				Move.STATES.WALL:
-					pass
-	pass
+	var anim_list:= ["idle","run","fall","jump","land","gdash","adash","wall"]
+	for anim_name in anim_list:
+		anim_tree.set("parameters/%s/blend_position" %anim_name,face_direction)
 
 func _player_management() -> void:
 	if stats.health == 0 and not is_dead:
@@ -913,26 +865,26 @@ func _on_animation_tree_animation_finished(anim_name: StringName) -> void:
 		match Move.current:
 			Move.STATES.IDLE:
 				anim_sm.travel("idle")
-				anim_tree.set("parameters/idle/blend_position",face_direction)
+#				anim_tree.set("parameters/idle/blend_position",face_direction)
 			Move.STATES.RUN:
 				anim_sm.travel("run")
-				anim_tree.set("parameters/run/blend_position",face_direction)
+#				anim_tree.set("parameters/run/blend_position",face_direction)
 			Move.STATES.FALL:
 				anim_sm.travel("fall")
-				anim_tree.set("parameters/fall/blend_position",face_direction)
+#				anim_tree.set("parameters/fall/blend_position",face_direction)
 			Move.STATES.WALL:
 				anim_sm.travel("wall")
-				anim_tree.set("parameters/wall/blend_position",face_direction)
+#				anim_tree.set("parameters/wall/blend_position",face_direction)
 			_:
 				anim_sm.travel("idle")
-				anim_tree.set("parameters/idle/blend_position",face_direction)
+#				anim_tree.set("parameters/idle/blend_position",face_direction)
 	elif anim_name in ["hurt_left","hurt_right"]:
 		match Move.previous:
 			#temp
 			_:
 				is_hurt = false #temp
 				anim_sm.travel("idle")
-				anim_tree.set("parameters/idle/blend_position",face_direction)
+#				anim_tree.set("parameters/idle/blend_position",face_direction)
 	elif anim_name in ["death_left","death_right"]:
 		queue_free()
 
