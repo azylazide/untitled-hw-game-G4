@@ -15,7 +15,7 @@ extends Camera2D
 class_name RemoteCamera
 
 ## Player node the camera follows.
-@export var player: CharacterBody2D
+@export var player: ActorBase
 ## Enable camera following player
 @export var follow_player:= true
 ## Initial position when not following player

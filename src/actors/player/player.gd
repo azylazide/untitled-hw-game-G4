@@ -131,6 +131,10 @@ var anim_sm: AnimationNodeStateMachinePlayback
 ## bool state changed by signal
 var attack_finished:= true
 
+signal player_dead
+
+var is_dead:= false
+
 ## Stores movement states information
 class MovementStates:
 	extends StateContainer
@@ -184,6 +188,10 @@ func _setup_anim() -> void:
 	anim_sm = anim_tree.get("parameters/playback")
 	anim_tree.active = true
 
+func _setup_signals() -> void:
+	player_dead.connect(_on_player_death)
+	pass
+
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
 	#create movementstates object
@@ -195,6 +203,7 @@ func _ready() -> void:
 	_setup_movement()
 	_setup_timers()
 	_setup_anim()
+	_setup_signals()
 	pass # Replace with function body.
 
 
@@ -208,6 +217,7 @@ func _physics_process(delta: float) -> void:
 	_movement_statemachine(delta)
 	_action_statemachine(delta)
 	_resolve_animations()
+	_player_management()
 	SignalBus.player_updated.emit(face_direction,camera_center.global_position,velocity,Move.current,Action.current)
 #	print(is_on_wall())
 	debug_text()
@@ -541,6 +551,7 @@ func _run_action_state(delta: float) -> int:
 			#invincibility timer
 			return Action.STATES.NEUTRAL
 		Action.STATES.DEATH:
+			anim_tree.set("parameters/death/blend_position",face_direction)
 			return Action.STATES.DEATH
 
 	return Action.NULL
@@ -818,6 +829,18 @@ func _resolve_animations() -> void:
 					pass
 	pass
 
+func _player_management() -> void:
+	if stats.health == 0 and not is_dead:
+		player_dead.emit()
+	pass
+
+func _on_player_death() -> void:
+	print("test")
+	is_dead = true
+	anim_sm.travel("death")
+	Action.next = Action.STATES.DEATH
+	Action.change_state()
+
 func _on_animation_tree_animation_finished(anim_name: StringName) -> void:
 #	print(anim_name)
 	if anim_name in ["attack_right","attack_left","attack_air_right","attack_air_left"]:
@@ -838,6 +861,8 @@ func _on_animation_tree_animation_finished(anim_name: StringName) -> void:
 			_:
 				anim_sm.travel("idle")
 				anim_tree.set("parameters/idle/blend_position",face_direction)
+	elif anim_name in ["death_left","death_right"]:
+		queue_free()
 
 func debug_text() -> void:
 	var debug_text_vel = "velocity: (%.00f,%.00f)" %[velocity.x,velocity.y]
@@ -868,34 +893,9 @@ func debug_text() -> void:
 	DebugTexts.get_node("%canajump").text = debug_text_canajump
 	DebugTexts.get_node("%canadash").text = debug_text_canadash
 	DebugTexts.get_node("%actionstates").text = debug_text_actionstates
-<<<<<<< HEAD:src/actors/player.gd
-
-
-
-	var blend_pos: float
-	match anim_sm.get_current_node():
-		"idle":
-			blend_pos = anim_tree.get("parameters/idle/blend_position")
-		"run":
-			blend_pos = anim_tree.get("parameters/run/blend_position")
-		"jump":
-			blend_pos = anim_tree.get("parameters/jump/blend_position")
-		"fall":
-			blend_pos = anim_tree.get("parameters/fall/blend_position")
-		"gdash":
-			blend_pos = anim_tree.get("parameters/gdash/blend_position")
-		"adash":
-			blend_pos = anim_tree.get("parameters/adash/blend_position")
-		"attack":
-			blend_pos = anim_tree.get("parameters/attack/blend_position")
-		"death":
-			blend_pos = anim_tree.get("parameters/death/blend_position")
-
-=======
 
 	var blend_pos: float = anim_tree.get("parameters/%s/blend_position" %anim_sm.get_current_node())
 
->>>>>>> 044e42fc1291fb88584c0f5e4659fe798c35cf79:src/actors/player/player.gd
 	DebugTexts.get_node("%anim_state").text = "Anim: %s (%d)" %[anim_sm.get_current_node(),blend_pos]
 
 	var current_state_node = anim_sm.get_current_node()
