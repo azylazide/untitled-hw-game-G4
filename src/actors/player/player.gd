@@ -844,7 +844,6 @@ func _on_animation_tree_animation_finished(anim_name: StringName) -> void:
 			#temp
 			_:
 				is_hurt = false #temp
-				anim_sm.travel("idle")
 #				anim_tree.set("parameters/idle/blend_position",face_direction)
 	elif anim_name in ["death_left","death_right"]:
 		#in case player slides off after animation
