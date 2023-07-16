@@ -1,4 +1,4 @@
-[gd_scene load_steps=105 format=3 uid="uid://wnwyyirpcmam"]
+[gd_scene load_steps=110 format=3 uid="uid://wnwyyirpcmam"]
 
 [ext_resource type="Script" path="res://src/actors/player/player.gd" id="1_oje55"]
 [ext_resource type="Resource" uid="uid://bvcyv5ih6dyl1" path="res://src/actors/player/debug_player.tres" id="2_iohlw"]
@@ -101,6 +101,18 @@ blend_point_0/pos = 1.0
 blend_point_1/node = SubResource("AnimationNodeAnimation_pc74d")
 blend_point_1/pos = -1.0
 blend_mode = 1
+
+[sub_resource type="AnimationNodeAnimation" id="AnimationNodeAnimation_6lute"]
+animation = &"hurt_right"
+
+[sub_resource type="AnimationNodeAnimation" id="AnimationNodeAnimation_lj1vv"]
+animation = &"hurt_left"
+
+[sub_resource type="AnimationNodeBlendSpace1D" id="AnimationNodeBlendSpace1D_lyi7m"]
+blend_point_0/node = SubResource("AnimationNodeAnimation_6lute")
+blend_point_0/pos = 1.0
+blend_point_1/node = SubResource("AnimationNodeAnimation_lj1vv")
+blend_point_1/pos = -1.0
 
 [sub_resource type="AnimationNodeAnimation" id="AnimationNodeAnimation_i5bcm"]
 animation = &"idle_left"
@@ -258,6 +270,8 @@ states/fall/node = SubResource("AnimationNodeBlendSpace1D_2po8h")
 states/fall/position = Vector2(435, -134)
 states/gdash/node = SubResource("AnimationNodeBlendSpace1D_cyunt")
 states/gdash/position = Vector2(65, 391)
+states/hurt/node = SubResource("AnimationNodeBlendSpace1D_lyi7m")
+states/hurt/position = Vector2(666, 256)
 states/idle/node = SubResource("AnimationNodeBlendSpace1D_jxamb")
 states/idle/position = Vector2(353, 100)
 states/jump/node = SubResource("AnimationNodeBlendSpace1D_n6106")
@@ -1198,6 +1212,84 @@ tracks/2/keys = {
 "values": [true]
 }
 
+[sub_resource type="Animation" id="Animation_amy27"]
+resource_name = "hurt_right"
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Sprite2D:frame")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 1,
+"values": [21]
+}
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath("Sprite2D:offset")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [Vector2(0, -15.5)]
+}
+tracks/2/type = "value"
+tracks/2/imported = false
+tracks/2/enabled = true
+tracks/2/path = NodePath("Sprite2D:flip_h")
+tracks/2/interp = 1
+tracks/2/loop_wrap = true
+tracks/2/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 1,
+"values": [false]
+}
+
+[sub_resource type="Animation" id="Animation_dmh3b"]
+resource_name = "hurt_left"
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Sprite2D:frame")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 1,
+"values": [21]
+}
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath("Sprite2D:offset")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [Vector2(0, -15.5)]
+}
+tracks/2/type = "value"
+tracks/2/imported = false
+tracks/2/enabled = true
+tracks/2/path = NodePath("Sprite2D:flip_h")
+tracks/2/interp = 1
+tracks/2/loop_wrap = true
+tracks/2/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 1,
+"values": [true]
+}
+
 [sub_resource type="AnimationLibrary" id="AnimationLibrary_n4wxi"]
 _data = {
 "RESET": SubResource("Animation_uwxcc"),
@@ -1213,6 +1305,8 @@ _data = {
 "fall_right": SubResource("Animation_3sm1x"),
 "gdash_left": SubResource("Animation_c8u7r"),
 "gdash_right": SubResource("Animation_ya1qs"),
+"hurt_left": SubResource("Animation_dmh3b"),
+"hurt_right": SubResource("Animation_amy27"),
 "idle_left": SubResource("Animation_alppg"),
 "idle_right": SubResource("Animation_pll0i"),
 "jump_left": SubResource("Animation_snow1"),
@@ -1350,6 +1444,7 @@ parameters/attack_air/blend_position = 1.0
 parameters/death/blend_position = 0.998498
 parameters/fall/blend_position = 1.0
 parameters/gdash/blend_position = 0
+parameters/hurt/blend_position = 0
 parameters/idle/blend_position = 1.0
 parameters/jump/blend_position = 1.0
 parameters/land/blend_position = 1.0

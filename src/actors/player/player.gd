@@ -132,8 +132,10 @@ var anim_sm: AnimationNodeStateMachinePlayback
 var attack_finished:= true
 
 signal player_dead
+signal player_hurt
 
 var is_dead:= false
+var is_hurt:= false
 
 ## Stores movement states information
 class MovementStates:
@@ -190,6 +192,8 @@ func _setup_anim() -> void:
 
 func _setup_signals() -> void:
 	player_dead.connect(_on_player_death)
+	player_hurt.connect(_on_player_hurt)
+#	hurt_timer.timeout.connect(func(): is_hurt = false)
 	pass
 
 # Called when the node enters the scene tree for the first time.
@@ -273,6 +277,12 @@ func _initial_action_state(delta: float) -> int:
 ## States setup when transitioning into
 func _enter_movement_state(delta: float) -> void:
 	match Move.current:
+		Move.AUTO:
+			if Action.current == Action.STATES.HURT:
+				print(frame_count)
+				velocity.x = -face_direction*2*speed
+				velocity.y = -1.8*jump_force
+				return
 		Move.STATES.IDLE:
 			_ground_reset()
 			return
@@ -315,8 +325,18 @@ func _run_movement_state(delta: float) -> int:
 			Action.STATES.HURT:
 				#ignore player input
 				#apply knockback while hurt time is active
+#				print("hurting %d" %frame_count)
+				_apply_movement(face_direction)
 				#return AUTO
 				#when done change AUTO to IDLE or RUN or FALL
+				if not is_hurt:
+					if check_floor():
+						if get_direction():
+							Move.next = Move.STATES.RUN
+						else:
+							Move.next = Move.STATES.IDLE
+					else:
+						Move.next = Move.STATES.FALL
 				pass
 			Action.STATES.DEATH:
 				#ignore player input
@@ -554,8 +574,11 @@ func _run_action_state(delta: float) -> int:
 				anim_tree.set("parameters/attack_air/blend_position",face_direction)
 			return Action.STATES.ATTACK
 		Action.STATES.HURT:
-			#invincibility timer
-			return Action.STATES.NEUTRAL
+			#knockback timer
+			if not is_hurt: #temp
+				return Action.STATES.NEUTRAL
+
+			return Action.STATES.HURT
 		Action.STATES.DEATH:
 			#play death when landed
 			if check_floor():
@@ -843,6 +866,26 @@ func _player_management() -> void:
 		player_dead.emit()
 	pass
 
+func hurt(damage: float) -> void:
+	stats.health -= damage
+	player_hurt.emit()
+	is_hurt = true
+
+	anim_sm.travel("hurt")
+	Action.next = Action.STATES.HURT
+	Action.change_state()
+	Move.next = Move.AUTO
+	Move.change_state()
+
+	#temp
+	hurt_timer.start()
+
+	pass
+
+func _on_player_hurt() -> void:
+#	is_hurt = true
+	pass
+
 func _on_player_death() -> void:
 	is_dead = true
 	Action.next = Action.STATES.DEATH
@@ -868,6 +911,13 @@ func _on_animation_tree_animation_finished(anim_name: StringName) -> void:
 				anim_sm.travel("wall")
 				anim_tree.set("parameters/wall/blend_position",face_direction)
 			_:
+				anim_sm.travel("idle")
+				anim_tree.set("parameters/idle/blend_position",face_direction)
+	elif anim_name in ["hurt_left","hurt_right"]:
+		match Move.previous:
+			#temp
+			_:
+				is_hurt = false #temp
 				anim_sm.travel("idle")
 				anim_tree.set("parameters/idle/blend_position",face_direction)
 	elif anim_name in ["death_left","death_right"]:
