@@ -284,22 +284,30 @@ func _enter_movement_state(delta: float) -> void:
 				velocity.y = -1.8*jump_force
 				return
 		Move.STATES.IDLE:
+			anim_sm.travel("idle")
 			_ground_reset()
 			return
 		Move.STATES.RUN:
+			anim_sm.travel("run")
 			_ground_reset()
 			return
+		Move.STATES.FALL:
+			anim_sm.travel("fall")
+			return
 		Move.STATES.JUMP:
+			anim_sm.travel("jump")
 			coyote_timer.stop()
 			jump_buffer_timer.stop()
 			_enter_jump()
 			return
 		Move.STATES.GDASH:
+			anim_sm.travel("gdash")
 			dash_cooldown_timer.start()
 			velocity.x = dash_force*face_direction
 			dash_timer.start()
 			return
 		Move.STATES.ADASH:
+			anim_sm.travel("adash")
 			dash_cooldown_timer.start()
 			can_adash = false
 			velocity.x = dash_force*face_direction
@@ -307,6 +315,7 @@ func _enter_movement_state(delta: float) -> void:
 			dash_timer.start()
 			return
 		Move.STATES.WALL:
+			anim_sm.travel("wall")
 			can_adash = true
 			velocity.x = 0
 			velocity.y = 0
@@ -330,6 +339,7 @@ func _run_movement_state(delta: float) -> int:
 				#return AUTO
 				#when done change AUTO to IDLE or RUN or FALL
 				if not is_hurt:
+					velocity.y = 0
 					if check_floor():
 						if get_direction():
 							Move.next = Move.STATES.RUN
@@ -364,19 +374,19 @@ func _run_movement_state(delta: float) -> int:
 				on_wall = check_wall()
 
 				if dir != 0:
-					anim_sm.travel("run")
+#					anim_sm.travel("run")
 					return Move.STATES.RUN
 
 				if not on_floor:
 					if was_on_floor:
 						coyote_timer.start()
 					else:
-						anim_sm.travel("fall")
+#						anim_sm.travel("fall")
 						return Move.STATES.FALL
 
 				if not jump_buffer_timer.is_stopped() and on_floor:
 					jump_buffer_timer.stop()
-					anim_sm.travel("jump")
+#					anim_sm.travel("jump")
 					return Move.STATES.JUMP
 
 				anim_tree.set("parameters/idle/blend_position",face_direction)
@@ -393,19 +403,19 @@ func _run_movement_state(delta: float) -> int:
 				on_wall = check_wall()
 
 				if dir == 0 and on_floor:
-					anim_sm.travel("idle")
+#					anim_sm.travel("idle")
 					return Move.STATES.IDLE
 
 				if not on_floor:
 					if was_on_floor:
 						coyote_timer.start()
 					else:
-						anim_sm.travel("fall")
+#						anim_sm.travel("fall")
 						return Move.STATES.FALL
 
 				if not jump_buffer_timer.is_stopped() and on_floor:
 					jump_buffer_timer.stop()
-					anim_sm.travel("jump")
+#					anim_sm.travel("jump")
 					return Move.STATES.JUMP
 
 				anim_tree.set("parameters/run/blend_position",face_direction)
@@ -424,7 +434,7 @@ func _run_movement_state(delta: float) -> int:
 				if on_wall and (stats.abilities & 0b100):
 					if dir != 0:
 						if wall_normal != Vector2.ZERO and dir*wall_normal.x < 0 and wall_cooldown_timer.is_stopped():
-							anim_sm.travel("wall")
+#							anim_sm.travel("wall")
 							return Move.STATES.WALL
 						elif wall_normal.x == 0:
 							#edge case review later; use face direction
@@ -432,7 +442,7 @@ func _run_movement_state(delta: float) -> int:
 
 				if on_floor:
 					anim_tree.set("parameters/land/blend_position",face_direction)
-					anim_sm.travel("idle")
+#					anim_sm.travel("idle")
 					return Move.STATES.IDLE
 
 				anim_tree.set("parameters/fall/blend_position",face_direction)
@@ -450,7 +460,7 @@ func _run_movement_state(delta: float) -> int:
 				on_wall = check_wall()
 
 				if velocity.y > 0:
-					anim_sm.travel("fall")
+#					anim_sm.travel("fall")
 					return Move.STATES.FALL
 
 				anim_tree.set("parameters/jump/blend_position",face_direction)
@@ -471,13 +481,13 @@ func _run_movement_state(delta: float) -> int:
 				if dash_timer.is_stopped():
 					if on_floor:
 						if dir != 0:
-							anim_sm.travel("run")
+#							anim_sm.travel("run")
 							return Move.STATES.RUN
 						else:
-							anim_sm.travel("idle")
+#							anim_sm.travel("idle")
 							return Move.STATES.IDLE
 					elif not on_floor and not was_on_floor:
-						anim_sm.travel("fall")
+#						anim_sm.travel("fall")
 						return Move.STATES.FALL
 
 				anim_tree.set("parameters/gdash/blend_position",face_direction)
@@ -494,18 +504,18 @@ func _run_movement_state(delta: float) -> int:
 				if dash_timer.is_stopped():
 					if on_floor:
 						if dir != 0:
-							anim_sm.travel("run")
+#							anim_sm.travel("run")
 							return Move.STATES.RUN
 						else:
-							anim_sm.travel("idle")
+#							anim_sm.travel("idle")
 							return Move.STATES.IDLE
 					else:
 						if not dash_jump_buffer_timer.is_stopped():
 							can_ajump = false
-							anim_sm.travel("jump")
+#							anim_sm.travel("jump")
 							return Move.STATES.JUMP
 						else:
-							anim_sm.travel("fall")
+#							anim_sm.travel("fall")
 							return Move.STATES.FALL
 
 				anim_tree.set("parameters/adash/blend_position",face_direction)
@@ -524,17 +534,17 @@ func _run_movement_state(delta: float) -> int:
 
 				if wall_slide_timer.is_stopped():
 						if dir*wall_normal.x > 0:
-							anim_sm.travel("fall")
+#							anim_sm.travel("fall")
 							return Move.STATES.FALL
 
 				if on_floor:
 					face_direction = signf(wall_normal.x)
-					anim_sm.travel("idle")
+#					anim_sm.travel("idle")
 					return Move.STATES.IDLE
 
 				if not on_wall:
 					face_direction = signf(wall_normal.x)
-					anim_sm.travel("fall")
+#					anim_sm.travel("fall")
 					return Move.STATES.FALL
 
 				face_direction = signf(wall_normal.x)
@@ -687,14 +697,14 @@ func _unhandled_input(event: InputEvent) -> void:
 				if event.is_action_pressed("jump"):
 					if on_floor:
 						Move.next = Move.STATES.JUMP
-						anim_sm.travel("jump")
+#						anim_sm.travel("jump")
 						Move.change_state()
 
 				#dash
 				if event.is_action_pressed("dash") and (stats.abilities & 0b001):
 					if dash_cooldown_timer.is_stopped():
 						Move.next = Move.STATES.GDASH
-						anim_sm.travel("gdash")
+#						anim_sm.travel("gdash")
 						Move.change_state()
 
 			Move.STATES.RUN:
@@ -702,14 +712,14 @@ func _unhandled_input(event: InputEvent) -> void:
 				if event.is_action_pressed("jump"):
 					if on_floor:
 						Move.next = Move.STATES.JUMP
-						anim_sm.travel("jump")
+#						anim_sm.travel("jump")
 						Move.change_state()
 
 				#dash
 				if event.is_action_pressed("dash") and (stats.abilities & 0b001):
 					if dash_cooldown_timer.is_stopped():
 						Move.next = Move.STATES.GDASH
-						anim_sm.travel("gdash")
+#						anim_sm.travel("gdash")
 						Move.change_state()
 
 			Move.STATES.JUMP:
@@ -719,20 +729,20 @@ func _unhandled_input(event: InputEvent) -> void:
 					if velocity.y < -min_jump_force:
 						velocity.y = -min_jump_force
 						Move.next = Move.STATES.FALL
-						anim_sm.travel("fall")
+#						anim_sm.travel("fall")
 						Move.change_state()
 
 					#interrupt
 					else:
 						Move.next = Move.STATES.FALL
-						anim_sm.travel("fall")
+#						anim_sm.travel("fall")
 						Move.change_state()
 
 				#air dash
 				if event.is_action_pressed("dash") and (stats.abilities & 0b001):
 					if dash_cooldown_timer.is_stopped() and can_adash:
 						Move.next = Move.STATES.ADASH
-						anim_sm.travel("adash")
+#						anim_sm.travel("adash")
 						Move.change_state()
 
 			Move.STATES.FALL:
@@ -743,20 +753,20 @@ func _unhandled_input(event: InputEvent) -> void:
 					#either wall jump or air jump depending on ability
 					if on_wall:
 						Move.next = Move.STATES.JUMP
-						anim_sm.travel("jump")
+#						anim_sm.travel("jump")
 						Move.change_state()
 					#air jump
 					elif not on_wall and can_ajump and (stats.abilities & 0b010):
 						can_ajump = false
 						jump_buffer_timer.stop()
 						Move.next = Move.STATES.JUMP
-						anim_sm.travel("jump")
+#						anim_sm.travel("jump")
 						Move.change_state()
 				#air dash
 				if event.is_action_pressed("dash") and (stats.abilities & 0b001):
 					if dash_cooldown_timer.is_stopped() and can_adash:
 						Move.next = Move.STATES.ADASH
-						anim_sm.travel("adash")
+#						anim_sm.travel("adash")
 						Move.change_state()
 
 			Move.STATES.GDASH:
@@ -764,13 +774,13 @@ func _unhandled_input(event: InputEvent) -> void:
 				if event.is_action_pressed("jump"):
 					if on_floor:
 						Move.next = Move.STATES.JUMP
-						anim_sm.travel("jump")
+#						anim_sm.travel("jump")
 						Move.change_state()
 				#dash
 				if event.is_action_pressed("dash"):
 					if dash_cooldown_timer.is_stopped():
 						Move.next = Move.STATES.GDASH
-						anim_sm.travel("gdash")
+#						anim_sm.travel("gdash")
 						Move.change_state()
 
 			Move.STATES.ADASH:
@@ -781,13 +791,13 @@ func _unhandled_input(event: InputEvent) -> void:
 				#wall jump
 				if event.is_action_pressed("jump"):
 					Move.next = Move.STATES.JUMP
-					anim_sm.travel("jump")
+#					anim_sm.travel("jump")
 					Move.change_state()
 				#wall dash in air
 				if event.is_action_pressed("dash") and (stats.abilities & 0b001):
 					face_direction = signf(wall_normal.x)
 					Move.next = Move.STATES.ADASH
-					anim_sm.travel("adash")
+#					anim_sm.travel("adash")
 					Move.change_state()
 
 	match Action.current:
@@ -867,6 +877,9 @@ func _player_management() -> void:
 	pass
 
 func hurt(damage: float) -> void:
+	if stats.health == 0:
+		return
+
 	stats.health -= damage
 	player_hurt.emit()
 	is_hurt = true

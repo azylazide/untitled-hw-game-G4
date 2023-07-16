@@ -1214,6 +1214,7 @@ tracks/2/keys = {
 
 [sub_resource type="Animation" id="Animation_amy27"]
 resource_name = "hurt_right"
+length = 0.2
 tracks/0/type = "value"
 tracks/0/imported = false
 tracks/0/enabled = true
@@ -1253,6 +1254,7 @@ tracks/2/keys = {
 
 [sub_resource type="Animation" id="Animation_dmh3b"]
 resource_name = "hurt_left"
+length = 0.2
 tracks/0/type = "value"
 tracks/0/imported = false
 tracks/0/enabled = true
