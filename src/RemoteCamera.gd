@@ -200,15 +200,17 @@ func _interp_pos(pos: Vector2) -> Vector2:
 	var output: Vector2
 
 	var hs:= horizontal_slow_smoothing
-	if prev_state == player.move_states_ref.WALL and current_state == player.move_states_ref.JUMP:
-		hs = wall_jump_smoothing
-	else:
-		if abs(player_velocity.x) > player.speed*0.5:
-			hs = horizontal_fast_smoothing
-
 	var vs:= vertical_slow_smoothing
-	if current_state == player.move_states_ref.FALL and player_velocity.y == player.max_fall_speed:
-		vs = lerpf(current_vs,vertical_fast_smoothing,0.1)
+
+	if not detector_exited:
+		if prev_state == player.move_states_ref.WALL and current_state == player.move_states_ref.JUMP:
+			hs = wall_jump_smoothing
+		else:
+			if abs(player_velocity.x) > player.speed*0.5:
+				hs = horizontal_fast_smoothing
+
+		if current_state == player.move_states_ref.FALL and player_velocity.y == player.max_fall_speed:
+			vs = lerpf(current_vs,vertical_fast_smoothing,0.1)
 
 	current_hs = hs
 	current_vs = vs
