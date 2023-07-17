@@ -280,7 +280,7 @@ func _enter_movement_state(delta: float) -> void:
 		Move.AUTO:
 			match Action.current:
 				Action.STATES.HURT:
-					print(frame_count)
+					print("hurt at %d" %frame_count)
 					velocity.x = -face_direction*speed
 					velocity.y = -0.5*jump_force
 					return
@@ -328,6 +328,9 @@ func _enter_movement_state(delta: float) -> void:
 	pass
 
 func _enter_action_state(delta: float) -> void:
+	match Action.current:
+		Action.STATES.HURT:
+			anim_sm.travel("hurt")
 	pass
 
 ## Main states code that runs per frame
@@ -342,15 +345,6 @@ func _run_movement_state(delta: float) -> int:
 				_apply_movement(face_direction)
 				#return AUTO
 				#when done change AUTO to IDLE or RUN or FALL
-				if not is_hurt:
-					velocity.y = 0
-					if check_floor():
-						if get_direction():
-							Move.next = Move.STATES.RUN
-						else:
-							Move.next = Move.STATES.IDLE
-					else:
-						Move.next = Move.STATES.FALL
 				pass
 			Action.STATES.DEATH:
 				#ignore player input
@@ -575,6 +569,11 @@ func _run_action_state(delta: float) -> int:
 
 ## Clean up when transitioning out to
 func _exit_movement_state(delta: float) -> void:
+	match Move.current:
+		Move.AUTO:
+			match Action.current:
+				Action.STATES.HURT:
+					velocity.x = 0
 	return
 
 func _exit_action_state(delta: float) -> void:
@@ -780,24 +779,26 @@ func _unhandled_input(event: InputEvent) -> void:
 				Action.change_state()
 
 func _resolve_animations() -> void:
-	var anim_list:= ["idle","run","fall","jump","land","gdash","adash","wall"]
+	var anim_list:= ["idle","run","fall","jump","land","gdash","adash","wall","hurt"]
 	for anim_name in anim_list:
 		anim_tree.set("parameters/%s/blend_position" %anim_name,face_direction)
 
 func _player_management() -> void:
 	if stats.health == 0 and not is_dead:
+		print("dead %d" %frame_count)
 		player_dead.emit()
 	pass
 
 func hurt(damage: float) -> void:
 	if stats.health == 0:
 		return
+	if is_hurt:
+		return
 
 	stats.health -= damage
 	player_hurt.emit()
 	is_hurt = true
 
-	anim_sm.travel("hurt")
 	Action.next = Action.STATES.HURT
 	Action.change_state()
 	Move.next = Move.AUTO
@@ -820,7 +821,7 @@ func _on_player_death() -> void:
 	Move.change_state()
 
 func _on_animation_tree_animation_finished(anim_name: StringName) -> void:
-#	print(anim_name)
+	print(anim_name)
 	if anim_name in ["attack_right","attack_left","attack_air_right","attack_air_left"]:
 		attack_finished = true
 		match Move.current:
@@ -840,10 +841,21 @@ func _on_animation_tree_animation_finished(anim_name: StringName) -> void:
 				anim_sm.travel("idle")
 #				anim_tree.set("parameters/idle/blend_position",face_direction)
 	elif anim_name in ["hurt_left","hurt_right"]:
-		match Move.previous:
-			#temp
-			_:
-				is_hurt = false #temp
+		print("test ended %d" %frame_count)
+		#temp
+		is_hurt = false #temp
+		if check_floor():
+			if get_direction():
+				Move.next = Move.STATES.RUN
+			else:
+				Move.next = Move.STATES.IDLE
+		else:
+			Move.next = Move.STATES.FALL
+		print("%s %d" %[Move.next,frame_count])
+		Move.change_state()
+		if not is_dead:
+			Action.next = Action.STATES.NEUTRAL
+			Action.change_state()
 #				anim_tree.set("parameters/idle/blend_position",face_direction)
 	elif anim_name in ["death_left","death_right"]:
 		#in case player slides off after animation
@@ -890,5 +902,6 @@ func debug_text() -> void:
 
 	var current_state_node = anim_sm.get_current_node()
 	var travel_path = anim_sm.get_travel_path()
+	var anim_playing = anim_sm.is_playing()
 
-	DebugTexts.get_node("%anim_playback").text = "%s\n%s" %[current_state_node,travel_path]
+	DebugTexts.get_node("%anim_playback").text = "%s\n%s\nPlaying: %s" %[current_state_node,travel_path,anim_playing]
