@@ -288,7 +288,10 @@ func _enter_movement_state(delta: float) -> void:
 					velocity.x = -face_direction*speed
 					return
 		Move.STATES.IDLE:
-			anim_sm.travel("idle")
+			if Move.previous == Move.STATES.FALL:
+				anim_sm.travel("land")
+			else:
+				anim_sm.travel("idle")
 			_ground_reset()
 			return
 		Move.STATES.RUN:
@@ -428,6 +431,9 @@ func _run_movement_state(delta: float) -> int:
 							pass
 
 				if on_floor:
+					if dir != 0:
+						return Move.STATES.RUN
+
 					return Move.STATES.IDLE
 
 				return Move.STATES.FALL
@@ -861,6 +867,8 @@ func _on_animation_tree_animation_finished(anim_name: StringName) -> void:
 		#in case player slides off after animation
 		if check_floor():
 			queue_free()
+	elif anim_name in ["landing_left","landing_right"]:
+		anim_sm.travel("idle")
 
 func debug_text() -> void:
 	var debug_text_vel = "velocity: (%.00f,%.00f)" %[velocity.x,velocity.y]
