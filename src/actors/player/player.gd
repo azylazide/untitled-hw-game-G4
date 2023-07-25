@@ -339,6 +339,7 @@ func _enter_action_state(delta: float) -> void:
 ## Main states code that runs per frame
 func _run_movement_state(delta: float) -> int:
 
+	#Action states that needed to interrupt movement
 	if Action.current in [Action.STATES.DEATH,Action.STATES.HURT]:
 		match Action.current:
 			Action.STATES.HURT:
@@ -360,6 +361,7 @@ func _run_movement_state(delta: float) -> int:
 				pass
 		return Move.AUTO
 
+	#Action states that will not interrupt movement
 	else:
 		match Move.current:
 			Move.STATES.IDLE:
@@ -826,6 +828,8 @@ func _on_player_death() -> void:
 	Move.next = Move.AUTO
 	Move.change_state()
 
+## Triggers when an animation is finished
+## Handles transitions to other animations or decides what state to transition to
 func _on_animation_tree_animation_finished(anim_name: StringName) -> void:
 	print(anim_name)
 	if anim_name in ["attack_right","attack_left","attack_air_right","attack_air_left"]:
