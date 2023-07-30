@@ -1,6 +1,7 @@
-[gd_scene load_steps=8 format=3 uid="uid://sui8erivjt5m"]
+[gd_scene load_steps=9 format=3 uid="uid://sui8erivjt5m"]
 
-[ext_resource type="Script" path="res://src/levels/LevelTemplate.gd" id="1_f8yqe"]
+[ext_resource type="Script" path="res://src/levels/level_test.gd" id="1_yx08m"]
+[ext_resource type="PackedScene" uid="uid://cmgcdb5sm7mll" path="res://src/props/arrow.tscn" id="2_ahl1u"]
 [ext_resource type="TileSet" uid="uid://dsgrixorcwhe3" path="res://src/levels/debugtileset.tres" id="2_ilwmr"]
 [ext_resource type="PackedScene" uid="uid://wnwyyirpcmam" path="res://src/actors/player/player.tscn" id="4_b3pug"]
 [ext_resource type="Script" path="res://src/camera_bound_box.gd" id="4_yupxf"]
@@ -10,8 +11,10 @@
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_ffwgc"]
 size = Vector2(6050, 2460)
 
-[node name="LevelTest" type="Node2D"]
-script = ExtResource("1_f8yqe")
+[node name="LevelTest" type="Node2D" node_paths=PackedStringArray("player_node")]
+script = ExtResource("1_yx08m")
+player_node = NodePath("Player")
+arrow_pscn = ExtResource("2_ahl1u")
 metadata/_edit_lock_ = true
 
 [node name="SampleTestScale" type="Sprite2D" parent="."]

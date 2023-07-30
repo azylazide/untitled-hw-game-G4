@@ -133,6 +133,7 @@ var attack_finished:= true
 
 signal player_dead
 signal player_hurt
+signal player_attacked
 
 var is_dead:= false
 var is_hurt:= false
@@ -334,6 +335,8 @@ func _enter_action_state(delta: float) -> void:
 	match Action.current:
 		Action.STATES.HURT:
 			anim_sm.travel("hurt")
+		Action.STATES.ATTACK:
+			player_attacked.emit(face_direction)
 	pass
 
 ## Main states code that runs per frame
@@ -831,7 +834,7 @@ func _on_player_death() -> void:
 ## Triggers when an animation is finished
 ## Handles transitions to other animations or decides what state to transition to
 func _on_animation_tree_animation_finished(anim_name: StringName) -> void:
-	print(anim_name)
+#	print(anim_name)
 	if anim_name in ["attack_right","attack_left","attack_air_right","attack_air_left"]:
 		attack_finished = true
 		match Move.current:

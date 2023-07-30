@@ -1,0 +1,29 @@
+[gd_scene load_steps=4 format=3 uid="uid://cmgcdb5sm7mll"]
+
+[ext_resource type="Script" path="res://src/props/arrow.gd" id="1_nmcbq"]
+[ext_resource type="Texture2D" uid="uid://bng0imq8kx7dn" path="res://assets/projectile.png" id="1_w7uso"]
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_kbib6"]
+radius = 20.2237
+
+[node name="Arrow" type="Area2D"]
+collision_layer = 256
+collision_mask = 5
+script = ExtResource("1_nmcbq")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+position = Vector2(120, 0)
+shape = SubResource("CircleShape2D_kbib6")
+
+[node name="Sprite2D" type="Sprite2D" parent="."]
+texture_filter = 1
+scale = Vector2(5.5, 5.5)
+texture = ExtResource("1_w7uso")
+offset = Vector2(10, 0)
+
+[node name="VisibleOnScreenEnabler2D" type="VisibleOnScreenEnabler2D" parent="."]
+scale = Vector2(32.4, 11.25)
+
+[connection signal="area_entered" from="." to="." method="_on_area_entered"]
+[connection signal="body_entered" from="." to="." method="_on_body_entered"]
+[connection signal="screen_exited" from="VisibleOnScreenEnabler2D" to="." method="_on_visible_on_screen_enabler_2d_screen_exited"]
