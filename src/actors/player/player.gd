@@ -335,6 +335,7 @@ func _enter_action_state(delta: float) -> void:
 	match Action.current:
 		Action.STATES.HURT:
 			anim_sm.travel("hurt")
+			$AudioStreamPlayer.play()
 			Globals.freeze(0.1,0.4)
 		Action.STATES.ATTACK:
 			player_attacked.emit(face_direction)
