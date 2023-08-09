@@ -818,7 +818,13 @@ func hurt(damage: float) -> void:
 	#temp
 	hurt_timer.start()
 
-	pass
+func invincibility_tween() -> void:
+	var sprite:= $Sprite2D
+	var tween:= create_tween().set_loops(4)
+	tween.tween_property(sprite,"modulate",Color(sprite.modulate,0.2),0.15)
+	tween.tween_property(sprite,"modulate",Color(sprite.modulate,1),0.15)
+	await tween.finished
+	is_hurt = false
 
 func _on_player_hurt() -> void:
 #	is_hurt = true
@@ -856,7 +862,7 @@ func _on_animation_tree_animation_finished(anim_name: StringName) -> void:
 	elif anim_name in ["hurt_left","hurt_right"]:
 		print("test ended %d" %frame_count)
 		#temp
-		is_hurt = false #temp
+#		is_hurt = false #temp
 		if check_floor():
 			if get_direction():
 				Move.next = Move.STATES.RUN
@@ -867,6 +873,7 @@ func _on_animation_tree_animation_finished(anim_name: StringName) -> void:
 		print("%s %d" %[Move.next,frame_count])
 		Move.change_state()
 		if not is_dead:
+			invincibility_tween()
 			Action.next = Action.STATES.NEUTRAL
 			Action.change_state()
 #				anim_tree.set("parameters/idle/blend_position",face_direction)
