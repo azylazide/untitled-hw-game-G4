@@ -40,6 +40,9 @@ var frame_count = 0
 ## Multiplier for gravity in wall sliding
 @export var wall_slide_multiplier:= 0.1
 
+@export_group("Misc")
+@export var ghost_scene: PackedScene
+
 ## Ground shapecast
 @onready var ground_cast:= $GroundDetector as ShapeCast2D
 
@@ -137,6 +140,8 @@ signal player_attacked
 
 var is_dead:= false
 var is_hurt:= false
+
+var ghost_tweener: Tween
 
 ## Stores movement states information
 class MovementStates:
@@ -243,7 +248,7 @@ func _movement_statemachine(delta: float) -> void:
 							else _run_movement_state(delta))
 	#If transitioning, run exit code
 	if Move.next != Move.current:
-		_exit_movement_state(delta)
+		_exit_movement_state()
 	#transition
 	#change_movement_state(Move.next)
 	Move.change_state()
@@ -258,7 +263,7 @@ func _action_statemachine(delta: float) -> void:
 							else _run_action_state(delta))
 	#If transitioning, run exit code
 	if Action.next != Action.current:
-		_exit_action_state(delta)
+		_exit_action_state()
 	#transition
 	Action.change_state()
 
@@ -313,6 +318,7 @@ func _enter_movement_state(delta: float) -> void:
 			dash_cooldown_timer.start()
 			velocity.x = dash_force*face_direction
 			dash_timer.start()
+			dash_ghost_tweener()
 			return
 		Move.STATES.ADASH:
 			anim_sm.travel("adash")
@@ -321,6 +327,7 @@ func _enter_movement_state(delta: float) -> void:
 			velocity.x = dash_force*face_direction
 			velocity.y = 0
 			dash_timer.start()
+			dash_ghost_tweener()
 			return
 		Move.STATES.WALL:
 			anim_sm.travel("wall")
@@ -581,15 +588,21 @@ func _run_action_state(delta: float) -> int:
 	return Action.NULL
 
 ## Clean up when transitioning out to
-func _exit_movement_state(delta: float) -> void:
+func _exit_movement_state() -> void:
 	match Move.current:
 		Move.AUTO:
 			match Action.current:
 				Action.STATES.HURT:
 					velocity.x = 0
+		Move.STATES.GDASH:
+			print(ghost_tweener)
+			ghost_tweener.kill()
+		Move.STATES.ADASH:
+			print(ghost_tweener)
+			ghost_tweener.kill()
 	return
 
-func _exit_action_state(delta: float) -> void:
+func _exit_action_state() -> void:
 	return
 
 ## Setup jump based on previous state for the jump enter setup
@@ -684,12 +697,14 @@ func _unhandled_input(event: InputEvent) -> void:
 				if event.is_action_pressed("jump"):
 					if on_floor:
 						Move.next = Move.STATES.JUMP
+						_exit_movement_state()
 						Move.change_state()
 
 				#dash
 				if event.is_action_pressed("dash") and (stats.abilities & 0b001):
 					if dash_cooldown_timer.is_stopped():
 						Move.next = Move.STATES.GDASH
+						_exit_movement_state()
 						Move.change_state()
 
 			Move.STATES.RUN:
@@ -697,12 +712,14 @@ func _unhandled_input(event: InputEvent) -> void:
 				if event.is_action_pressed("jump"):
 					if on_floor:
 						Move.next = Move.STATES.JUMP
+						_exit_movement_state()
 						Move.change_state()
 
 				#dash
 				if event.is_action_pressed("dash") and (stats.abilities & 0b001):
 					if dash_cooldown_timer.is_stopped():
 						Move.next = Move.STATES.GDASH
+						_exit_movement_state()
 						Move.change_state()
 
 			Move.STATES.JUMP:
@@ -712,17 +729,20 @@ func _unhandled_input(event: InputEvent) -> void:
 					if velocity.y < -min_jump_force:
 						velocity.y = -min_jump_force
 						Move.next = Move.STATES.FALL
+						_exit_movement_state()
 						Move.change_state()
 
 					#interrupt
 					else:
 						Move.next = Move.STATES.FALL
+						_exit_movement_state()
 						Move.change_state()
 
 				#air dash
 				if event.is_action_pressed("dash") and (stats.abilities & 0b001):
 					if dash_cooldown_timer.is_stopped() and can_adash:
 						Move.next = Move.STATES.ADASH
+						_exit_movement_state()
 						Move.change_state()
 
 			Move.STATES.FALL:
@@ -733,17 +753,20 @@ func _unhandled_input(event: InputEvent) -> void:
 					#either wall jump or air jump depending on ability
 					if on_wall:
 						Move.next = Move.STATES.JUMP
+						_exit_movement_state()
 						Move.change_state()
 					#air jump
 					elif not on_wall and can_ajump and (stats.abilities & 0b010):
 						can_ajump = false
 						jump_buffer_timer.stop()
 						Move.next = Move.STATES.JUMP
+						_exit_movement_state()
 						Move.change_state()
 				#air dash
 				if event.is_action_pressed("dash") and (stats.abilities & 0b001):
 					if dash_cooldown_timer.is_stopped() and can_adash:
 						Move.next = Move.STATES.ADASH
+						_exit_movement_state()
 						Move.change_state()
 
 			Move.STATES.GDASH:
@@ -751,11 +774,13 @@ func _unhandled_input(event: InputEvent) -> void:
 				if event.is_action_pressed("jump"):
 					if on_floor:
 						Move.next = Move.STATES.JUMP
+						_exit_movement_state()
 						Move.change_state()
 				#dash
 				if event.is_action_pressed("dash"):
 					if dash_cooldown_timer.is_stopped():
 						Move.next = Move.STATES.GDASH
+						_exit_movement_state()
 						Move.change_state()
 
 			Move.STATES.ADASH:
@@ -766,11 +791,13 @@ func _unhandled_input(event: InputEvent) -> void:
 				#wall jump
 				if event.is_action_pressed("jump"):
 					Move.next = Move.STATES.JUMP
+					_exit_movement_state()
 					Move.change_state()
 				#wall dash in air
 				if event.is_action_pressed("dash") and (stats.abilities & 0b001):
 					face_direction = signf(wall_normal.x)
 					Move.next = Move.STATES.ADASH
+					_exit_movement_state()
 					Move.change_state()
 
 	match Action.current:
@@ -789,6 +816,7 @@ func _unhandled_input(event: InputEvent) -> void:
 				$Timers/testtimer.start()
 				Action.next = Action.STATES.ATTACK
 				attack_finished = false
+				_exit_action_state()
 				Action.change_state()
 
 func _resolve_animations() -> void:
@@ -815,6 +843,7 @@ func hurt(damage: float) -> void:
 	Action.next = Action.STATES.HURT
 	Action.change_state()
 	Move.next = Move.AUTO
+	_exit_movement_state()
 	Move.change_state()
 
 	#temp
@@ -828,6 +857,18 @@ func invincibility_tween() -> void:
 	await tween.finished
 	is_hurt = false
 
+func dash_ghost_tweener() -> void:
+	ghost_tweener = create_tween().set_loops()
+	ghost_tweener.tween_callback(dash_ghost)
+	ghost_tweener.tween_interval(0.35*dash_time)
+	print(ghost_tweener)
+
+
+func dash_ghost() -> void:
+	var ghost: Sprite2D = ghost_scene.instantiate()
+	ghost.sprite = $Sprite2D
+	add_child(ghost)
+
 func _on_player_hurt() -> void:
 #	is_hurt = true
 	pass
@@ -837,6 +878,7 @@ func _on_player_death() -> void:
 	Action.next = Action.STATES.DEATH
 	Action.change_state()
 	Move.next = Move.AUTO
+	_exit_movement_state()
 	Move.change_state()
 
 ## Triggers when an animation is finished
@@ -873,10 +915,12 @@ func _on_animation_tree_animation_finished(anim_name: StringName) -> void:
 		else:
 			Move.next = Move.STATES.FALL
 		print("%s %d" %[Move.next,frame_count])
+		_exit_movement_state()
 		Move.change_state()
 		if not is_dead:
 			invincibility_tween()
 			Action.next = Action.STATES.NEUTRAL
+			_exit_action_state()
 			Action.change_state()
 #				anim_tree.set("parameters/idle/blend_position",face_direction)
 	elif anim_name in ["death_left","death_right"]:
