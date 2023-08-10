@@ -1440,6 +1440,10 @@ one_shot = true
 wait_time = 0.8
 one_shot = true
 
+[node name="AttackChargeTimer" type="Timer" parent="Timers"]
+process_callback = 0
+one_shot = true
+
 [node name="Camera2D" type="Camera2D" parent="."]
 visible = false
 enabled = false

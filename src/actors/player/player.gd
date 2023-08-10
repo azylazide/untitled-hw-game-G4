@@ -43,6 +43,8 @@ var frame_count = 0
 @export_group("Misc")
 @export var ghost_scene: PackedScene
 
+@export var attack_charge_time:= 0.8
+
 ## Ground shapecast
 @onready var ground_cast:= $GroundDetector as ShapeCast2D
 
@@ -84,6 +86,9 @@ var frame_count = 0
 
 ## Hurt duration timer
 @onready var hurt_timer:= $Timers/HurtTimer as Timer
+
+## Timer that determines if fully charged or interrupted
+@onready var attack_charge_timer:= $Timers/AttackChargeTimer as Timer
 
 ## If on floor on previous frame
 @onready var was_on_floor:= true
@@ -140,6 +145,7 @@ signal player_attacked
 
 var is_dead:= false
 var is_hurt:= false
+var is_attack_charged:= false
 
 var ghost_tweener: Tween
 
@@ -190,6 +196,7 @@ func _setup_timers() -> void:
 	wall_slide_timer.wait_time = 0.1
 	wall_cooldown_timer.wait_time = wall_cooldown_time
 	wall_jump_hold_timer.wait_time = 0.5
+	attack_charge_timer.wait_time = attack_charge_time
 	pass
 
 func _setup_anim() -> void:
@@ -200,6 +207,7 @@ func _setup_signals() -> void:
 	player_dead.connect(_on_player_death)
 	player_hurt.connect(_on_player_hurt)
 #	hurt_timer.timeout.connect(func(): is_hurt = false)
+	attack_charge_timer.timeout.connect(func(): is_attack_charged = true)
 	pass
 
 # Called when the node enters the scene tree for the first time.
@@ -603,6 +611,9 @@ func _exit_movement_state() -> void:
 	return
 
 func _exit_action_state() -> void:
+	match Action.current:
+		Action.STATES.ATTACK:
+			is_attack_charged = false
 	return
 
 ## Setup jump based on previous state for the jump enter setup
@@ -803,21 +814,46 @@ func _unhandled_input(event: InputEvent) -> void:
 	match Action.current:
 		Action.STATES.NEUTRAL:
 			if event.is_action_pressed("attack"):
-#				print("ATTACK %d" %frame_count)
-				if Move.current in [Move.STATES.IDLE,Move.STATES.RUN]:
-					anim_sm.travel("attack")
-					anim_tree.set("parameters/attack/blend_position",face_direction)
-				elif Move.current in [Move.STATES.JUMP,Move.STATES.FALL,Move.STATES.WALL]:
-					anim_sm.travel("attack_air")
-					anim_tree.set("parameters/attack_air/blend_position",face_direction)
-				else:
-					return
+				attack_charge_timer.start()
 
-				$Timers/testtimer.start()
-				Action.next = Action.STATES.ATTACK
-				attack_finished = false
-				_exit_action_state()
-				Action.change_state()
+			if event.is_action_released("attack"):
+				if not attack_charge_timer.is_stopped():
+
+	#				print("ATTACK %d" %frame_count)
+					if Move.current in [Move.STATES.IDLE,Move.STATES.RUN]:
+						anim_sm.travel("attack")
+						anim_tree.set("parameters/attack/blend_position",face_direction)
+					elif Move.current in [Move.STATES.JUMP,Move.STATES.FALL,Move.STATES.WALL]:
+						anim_sm.travel("attack_air")
+						anim_tree.set("parameters/attack_air/blend_position",face_direction)
+					else:
+						return
+
+					$Timers/testtimer.start()
+					Action.next = Action.STATES.ATTACK
+					attack_finished = false
+					_exit_action_state()
+					Action.change_state()
+					attack_charge_timer.stop()
+
+				else:
+					print("CHARGED")
+					#TEMP
+					#REPLACE WITH CHARGED ATTACK
+					if Move.current in [Move.STATES.IDLE,Move.STATES.RUN]:
+						anim_sm.travel("attack")
+						anim_tree.set("parameters/attack/blend_position",face_direction)
+					elif Move.current in [Move.STATES.JUMP,Move.STATES.FALL,Move.STATES.WALL]:
+						anim_sm.travel("attack_air")
+						anim_tree.set("parameters/attack_air/blend_position",face_direction)
+					else:
+						return
+
+					$Timers/testtimer.start()
+					Action.next = Action.STATES.ATTACK
+					attack_finished = false
+					_exit_action_state()
+					Action.change_state()
 
 ## Resolves blend position of some blendspaces
 func _resolve_animations() -> void:
@@ -830,7 +866,7 @@ func _player_management() -> void:
 	if stats.health == 0 and not is_dead:
 		print("dead %d" %frame_count)
 		player_dead.emit()
-	pass
+
 
 ## Called by other nodes that hurt the player and change state
 func hurt(damage: float) -> void:
@@ -970,6 +1006,7 @@ func debug_text() -> void:
 
 	DebugTexts.get_node("%is_hurt").text = "is hurt: %s" %is_hurt
 	DebugTexts.get_node("%is_dead").text = "is dead: %s" %is_dead
+	DebugTexts.get_node("%is_attack_charged").text = "is attack charged: %s" %is_attack_charged
 
 	DebugTexts.get_node("%actionstates").text = debug_text_actionstates
 
