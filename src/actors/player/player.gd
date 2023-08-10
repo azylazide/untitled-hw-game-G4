@@ -350,7 +350,7 @@ func _enter_action_state(delta: float) -> void:
 	match Action.current:
 		Action.STATES.HURT:
 			anim_sm.travel("hurt")
-
+			SignalBus.screen_shake_requested.emit(0.1)
 			Globals.freeze(0.1,0.4)
 		Action.STATES.ATTACK:
 			player_attacked.emit(face_direction)
@@ -891,7 +891,8 @@ func hurt(damage: float) -> void:
 	hurt_timer.start()
 
 func charged_freeze() -> void:
-	Globals.freeze(0.08,0.4)
+#	SignalBus.screen_shake_requested.emit(0.1)
+	Globals.freeze(0.05,0.4)
 	pass
 
 ## Creates invincibility frames in a loop then disables hurt flag
