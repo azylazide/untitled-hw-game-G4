@@ -1,4 +1,4 @@
-[gd_scene load_steps=113 format=3 uid="uid://wnwyyirpcmam"]
+[gd_scene load_steps=132 format=3 uid="uid://wnwyyirpcmam"]
 
 [ext_resource type="Script" path="res://src/actors/player/player.gd" id="1_oje55"]
 [ext_resource type="PackedScene" uid="uid://cpattaf8vxwk4" path="res://src/props/ghost_frames.tscn" id="2_4tdf0"]
@@ -61,6 +61,31 @@ animation = &"attack_air_left"
 blend_point_0/node = SubResource("AnimationNodeAnimation_w7vs1")
 blend_point_0/pos = 1.0
 blend_point_1/node = SubResource("AnimationNodeAnimation_larqh")
+blend_point_1/pos = -1.0
+blend_mode = 1
+
+[sub_resource type="AnimationNodeAnimation" id="AnimationNodeAnimation_p0ulg"]
+animation = &"attack_charged_right"
+
+[sub_resource type="AnimationNodeAnimation" id="AnimationNodeAnimation_ineyd"]
+animation = &"attack_charged_left"
+
+[sub_resource type="AnimationNodeBlendSpace1D" id="AnimationNodeBlendSpace1D_7853n"]
+blend_point_0/node = SubResource("AnimationNodeAnimation_p0ulg")
+blend_point_0/pos = 1.0
+blend_point_1/node = SubResource("AnimationNodeAnimation_ineyd")
+blend_point_1/pos = -1.0
+
+[sub_resource type="AnimationNodeAnimation" id="AnimationNodeAnimation_jacfy"]
+animation = &"attack_charged_air_right"
+
+[sub_resource type="AnimationNodeAnimation" id="AnimationNodeAnimation_0ionp"]
+animation = &"attack_charged_air_left"
+
+[sub_resource type="AnimationNodeBlendSpace1D" id="AnimationNodeBlendSpace1D_8kob6"]
+blend_point_0/node = SubResource("AnimationNodeAnimation_jacfy")
+blend_point_0/pos = 1.0
+blend_point_1/node = SubResource("AnimationNodeAnimation_0ionp")
 blend_point_1/pos = -1.0
 blend_mode = 1
 
@@ -261,6 +286,27 @@ switch_mode = 2
 
 [sub_resource type="AnimationNodeStateMachineTransition" id="AnimationNodeStateMachineTransition_y47x0"]
 
+[sub_resource type="AnimationNodeStateMachineTransition" id="AnimationNodeStateMachineTransition_v0835"]
+
+[sub_resource type="AnimationNodeStateMachineTransition" id="AnimationNodeStateMachineTransition_tc6s4"]
+
+[sub_resource type="AnimationNodeStateMachineTransition" id="AnimationNodeStateMachineTransition_vog2f"]
+
+[sub_resource type="AnimationNodeStateMachineTransition" id="AnimationNodeStateMachineTransition_yo53s"]
+
+[sub_resource type="AnimationNodeStateMachineTransition" id="AnimationNodeStateMachineTransition_x1l6k"]
+switch_mode = 2
+
+[sub_resource type="AnimationNodeStateMachineTransition" id="AnimationNodeStateMachineTransition_lvfcu"]
+
+[sub_resource type="AnimationNodeStateMachineTransition" id="AnimationNodeStateMachineTransition_73lck"]
+
+[sub_resource type="AnimationNodeStateMachineTransition" id="AnimationNodeStateMachineTransition_eeshc"]
+switch_mode = 2
+
+[sub_resource type="AnimationNodeStateMachineTransition" id="AnimationNodeStateMachineTransition_ntppm"]
+switch_mode = 2
+
 [sub_resource type="AnimationNodeStateMachine" id="AnimationNodeStateMachine_lagf6"]
 states/End/position = Vector2(941, 100)
 states/adash/node = SubResource("AnimationNodeBlendSpace1D_3jdab")
@@ -269,6 +315,10 @@ states/attack/node = SubResource("AnimationNodeBlendSpace1D_1xrlj")
 states/attack/position = Vector2(435, 256)
 states/attack_air/node = SubResource("AnimationNodeBlendSpace1D_m17wx")
 states/attack_air/position = Vector2(-222, 108)
+states/attack_charged/node = SubResource("AnimationNodeBlendSpace1D_7853n")
+states/attack_charged/position = Vector2(435, 438.437)
+states/attack_charged_air/node = SubResource("AnimationNodeBlendSpace1D_8kob6")
+states/attack_charged_air/position = Vector2(-222, 279.437)
 states/death/node = SubResource("AnimationNodeBlendSpace1D_n0lvd")
 states/death/position = Vector2(795, 256)
 states/fall/node = SubResource("AnimationNodeBlendSpace1D_2po8h")
@@ -287,8 +337,8 @@ states/run/node = SubResource("AnimationNodeBlendSpace1D_qig51")
 states/run/position = Vector2(520, 100)
 states/wall/node = SubResource("AnimationNodeBlendSpace1D_qjijo")
 states/wall/position = Vector2(733, -259)
-transitions = ["Start", "idle", SubResource("AnimationNodeStateMachineTransition_8g710"), "idle", "run", SubResource("AnimationNodeStateMachineTransition_2rle4"), "run", "idle", SubResource("AnimationNodeStateMachineTransition_yehtk"), "idle", "jump", SubResource("AnimationNodeStateMachineTransition_nf55a"), "run", "jump", SubResource("AnimationNodeStateMachineTransition_0h712"), "jump", "fall", SubResource("AnimationNodeStateMachineTransition_gutau"), "idle", "attack", SubResource("AnimationNodeStateMachineTransition_4plpm"), "attack", "idle", SubResource("AnimationNodeStateMachineTransition_3j52a"), "attack", "run", SubResource("AnimationNodeStateMachineTransition_b3o0g"), "run", "attack", SubResource("AnimationNodeStateMachineTransition_2kgkw"), "death", "End", SubResource("AnimationNodeStateMachineTransition_6k2c5"), "idle", "fall", SubResource("AnimationNodeStateMachineTransition_133cf"), "run", "fall", SubResource("AnimationNodeStateMachineTransition_4uwj4"), "fall", "land", SubResource("AnimationNodeStateMachineTransition_v05qh"), "land", "idle", SubResource("AnimationNodeStateMachineTransition_7iua1"), "fall", "adash", SubResource("AnimationNodeStateMachineTransition_8qrko"), "jump", "adash", SubResource("AnimationNodeStateMachineTransition_n0ba6"), "adash", "fall", SubResource("AnimationNodeStateMachineTransition_msyde"), "idle", "gdash", SubResource("AnimationNodeStateMachineTransition_3kl2c"), "run", "gdash", SubResource("AnimationNodeStateMachineTransition_aj57g"), "gdash", "idle", SubResource("AnimationNodeStateMachineTransition_f44eb"), "gdash", "run", SubResource("AnimationNodeStateMachineTransition_6x1i0"), "gdash", "fall", SubResource("AnimationNodeStateMachineTransition_s02ir"), "adash", "jump", SubResource("AnimationNodeStateMachineTransition_xflu6"), "gdash", "jump", SubResource("AnimationNodeStateMachineTransition_7u4ik"), "jump", "attack_air", SubResource("AnimationNodeStateMachineTransition_6cogi"), "fall", "attack_air", SubResource("AnimationNodeStateMachineTransition_cmgyd"), "adash", "attack_air", SubResource("AnimationNodeStateMachineTransition_yw1sa"), "wall", "land", SubResource("AnimationNodeStateMachineTransition_udrt0"), "wall", "jump", SubResource("AnimationNodeStateMachineTransition_f1e7m"), "fall", "wall", SubResource("AnimationNodeStateMachineTransition_jp5ix"), "wall", "fall", SubResource("AnimationNodeStateMachineTransition_6krvu"), "attack_air", "wall", SubResource("AnimationNodeStateMachineTransition_23h1i"), "attack_air", "fall", SubResource("AnimationNodeStateMachineTransition_itasu"), "fall", "jump", SubResource("AnimationNodeStateMachineTransition_sqril"), "fall", "run", SubResource("AnimationNodeStateMachineTransition_tx50m"), "land", "run", SubResource("AnimationNodeStateMachineTransition_y47x0")]
-graph_offset = Vector2(-365, -64.5628)
+transitions = ["Start", "idle", SubResource("AnimationNodeStateMachineTransition_8g710"), "idle", "run", SubResource("AnimationNodeStateMachineTransition_2rle4"), "run", "idle", SubResource("AnimationNodeStateMachineTransition_yehtk"), "idle", "jump", SubResource("AnimationNodeStateMachineTransition_nf55a"), "run", "jump", SubResource("AnimationNodeStateMachineTransition_0h712"), "jump", "fall", SubResource("AnimationNodeStateMachineTransition_gutau"), "idle", "attack", SubResource("AnimationNodeStateMachineTransition_4plpm"), "attack", "idle", SubResource("AnimationNodeStateMachineTransition_3j52a"), "attack", "run", SubResource("AnimationNodeStateMachineTransition_b3o0g"), "run", "attack", SubResource("AnimationNodeStateMachineTransition_2kgkw"), "death", "End", SubResource("AnimationNodeStateMachineTransition_6k2c5"), "idle", "fall", SubResource("AnimationNodeStateMachineTransition_133cf"), "run", "fall", SubResource("AnimationNodeStateMachineTransition_4uwj4"), "fall", "land", SubResource("AnimationNodeStateMachineTransition_v05qh"), "land", "idle", SubResource("AnimationNodeStateMachineTransition_7iua1"), "fall", "adash", SubResource("AnimationNodeStateMachineTransition_8qrko"), "jump", "adash", SubResource("AnimationNodeStateMachineTransition_n0ba6"), "adash", "fall", SubResource("AnimationNodeStateMachineTransition_msyde"), "idle", "gdash", SubResource("AnimationNodeStateMachineTransition_3kl2c"), "run", "gdash", SubResource("AnimationNodeStateMachineTransition_aj57g"), "gdash", "idle", SubResource("AnimationNodeStateMachineTransition_f44eb"), "gdash", "run", SubResource("AnimationNodeStateMachineTransition_6x1i0"), "gdash", "fall", SubResource("AnimationNodeStateMachineTransition_s02ir"), "adash", "jump", SubResource("AnimationNodeStateMachineTransition_xflu6"), "gdash", "jump", SubResource("AnimationNodeStateMachineTransition_7u4ik"), "jump", "attack_air", SubResource("AnimationNodeStateMachineTransition_6cogi"), "fall", "attack_air", SubResource("AnimationNodeStateMachineTransition_cmgyd"), "adash", "attack_air", SubResource("AnimationNodeStateMachineTransition_yw1sa"), "wall", "land", SubResource("AnimationNodeStateMachineTransition_udrt0"), "wall", "jump", SubResource("AnimationNodeStateMachineTransition_f1e7m"), "fall", "wall", SubResource("AnimationNodeStateMachineTransition_jp5ix"), "wall", "fall", SubResource("AnimationNodeStateMachineTransition_6krvu"), "attack_air", "wall", SubResource("AnimationNodeStateMachineTransition_23h1i"), "attack_air", "fall", SubResource("AnimationNodeStateMachineTransition_itasu"), "fall", "jump", SubResource("AnimationNodeStateMachineTransition_sqril"), "fall", "run", SubResource("AnimationNodeStateMachineTransition_tx50m"), "land", "run", SubResource("AnimationNodeStateMachineTransition_y47x0"), "adash", "attack_charged_air", SubResource("AnimationNodeStateMachineTransition_v0835"), "fall", "attack_charged_air", SubResource("AnimationNodeStateMachineTransition_tc6s4"), "jump", "attack_charged_air", SubResource("AnimationNodeStateMachineTransition_vog2f"), "attack_charged_air", "fall", SubResource("AnimationNodeStateMachineTransition_yo53s"), "attack_charged_air", "wall", SubResource("AnimationNodeStateMachineTransition_x1l6k"), "idle", "attack_charged", SubResource("AnimationNodeStateMachineTransition_lvfcu"), "run", "attack_charged", SubResource("AnimationNodeStateMachineTransition_73lck"), "attack_charged", "idle", SubResource("AnimationNodeStateMachineTransition_eeshc"), "attack_charged", "run", SubResource("AnimationNodeStateMachineTransition_ntppm")]
+graph_offset = Vector2(-425, -207.563)
 
 [sub_resource type="AnimationNodeStateMachinePlayback" id="AnimationNodeStateMachinePlayback_28qgb"]
 
@@ -1333,6 +1383,246 @@ tracks/2/keys = {
 "values": [true]
 }
 
+[sub_resource type="Animation" id="Animation_i8px1"]
+resource_name = "attack_charged_right"
+length = 0.15
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Sprite2D:frame")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 0.1),
+"transitions": PackedFloat32Array(1, 1),
+"update": 1,
+"values": [29, 30]
+}
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath("Sprite2D:offset")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 1,
+"values": [Vector2(0, -15.5)]
+}
+tracks/2/type = "value"
+tracks/2/imported = false
+tracks/2/enabled = true
+tracks/2/path = NodePath("Sprite2D:flip_h")
+tracks/2/interp = 1
+tracks/2/loop_wrap = true
+tracks/2/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 1,
+"values": [false]
+}
+tracks/3/type = "value"
+tracks/3/imported = false
+tracks/3/enabled = true
+tracks/3/path = NodePath("ArrowSpawn:position")
+tracks/3/interp = 1
+tracks/3/loop_wrap = true
+tracks/3/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [Vector2(143, -114)]
+}
+tracks/4/type = "method"
+tracks/4/imported = false
+tracks/4/enabled = true
+tracks/4/path = NodePath(".")
+tracks/4/interp = 1
+tracks/4/loop_wrap = true
+tracks/4/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"values": [{
+"args": [],
+"method": &"charged_freeze"
+}]
+}
+
+[sub_resource type="Animation" id="Animation_f3yf7"]
+resource_name = "attack_charged_left"
+length = 0.15
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Sprite2D:frame")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 0.1),
+"transitions": PackedFloat32Array(1, 1),
+"update": 1,
+"values": [29, 30]
+}
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath("Sprite2D:offset")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 1,
+"values": [Vector2(0, -15.5)]
+}
+tracks/2/type = "value"
+tracks/2/imported = false
+tracks/2/enabled = true
+tracks/2/path = NodePath("Sprite2D:flip_h")
+tracks/2/interp = 1
+tracks/2/loop_wrap = true
+tracks/2/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 1,
+"values": [true]
+}
+tracks/3/type = "value"
+tracks/3/imported = false
+tracks/3/enabled = true
+tracks/3/path = NodePath("ArrowSpawn:position")
+tracks/3/interp = 1
+tracks/3/loop_wrap = true
+tracks/3/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [Vector2(-143, -114)]
+}
+tracks/4/type = "method"
+tracks/4/imported = false
+tracks/4/enabled = true
+tracks/4/path = NodePath(".")
+tracks/4/interp = 1
+tracks/4/loop_wrap = true
+tracks/4/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"values": [{
+"args": [],
+"method": &"charged_freeze"
+}]
+}
+
+[sub_resource type="Animation" id="Animation_1c1us"]
+resource_name = "attack_charged_air_left"
+length = 0.15
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Sprite2D:frame")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 0.1),
+"transitions": PackedFloat32Array(1, 1),
+"update": 1,
+"values": [29, 30]
+}
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath("Sprite2D:offset")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 1,
+"values": [Vector2(0, -15.5)]
+}
+tracks/2/type = "value"
+tracks/2/imported = false
+tracks/2/enabled = true
+tracks/2/path = NodePath("Sprite2D:flip_h")
+tracks/2/interp = 1
+tracks/2/loop_wrap = true
+tracks/2/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 1,
+"values": [true]
+}
+tracks/3/type = "method"
+tracks/3/imported = false
+tracks/3/enabled = true
+tracks/3/path = NodePath(".")
+tracks/3/interp = 1
+tracks/3/loop_wrap = true
+tracks/3/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"values": [{
+"args": [],
+"method": &"charged_freeze"
+}]
+}
+
+[sub_resource type="Animation" id="Animation_saux7"]
+resource_name = "attack_charged_air_right"
+length = 0.15
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Sprite2D:frame")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 0.1),
+"transitions": PackedFloat32Array(1, 1),
+"update": 1,
+"values": [29, 30]
+}
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath("Sprite2D:offset")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 1,
+"values": [Vector2(0, -15.5)]
+}
+tracks/2/type = "value"
+tracks/2/imported = false
+tracks/2/enabled = true
+tracks/2/path = NodePath("Sprite2D:flip_h")
+tracks/2/interp = 1
+tracks/2/loop_wrap = true
+tracks/2/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 1,
+"values": [false]
+}
+tracks/3/type = "method"
+tracks/3/imported = false
+tracks/3/enabled = true
+tracks/3/path = NodePath(".")
+tracks/3/interp = 1
+tracks/3/loop_wrap = true
+tracks/3/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"values": [{
+"args": [],
+"method": &"charged_freeze"
+}]
+}
+
 [sub_resource type="AnimationLibrary" id="AnimationLibrary_n4wxi"]
 _data = {
 "RESET": SubResource("Animation_uwxcc"),
@@ -1340,6 +1630,10 @@ _data = {
 "adash_right": SubResource("Animation_pngrv"),
 "attack_air_left": SubResource("Animation_6yemg"),
 "attack_air_right": SubResource("Animation_iihd8"),
+"attack_charged_air_left": SubResource("Animation_1c1us"),
+"attack_charged_air_right": SubResource("Animation_saux7"),
+"attack_charged_left": SubResource("Animation_f3yf7"),
+"attack_charged_right": SubResource("Animation_i8px1"),
 "attack_left": SubResource("Animation_ni3bk"),
 "attack_right": SubResource("Animation_70s3h"),
 "death_left": SubResource("Animation_mnq1f"),
@@ -1493,6 +1787,8 @@ parameters/playback = SubResource("AnimationNodeStateMachinePlayback_28qgb")
 parameters/adash/blend_position = 1.0
 parameters/attack/blend_position = 1.0
 parameters/attack_air/blend_position = 1.0
+parameters/attack_charged/blend_position = 1.0
+parameters/attack_charged_air/blend_position = 1.0
 parameters/death/blend_position = 1.0
 parameters/fall/blend_position = 1.0
 parameters/gdash/blend_position = 0

@@ -572,13 +572,11 @@ func _run_action_state(delta: float) -> int:
 #						anim_sm.travel("idle")
 #						anim_tree.set("parameters/idle/blend_position",face_direction)
 #				return Action.STATES.NEUTRAL
-			if attack_finished or not (anim_sm.get_current_node() == "attack" or anim_sm.get_current_node() == "attack_air"):
+			var current_node = anim_sm.get_current_node()
+			if attack_finished or not current_node in ["attack","attack_air","attack_charged","attack_charged_air"]:
 				attack_finished = true
 				return Action.STATES.NEUTRAL
-			if anim_sm.get_current_node() == "attack":
-				anim_tree.set("parameters/attack/blend_position",face_direction)
-			else:
-				anim_tree.set("parameters/attack_air/blend_position",face_direction)
+			anim_tree.set("parameters/%s/blend_position" %current_node,face_direction)
 			return Action.STATES.ATTACK
 		Action.STATES.HURT:
 			#knockback timer
@@ -814,10 +812,11 @@ func _unhandled_input(event: InputEvent) -> void:
 	match Action.current:
 		Action.STATES.NEUTRAL:
 			if event.is_action_pressed("attack"):
-				attack_charge_timer.start()
+				if (stats.shot_attacks & 0b10):
+					attack_charge_timer.start()
 
 			if event.is_action_released("attack"):
-				if not attack_charge_timer.is_stopped():
+				if not is_attack_charged:
 
 	#				print("ATTACK %d" %frame_count)
 					if Move.current in [Move.STATES.IDLE,Move.STATES.RUN]:
@@ -841,11 +840,11 @@ func _unhandled_input(event: InputEvent) -> void:
 					#TEMP
 					#REPLACE WITH CHARGED ATTACK
 					if Move.current in [Move.STATES.IDLE,Move.STATES.RUN]:
-						anim_sm.travel("attack")
-						anim_tree.set("parameters/attack/blend_position",face_direction)
+						anim_sm.travel("attack_charged")
+						anim_tree.set("parameters/attack_charged/blend_position",face_direction)
 					elif Move.current in [Move.STATES.JUMP,Move.STATES.FALL,Move.STATES.WALL]:
-						anim_sm.travel("attack_air")
-						anim_tree.set("parameters/attack_air/blend_position",face_direction)
+						anim_sm.travel("attack_charged_air")
+						anim_tree.set("parameters/attack_charged_air/blend_position",face_direction)
 					else:
 						return
 
@@ -891,6 +890,10 @@ func hurt(damage: float) -> void:
 	#temp
 	hurt_timer.start()
 
+func charged_freeze() -> void:
+	Globals.freeze(0.08,0.4)
+	pass
+
 ## Creates invincibility frames in a loop then disables hurt flag
 func invincibility_tween() -> void:
 	var sprite:= $Sprite2D
@@ -930,7 +933,7 @@ func _on_player_death() -> void:
 ## Handles transitions to other animations or decides what state to transition to
 func _on_animation_tree_animation_finished(anim_name: StringName) -> void:
 #	print(anim_name)
-	if anim_name in ["attack_right","attack_left","attack_air_right","attack_air_left"]:
+	if anim_name in ["attack_right","attack_left","attack_air_right","attack_air_left","attack_charged_air_right","attack_charged_air_left","attack_charged_right","attack_charged_left"]:
 		attack_finished = true
 		match Move.current:
 			Move.STATES.IDLE:
