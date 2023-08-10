@@ -8,3 +8,4 @@ script = ExtResource("1_8iydp")
 
 [node name="PlayerHurt" type="AudioStreamPlayer" parent="."]
 stream = ExtResource("2_x4vqq")
+bus = &"Sound"

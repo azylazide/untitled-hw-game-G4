@@ -819,17 +819,20 @@ func _unhandled_input(event: InputEvent) -> void:
 				_exit_action_state()
 				Action.change_state()
 
+## Resolves blend position of some blendspaces
 func _resolve_animations() -> void:
 	var anim_list:= ["idle","run","fall","jump","land","gdash","adash","wall","hurt"]
 	for anim_name in anim_list:
 		anim_tree.set("parameters/%s/blend_position" %anim_name,face_direction)
 
+## End of physics frame player checks
 func _player_management() -> void:
 	if stats.health == 0 and not is_dead:
 		print("dead %d" %frame_count)
 		player_dead.emit()
 	pass
 
+## Called by other nodes that hurt the player and change state
 func hurt(damage: float) -> void:
 	if stats.health == 0:
 		return
@@ -843,6 +846,7 @@ func hurt(damage: float) -> void:
 	GlobalSoundPlayer.play_hurt()
 
 	Action.next = Action.STATES.HURT
+	_exit_action_state()
 	Action.change_state()
 	Move.next = Move.AUTO
 	_exit_movement_state()
@@ -851,21 +855,23 @@ func hurt(damage: float) -> void:
 	#temp
 	hurt_timer.start()
 
+## Creates invincibility frames in a loop then disables hurt flag
 func invincibility_tween() -> void:
 	var sprite:= $Sprite2D
 	var tween:= create_tween().set_loops(4)
-	tween.tween_property(sprite,"modulate",Color(sprite.modulate,0.2),0.15)
-	tween.tween_property(sprite,"modulate",Color(sprite.modulate,1),0.15)
+	tween.tween_property(sprite,"modulate:a",0.2,0.15)
+	tween.tween_property(sprite,"modulate:a",1,0.15)
 	await tween.finished
 	is_hurt = false
 
+## Calls dash ghosts spawner in a loop
 func dash_ghost_tweener() -> void:
 	ghost_tweener = create_tween().set_loops()
 	ghost_tweener.tween_callback(dash_ghost)
 	ghost_tweener.tween_interval(0.35*dash_time)
 	print(ghost_tweener)
 
-
+## Instances and adds to tree dash ghosts
 func dash_ghost() -> void:
 	var ghost: Sprite2D = ghost_scene.instantiate()
 	ghost.sprite = $Sprite2D
@@ -875,6 +881,7 @@ func _on_player_hurt() -> void:
 #	is_hurt = true
 	pass
 
+## Called during player death
 func _on_player_death() -> void:
 	is_dead = true
 	Action.next = Action.STATES.DEATH
