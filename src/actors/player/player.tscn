@@ -1,11 +1,10 @@
-[gd_scene load_steps=114 format=3 uid="uid://wnwyyirpcmam"]
+[gd_scene load_steps=113 format=3 uid="uid://wnwyyirpcmam"]
 
 [ext_resource type="Script" path="res://src/actors/player/player.gd" id="1_oje55"]
 [ext_resource type="PackedScene" uid="uid://cpattaf8vxwk4" path="res://src/props/ghost_frames.tscn" id="2_4tdf0"]
 [ext_resource type="Resource" uid="uid://bvcyv5ih6dyl1" path="res://src/actors/player/debug_player.tres" id="2_iohlw"]
 [ext_resource type="Script" path="res://src/actors/player/CameraBBoxDetector.gd" id="3_il3ji"]
 [ext_resource type="Texture2D" uid="uid://sa6q1jkf07gi" path="res://assets/spritesheet.png" id="4_ksiyv"]
-[ext_resource type="AudioStream" uid="uid://ooyjwkxbfgjl" path="res://assets/Sounds/player_hurt.wav" id="5_jvewl"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_p3dhm"]
 size = Vector2(70, 150)
@@ -1504,8 +1503,5 @@ parameters/wall/blend_position = 0
 libraries = {
 "": SubResource("AnimationLibrary_n4wxi")
 }
-
-[node name="AudioStreamPlayer" type="AudioStreamPlayer" parent="."]
-stream = ExtResource("5_jvewl")
 
 [connection signal="animation_finished" from="AnimationTree" to="." method="_on_animation_tree_animation_finished"]

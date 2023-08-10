@@ -342,7 +342,7 @@ func _enter_action_state(delta: float) -> void:
 	match Action.current:
 		Action.STATES.HURT:
 			anim_sm.travel("hurt")
-			$AudioStreamPlayer.play()
+
 			Globals.freeze(0.1,0.4)
 		Action.STATES.ATTACK:
 			player_attacked.emit(face_direction)
@@ -839,6 +839,8 @@ func hurt(damage: float) -> void:
 	stats.health -= damage
 	player_hurt.emit()
 	is_hurt = true
+
+	GlobalSoundPlayer.play_hurt()
 
 	Action.next = Action.STATES.HURT
 	Action.change_state()
