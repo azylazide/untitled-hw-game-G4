@@ -1,4 +1,4 @@
-[gd_scene load_steps=9 format=3 uid="uid://sui8erivjt5m"]
+[gd_scene load_steps=10 format=3 uid="uid://sui8erivjt5m"]
 
 [ext_resource type="Script" path="res://src/levels/level_test.gd" id="1_yx08m"]
 [ext_resource type="PackedScene" uid="uid://cmgcdb5sm7mll" path="res://src/props/arrow.tscn" id="2_ahl1u"]
@@ -7,6 +7,7 @@
 [ext_resource type="Script" path="res://src/camera_bound_box.gd" id="4_yupxf"]
 [ext_resource type="Script" path="res://src/RemoteCamera.gd" id="5_oftha"]
 [ext_resource type="Texture2D" uid="uid://cp1jwnrrrcbdg" path="res://assets/sample test scale.png" id="6_mj05s"]
+[ext_resource type="PackedScene" uid="uid://cwmj4tadylf8s" path="res://src/actors/EnemyTest.tscn" id="8_j4lar"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_ffwgc"]
 size = Vector2(6050, 2460)
@@ -45,3 +46,6 @@ zoom = Vector2(0.65, 0.65)
 script = ExtResource("5_oftha")
 player = NodePath("../Player")
 wall_jump_smoothing = 0.358
+
+[node name="TestEnemy" parent="." instance=ExtResource("8_j4lar")]
+position = Vector2(785, 12)
