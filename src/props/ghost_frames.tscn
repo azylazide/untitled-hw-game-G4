@@ -3,4 +3,5 @@
 [ext_resource type="Script" path="res://src/props/ghost_frames.gd" id="1_cj4x7"]
 
 [node name="GhostSprite" type="Sprite2D"]
+texture_filter = 1
 script = ExtResource("1_cj4x7")
