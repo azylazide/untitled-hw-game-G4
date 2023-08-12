@@ -25,6 +25,7 @@ SignalBus="*res://src/signal_bus.gd"
 Globals="*res://src/Globals.gd"
 DebugTexts="*res://src/debug_texts.tscn"
 DebugUtils="*res://src/DebugUtils.gd"
+GlobalSoundPlayer="*res://src/global_sound_player.tscn"
 
 [display]
 

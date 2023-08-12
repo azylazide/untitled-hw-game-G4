@@ -14,6 +14,11 @@ func _jump_vel(walk_length: float, h: float, x: float) -> float:
 
 func _dash_speed(dash_length: float, dash_time: float) -> float:
 	return dash_length*TILE_UNITS/dash_time
-	
+
 func _wall_kick(wall_kick_power: float, wall_kick_time: float):
 	return wall_kick_power*TILE_UNITS/wall_kick_time
+
+func freeze(timescale: float, duration: float) -> void:
+	Engine.time_scale = timescale
+	await get_tree().create_timer(duration*timescale).timeout
+	Engine.time_scale = 1

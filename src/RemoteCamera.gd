@@ -57,6 +57,8 @@ var player_camera_center_pos: Vector2
 var movement_states
 var detector_exited:= false
 
+var shake_tween: Tween
+
 ## Current horizontal camera smoothing
 @onready var current_hs = horizontal_slow_smoothing
 @onready var current_vs = vertical_slow_smoothing
@@ -69,6 +71,10 @@ var detector_exited:= false
 @onready var x_offset: float = x_offset_tiles*Globals.TILE_UNITS
 ## Position of offset
 @onready var current_offset:= Vector2(x_offset,0)
+## Screen shake flag
+@onready var screen_shake:= false
+
+@onready var shake_offset:= Vector2.ZERO
 
 func _ready() -> void:
 #	await playernode.ready
@@ -80,9 +86,12 @@ func _ready() -> void:
 
 	#connect player physics updates
 	SignalBus.player_updated.connect(_on_player_node_updated)
+	SignalBus.screen_shake_requested.connect(_on_screen_shake_requested)
 
 	#player info
 	player_facing = player.face_direction
+
+	randomize()
 
 func _physics_process(delta: float) -> void:
 	#Get new position of player camera marker
@@ -110,6 +119,10 @@ func _physics_process(delta: float) -> void:
 ## Get new camera target position
 func _update_position() -> Vector2:
 	current_offset = _get_offset()
+	if screen_shake:
+		shake_tween = create_tween()
+		shake_tween.tween_property(self,"shake_offset",compute_shake_offset(20),0.1)
+		player_camera_center_pos+= shake_offset
 	return player_camera_center_pos + current_offset
 
 ## Clamp the target position
@@ -199,6 +212,9 @@ func _clamp_pos(pos: Vector2) -> Vector2:
 func _interp_pos(pos: Vector2) -> Vector2:
 	var output: Vector2
 
+	if screen_shake:
+		return clamped_pos
+
 	var hs:= horizontal_slow_smoothing
 	var vs:= vertical_slow_smoothing
 
@@ -228,6 +244,7 @@ func _get_offset() -> Vector2:
 		output.x = x_offset
 	elif face_dir < 0:
 		output.x = -x_offset
+
 	return output
 
 ## Append [CameraBoundBox] node to [member bbox_array].
@@ -249,3 +266,15 @@ func _on_player_node_updated(facing: float, cam_pos: Vector2, velocity: Vector2,
 	player_velocity = velocity
 	prev_state = current_state
 	current_state = move
+
+func compute_shake_offset(intensity: float) -> Vector2:
+	var output = Vector2(randf_range(-1,1)*intensity,randf_range(-1,1)*intensity)
+	return output
+
+func _on_screen_shake_requested(duration: float) -> void:
+	screen_shake = true
+	var tween:= create_tween()
+	await tween.tween_interval(duration).finished
+	screen_shake = false
+	shake_offset = Vector2.ZERO
+	pass
