@@ -601,10 +601,8 @@ func _exit_movement_state() -> void:
 				Action.STATES.HURT:
 					velocity.x = 0
 		Move.STATES.GDASH:
-			print(ghost_tweener)
 			ghost_tweener.kill()
 		Move.STATES.ADASH:
-			print(ghost_tweener)
 			ghost_tweener.kill()
 	return
 
@@ -909,7 +907,6 @@ func dash_ghost_tweener() -> void:
 	ghost_tweener = create_tween().set_loops()
 	ghost_tweener.tween_callback(dash_ghost)
 	ghost_tweener.tween_interval(0.35*dash_time)
-	print(ghost_tweener)
 
 ## Instances and adds to tree dash ghosts
 func dash_ghost() -> void:
@@ -953,7 +950,7 @@ func _on_animation_tree_animation_finished(anim_name: StringName) -> void:
 				anim_sm.travel("idle")
 #				anim_tree.set("parameters/idle/blend_position",face_direction)
 	elif anim_name in ["hurt_left","hurt_right"]:
-		print("test ended %d" %frame_count)
+#		print("test ended %d" %frame_count)
 		#temp
 #		is_hurt = false #temp
 		if check_floor():
@@ -963,7 +960,7 @@ func _on_animation_tree_animation_finished(anim_name: StringName) -> void:
 				Move.next = Move.STATES.IDLE
 		else:
 			Move.next = Move.STATES.FALL
-		print("%s %d" %[Move.next,frame_count])
+#		print("%s %d" %[Move.next,frame_count])
 		_exit_movement_state()
 		Move.change_state()
 		if not is_dead:
