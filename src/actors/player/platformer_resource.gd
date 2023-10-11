@@ -21,13 +21,13 @@ class_name PlatformerResource
 ## Duration until player can dash again
 @export var dash_cooldown_time:= 0.2
 ## Distance travelled by dash
-@export var dash_length:= 2.0
+@export var dash_length:= 4.0
 
 @export_subgroup("Wall")
 ## Duration of full wall kick air time
 @export var wall_kick_time:= 0.5
 ## Velocity applied horizontally in wall kick
-@export var wall_kick_power:= 2.5
+@export var wall_kick_power:= 5
 ## Cooldown time until another wall kick is allowed
 @export var wall_cooldown_time:= 0.2
 ## Multiplier for gravity in wall sliding

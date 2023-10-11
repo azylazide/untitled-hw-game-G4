@@ -56,7 +56,7 @@ class_name Player
 @onready var hurt_timer:= $Timers/HurtTimer as Timer
 
 ## Timer that determines if fully charged or interrupted
-@onready var attack_charge_timer:= $Timers/AttackChargeTimer as Timer
+#@onready var attack_charge_timer:= $Timers/AttackChargeTimer as Timer
 
 ## If on floor on previous frame
 @onready var was_on_floor:= true
@@ -104,6 +104,16 @@ var anim_sm: AnimationNodeStateMachinePlayback
 ## bool state changed by signal
 var attack_finished:= true
 
+signal player_dead
+signal player_hurt
+signal player_attacked
+
+var is_dead:= false
+var is_hurt:= false
+var is_attack_charged:= false
+
+var ghost_tweener: Tween
+
 ## Setup movement values
 func _setup_movement() -> void:
 	jump_gravity = Globals._gravity(jump_height,max_run_tile,gap_length)
@@ -149,6 +159,7 @@ func _ready() -> void:
 
 func _physics_process(delta: float) -> void:
 	movement_sm.machine_physics(delta)
+	SignalBus.player_updated.emit(face_direction,camera_center.global_position,velocity,movement_sm.current_state,null)
 	debug_text()
 	pass
 

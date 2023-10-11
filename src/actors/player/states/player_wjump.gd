@@ -35,6 +35,13 @@ func state_input(event: InputEvent) -> State:
 		if player.dash_cooldown_timer.is_stopped():
 			return adash
 
+	if event.is_action_released("jump"):
+		if player.velocity.y < -player.min_jump_force:
+			player.velocity.y = -player.min_jump_force
+			return fall
+		else:
+			return fall
+
 	return null
 
 func state_animated(anim_name: StringName) -> State:

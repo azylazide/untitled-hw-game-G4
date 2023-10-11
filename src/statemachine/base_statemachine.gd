@@ -5,8 +5,8 @@ class_name StateMachine
 
 @export var initial_state: State = null
 
-var current_state: State
-var previous_state: State
+var current_state: State = null
+var previous_state: State = null
 var previous_frame_state: State
 var next_state: State
 

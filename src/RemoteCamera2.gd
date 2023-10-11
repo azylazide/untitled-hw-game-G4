@@ -12,7 +12,7 @@
 ## [br] -Camera contextually bounded
 ## [br]
 extends Camera2D
-class_name RemoteCamera
+class_name RemoteCamera2
 
 ## Player node the camera follows.
 @export var player: ActorBase
@@ -49,8 +49,8 @@ var interped_pos: Vector2
 
 ## Store face direction of [member player]
 var player_facing: float
-var prev_state: int
-var current_state: int
+var prev_state: State
+var current_state: State
 var player_velocity: Vector2
 var player_speed: float
 var player_camera_center_pos: Vector2
@@ -77,6 +77,7 @@ var shake_tween: Tween
 @onready var shake_offset:= Vector2.ZERO
 
 func _ready() -> void:
+	await player.ready
 #	await cameraboundcontainer.ready
 #	print(player)
 	player.camera_bbox_detector.area_entered.connect(on_CameraBBoxDetector_area_entered)
@@ -218,14 +219,15 @@ func _interp_pos(pos: Vector2) -> Vector2:
 	var vs:= vertical_slow_smoothing
 
 	if not detector_exited:
-		if prev_state == player.move_states_ref.WALL and current_state == player.move_states_ref.JUMP:
-			hs = wall_jump_smoothing
-		else:
-			if abs(player_velocity.x) > player.speed*0.5:
-				hs = horizontal_fast_smoothing
+		if prev_state and current_state:
+			if prev_state.name == "Wall" and current_state.name == "Jump":
+				hs = wall_jump_smoothing
+			else:
+				if abs(player_velocity.x) > player.speed*0.5:
+					hs = horizontal_fast_smoothing
 
-		if current_state == player.move_states_ref.FALL and player_velocity.y == player.max_fall_speed:
-			vs = lerpf(current_vs,vertical_fast_smoothing,0.1)
+			if current_state.name == "Fall" and player_velocity.y == player.max_fall_speed:
+				vs = lerpf(current_vs,vertical_fast_smoothing,0.1)
 
 	current_hs = hs
 	current_vs = vs
@@ -259,7 +261,7 @@ func on_area_detector_exiting() -> void:
 	detector_exited = true
 
 ## Update stored [member player] information after its physics step.
-func _on_player_node_updated(facing: float, cam_pos: Vector2, velocity: Vector2, move: int, action: int) -> void:
+func _on_player_node_updated(facing: float, cam_pos: Vector2, velocity: Vector2, move: State, action: State) -> void:
 	player_facing = facing
 	player_camera_center_pos = cam_pos
 	player_velocity = velocity

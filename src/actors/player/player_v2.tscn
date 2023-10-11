@@ -1055,9 +1055,10 @@ debug_color = Color(0.733333, 0.945098, 1, 0.337255)
 
 [node name="StateMachinesHolder" type="Node" parent="."]
 
-[node name="MovementStateMachine" type="Node" parent="StateMachinesHolder" node_paths=PackedStringArray("pawn")]
+[node name="MovementStateMachine" type="Node" parent="StateMachinesHolder" node_paths=PackedStringArray("pawn", "initial_state")]
 script = ExtResource("5_nojwa")
 pawn = NodePath("../..")
+initial_state = NodePath("Idle")
 
 [node name="Idle" type="Node" parent="StateMachinesHolder/MovementStateMachine" node_paths=PackedStringArray("run", "jump", "fall", "gdash")]
 script = ExtResource("5_f6uax")
@@ -1103,7 +1104,7 @@ jump = NodePath("../Jump")
 
 [node name="ADash" type="Node" parent="StateMachinesHolder/MovementStateMachine" node_paths=PackedStringArray("idle", "run", "fall", "ajump")]
 script = ExtResource("11_x1nvp")
-idle = NodePath("../Idle")
+idle = NodePath(".")
 run = NodePath("../Run")
 fall = NodePath("../Fall")
 ajump = NodePath("../AJump")
