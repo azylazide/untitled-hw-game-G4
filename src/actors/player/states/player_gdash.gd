@@ -1,4 +1,5 @@
 extends PlayerState
+class_name PlayerGDash
 
 @export_group("Transitions")
 @export var idle: State = null

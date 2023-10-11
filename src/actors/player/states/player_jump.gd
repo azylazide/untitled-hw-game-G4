@@ -1,4 +1,5 @@
 extends PlayerState
+class_name PlayerJump
 
 @export_group("Transitions")
 @export var fall: State = null

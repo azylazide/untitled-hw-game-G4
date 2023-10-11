@@ -1,4 +1,4 @@
-[gd_scene load_steps=102 format=3 uid="uid://b7syhleiwn1bv"]
+[gd_scene load_steps=104 format=3 uid="uid://b12acqdh5oabo"]
 
 [ext_resource type="Script" path="res://src/actors/player/player_v2.gd" id="1_wm1sy"]
 [ext_resource type="Resource" uid="uid://bjsu5tksv0kxc" path="res://src/actors/player/default_platformer_values.tres" id="2_e513s"]
@@ -6,8 +6,9 @@
 [ext_resource type="Resource" uid="uid://bvcyv5ih6dyl1" path="res://src/actors/player/debug_player.tres" id="3_n3p8u"]
 [ext_resource type="Texture2D" uid="uid://sa6q1jkf07gi" path="res://assets/spritesheet.png" id="4_1l24v"]
 [ext_resource type="Script" path="res://src/actors/player/states/player_idle.gd" id="5_f6uax"]
-[ext_resource type="Script" path="res://src/statemachine/base_statemachine.gd" id="5_nojwa"]
+[ext_resource type="Script" path="res://src/actors/player/states/statemachineholder.gd" id="5_wii1x"]
 [ext_resource type="Script" path="res://src/actors/player/states/player_run.gd" id="6_6n4cl"]
+[ext_resource type="Script" path="res://src/actors/player/states/playerstatemachine.gd" id="6_yn0ar"]
 [ext_resource type="Script" path="res://src/actors/player/states/player_fall.gd" id="7_gpjne"]
 [ext_resource type="Script" path="res://src/actors/player/states/player_jump.gd" id="8_uxet1"]
 [ext_resource type="Script" path="res://src/actors/player/states/player_ajump.gd" id="9_42qpu"]
@@ -16,6 +17,7 @@
 [ext_resource type="Script" path="res://src/actors/player/states/player_wall.gd" id="12_2oh6g"]
 [ext_resource type="Script" path="res://src/actors/player/states/player_wjump.gd" id="13_mkqwc"]
 [ext_resource type="Script" path="res://src/actors/player/states/playerstate.gd" id="14_kuw0v"]
+[ext_resource type="Script" path="res://src/actors/player/states/player_neutral.gd" id="18_42bri"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_p3dhm"]
 size = Vector2(70, 150)
@@ -1054,9 +1056,10 @@ shape = SubResource("CircleShape2D_i8aq0")
 debug_color = Color(0.733333, 0.945098, 1, 0.337255)
 
 [node name="StateMachinesHolder" type="Node" parent="."]
+script = ExtResource("5_wii1x")
 
 [node name="MovementStateMachine" type="Node" parent="StateMachinesHolder" node_paths=PackedStringArray("pawn", "initial_state")]
-script = ExtResource("5_nojwa")
+script = ExtResource("6_yn0ar")
 pawn = NodePath("../..")
 initial_state = NodePath("Idle")
 
@@ -1123,6 +1126,14 @@ adash = NodePath("../ADash")
 
 [node name="Auto" type="Node" parent="StateMachinesHolder/MovementStateMachine"]
 script = ExtResource("14_kuw0v")
+
+[node name="ActionStateMachine" type="Node" parent="StateMachinesHolder" node_paths=PackedStringArray("pawn", "initial_state")]
+script = ExtResource("6_yn0ar")
+pawn = NodePath("../..")
+initial_state = NodePath("Neutral")
+
+[node name="Neutral" type="Node" parent="StateMachinesHolder/ActionStateMachine"]
+script = ExtResource("18_42bri")
 
 [node name="CameraCenter" type="Marker2D" parent="."]
 position = Vector2(0, -75)

@@ -1,4 +1,5 @@
 extends PlayerState
+class_name PlayerIdle
 
 @export_group("Transitions")
 @export var run: State = null
