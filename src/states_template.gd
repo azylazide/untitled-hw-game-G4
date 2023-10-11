@@ -29,12 +29,12 @@ func _name_dict(enum_dic) -> void:
 	for state in temp_name:
 		state_name[i] = state
 		i+=1
-	
+
 func change_state() -> void:
 	self.previous_frame = self.current
 	if self.next == self.current:
 		return
-	
+
 	self.previous = self.current
 	self.current = self.next
 #	print("changed")

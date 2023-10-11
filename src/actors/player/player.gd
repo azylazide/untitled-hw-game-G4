@@ -976,6 +976,8 @@ func _on_animation_tree_animation_finished(anim_name: StringName) -> void:
 	elif anim_name in ["landing_left","landing_right"]:
 		anim_sm.travel("idle")
 
+
+
 func debug_text() -> void:
 	var debug_text_vel = "velocity: (%.00f,%.00f)" %[velocity.x,velocity.y]
 	var debug_text_pos = "position: (%.00f,%.00f)" %[global_position.x,global_position.y]

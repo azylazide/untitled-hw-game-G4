@@ -9,7 +9,6 @@ func _ready() -> void:
 	player_node.player_attacked.connect(spawn_arrow)
 	pass # Replace with function body.
 
-
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(delta: float) -> void:
 	pass

@@ -1,10 +1,21 @@
-[gd_scene load_steps=91 format=3 uid="uid://cv0wiqatm10vs"]
+[gd_scene load_steps=102 format=3 uid="uid://b7syhleiwn1bv"]
 
 [ext_resource type="Script" path="res://src/actors/player/player_v2.gd" id="1_wm1sy"]
-[ext_resource type="Resource" path="res://src/actors/player/default_platformer_values.tres" id="2_e513s"]
+[ext_resource type="Resource" uid="uid://bjsu5tksv0kxc" path="res://src/actors/player/default_platformer_values.tres" id="2_e513s"]
 [ext_resource type="Script" path="res://src/actors/player/CameraBBoxDetector.gd" id="3_0s0g8"]
+[ext_resource type="Resource" uid="uid://bvcyv5ih6dyl1" path="res://src/actors/player/debug_player.tres" id="3_n3p8u"]
 [ext_resource type="Texture2D" uid="uid://sa6q1jkf07gi" path="res://assets/spritesheet.png" id="4_1l24v"]
-[ext_resource type="Script" path="res://src/actors/player/states/playerstatemachine.gd" id="5_lp6c1"]
+[ext_resource type="Script" path="res://src/actors/player/states/player_idle.gd" id="5_f6uax"]
+[ext_resource type="Script" path="res://src/statemachine/base_statemachine.gd" id="5_nojwa"]
+[ext_resource type="Script" path="res://src/actors/player/states/player_run.gd" id="6_6n4cl"]
+[ext_resource type="Script" path="res://src/actors/player/states/player_fall.gd" id="7_gpjne"]
+[ext_resource type="Script" path="res://src/actors/player/states/player_jump.gd" id="8_uxet1"]
+[ext_resource type="Script" path="res://src/actors/player/states/player_ajump.gd" id="9_42qpu"]
+[ext_resource type="Script" path="res://src/actors/player/states/player_gdash.gd" id="10_8omtw"]
+[ext_resource type="Script" path="res://src/actors/player/states/player_adash.gd" id="11_x1nvp"]
+[ext_resource type="Script" path="res://src/actors/player/states/player_wall.gd" id="12_2oh6g"]
+[ext_resource type="Script" path="res://src/actors/player/states/player_wjump.gd" id="13_mkqwc"]
+[ext_resource type="Script" path="res://src/actors/player/states/playerstate.gd" id="14_kuw0v"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_p3dhm"]
 size = Vector2(70, 150)
@@ -1016,12 +1027,18 @@ _data = {
 "run_right": SubResource("Animation_18q4d")
 }
 
-[node name="Player" type="CharacterBody2D"]
+[node name="Player" type="CharacterBody2D" node_paths=PackedStringArray("initial_movement_state")]
 collision_layer = 2
 floor_snap_length = 5.0
 platform_floor_layers = 4294967277
 script = ExtResource("1_wm1sy")
+initial_movement_state = NodePath("StateMachinesHolder/MovementStateMachine/Idle")
 platformer_settings = ExtResource("2_e513s")
+max_run_tile = 10.0
+jump_height = 2.5
+min_jump_height = 0.8
+gap_length = 12.0
+stats = ExtResource("3_n3p8u")
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
 position = Vector2(0, -75)
@@ -1035,6 +1052,76 @@ script = ExtResource("3_0s0g8")
 [node name="CollisionShape2D" type="CollisionShape2D" parent="CameraBBoxDetector"]
 shape = SubResource("CircleShape2D_i8aq0")
 debug_color = Color(0.733333, 0.945098, 1, 0.337255)
+
+[node name="StateMachinesHolder" type="Node" parent="."]
+
+[node name="MovementStateMachine" type="Node" parent="StateMachinesHolder" node_paths=PackedStringArray("pawn")]
+script = ExtResource("5_nojwa")
+pawn = NodePath("../..")
+
+[node name="Idle" type="Node" parent="StateMachinesHolder/MovementStateMachine" node_paths=PackedStringArray("run", "jump", "fall", "gdash")]
+script = ExtResource("5_f6uax")
+run = NodePath("../Run")
+jump = NodePath("../Jump")
+fall = NodePath("../Fall")
+gdash = NodePath("../GDash")
+
+[node name="Run" type="Node" parent="StateMachinesHolder/MovementStateMachine" node_paths=PackedStringArray("idle", "jump", "fall", "gdash")]
+script = ExtResource("6_6n4cl")
+idle = NodePath("../Idle")
+jump = NodePath("../Jump")
+fall = NodePath("../Fall")
+gdash = NodePath("../GDash")
+
+[node name="Fall" type="Node" parent="StateMachinesHolder/MovementStateMachine" node_paths=PackedStringArray("idle", "run", "jump", "adash", "ajump", "wall", "wjump")]
+script = ExtResource("7_gpjne")
+idle = NodePath("../Idle")
+run = NodePath("../Run")
+jump = NodePath("../Jump")
+adash = NodePath("../ADash")
+ajump = NodePath("../AJump")
+wall = NodePath("../Wall")
+wjump = NodePath("../WJump")
+
+[node name="Jump" type="Node" parent="StateMachinesHolder/MovementStateMachine" node_paths=PackedStringArray("fall", "adash", "gdash")]
+script = ExtResource("8_uxet1")
+fall = NodePath("../Fall")
+adash = NodePath("../ADash")
+gdash = NodePath("../GDash")
+
+[node name="AJump" type="Node" parent="StateMachinesHolder/MovementStateMachine" node_paths=PackedStringArray("fall", "adash")]
+script = ExtResource("9_42qpu")
+fall = NodePath("../Fall")
+adash = NodePath("../ADash")
+
+[node name="GDash" type="Node" parent="StateMachinesHolder/MovementStateMachine" node_paths=PackedStringArray("idle", "run", "fall", "jump")]
+script = ExtResource("10_8omtw")
+idle = NodePath("../Idle")
+run = NodePath("../Run")
+fall = NodePath("../Fall")
+jump = NodePath("../Jump")
+
+[node name="ADash" type="Node" parent="StateMachinesHolder/MovementStateMachine" node_paths=PackedStringArray("idle", "run", "fall", "ajump")]
+script = ExtResource("11_x1nvp")
+idle = NodePath("../Idle")
+run = NodePath("../Run")
+fall = NodePath("../Fall")
+ajump = NodePath("../AJump")
+
+[node name="Wall" type="Node" parent="StateMachinesHolder/MovementStateMachine" node_paths=PackedStringArray("idle", "fall", "adash", "wjump")]
+script = ExtResource("12_2oh6g")
+idle = NodePath("../Idle")
+fall = NodePath("../Fall")
+adash = NodePath("../ADash")
+wjump = NodePath("../WJump")
+
+[node name="WJump" type="Node" parent="StateMachinesHolder/MovementStateMachine" node_paths=PackedStringArray("fall", "adash")]
+script = ExtResource("13_mkqwc")
+fall = NodePath("../Fall")
+adash = NodePath("../ADash")
+
+[node name="Auto" type="Node" parent="StateMachinesHolder/MovementStateMachine"]
+script = ExtResource("14_kuw0v")
 
 [node name="CameraCenter" type="Marker2D" parent="."]
 position = Vector2(0, -75)
@@ -1088,7 +1175,6 @@ one_shot = true
 
 [node name="Camera2D" type="Camera2D" parent="."]
 visible = false
-enabled = false
 zoom = Vector2(0.5, 0.5)
 
 [node name="WallDetectors" type="Node2D" parent="."]
@@ -1143,8 +1229,5 @@ parameters/run/blend_position = 1.0
 libraries = {
 "": SubResource("AnimationLibrary_n4wxi")
 }
-
-[node name="StateMachine" type="Node" parent="."]
-script = ExtResource("5_lp6c1")
 
 [connection signal="animation_finished" from="AnimationTree" to="." method="_on_animation_tree_animation_finished"]

@@ -1,8 +1,8 @@
 ## Remote camera that smoothtly follows the player and is clamped by camera regions.
 ##
-## [color=yellow][b]Warning[/b]:[/color] Provide the player scene with 
+## [color=yellow][b]Warning[/b]:[/color] Provide the player scene with
 ## a [Node2D] to be the camera center.
-## [br][color=yellow][b]Warning[/b]:[/color] Provide the player scene with 
+## [br][color=yellow][b]Warning[/b]:[/color] Provide the player scene with
 ## an [Area2D] named CameraBBoxDetector to be the region detector.
 ## [br]
 ## [br]The remote camera must do the ff:
@@ -20,7 +20,7 @@ extends Camera2D
 ## Initial position when not following player
 @export var initial_pos:= Vector2.ZERO
 
-@export var camera_bound_container: Node2D 
+@export var camera_bound_container: Node2D
 
 @export var x_offset_tiles := 0.8
 #@export var down_bias_tiles := 0.8
@@ -73,20 +73,20 @@ func _ready() -> void:
 	#wait for player to ready
 	await player_node.ready
 	await camera_bound_container.ready
-	
+
 	#connect detector to camera
 	player_node.camera_bbox_detector.area_entered.connect(on_CameraBBoxDetector_area_entered)
 	player_node.camera_bbox_detector.area_exited.connect(on_CameraBBoxDetector_area_exited)
 	player_node.camera_bbox_detector.tree_exiting.connect(on_area_detector_exiting)
-	
+
 	#connect player physics updates
 	SignalBus.player_updated.connect(_on_player_node_updated)
-	
+
 	#player info
 	player_facing = player_node.face_direction
 	player_camera_center = player_node.camera_center
 	player_camera_center_pos = player_camera_center.global_position
-	
+
 	if follow_player:
 		#set initial position
 		global_position = _update_position()
@@ -105,7 +105,7 @@ func _physics_process(delta: float) -> void:
 		var interped_position:= _interp_position(new_position,clamped_position)
 		#update position
 		global_position = interped_position
-		
+
 		queue_redraw()
 
 func _draw() -> void:
@@ -119,7 +119,7 @@ func _draw() -> void:
 				draw_line(to_local(line[0]+Vector2(0.5*screen_size.x,0)),to_local(line[1]-Vector2(0.5*screen_size.x,0)),Color(0.95294117927551, 0.95294117927551, 0))
 				pass
 			pass
-		
+
 		pass
 
 
@@ -127,12 +127,12 @@ func _draw() -> void:
 ## taking into account priority levels and region limit flags.
 func _clamp_position(pos: Vector2) -> Vector2:
 	var output: Vector2
-	
+
 	var left_limit:= -bridge_inf
 	var top_limit:= -bridge_inf
 	var right_limit:= bridge_inf
 	var bottom_limit:= bridge_inf
-	
+
 	#when intersecting
 	if not bbox_array.is_empty():
 		var left_array:= []
@@ -142,8 +142,8 @@ func _clamp_position(pos: Vector2) -> Vector2:
 
 		var priorities:= []
 
-		var append_to_array = func(array: Array, area: Area2D, direction: Vector2): 
-			
+		var append_to_array = func(array: Array, area: Area2D, direction: Vector2):
+
 			match direction:
 				Vector2.LEFT:
 					if area.limit_left:
@@ -165,16 +165,16 @@ func _clamp_position(pos: Vector2) -> Vector2:
 						array.append(int(area.limits["bottom"]))
 					else:
 						array.append(bottom_limit)
-			
+
 
 		#save limits of each area in bbox array
 		for area in bbox_array:
-			
+
 			append_to_array.call(left_array,area,Vector2.LEFT)
 			append_to_array.call(top_array,area,Vector2.UP)
 			append_to_array.call(right_array,area,Vector2.RIGHT)
 			append_to_array.call(bottom_array,area,Vector2.DOWN)
-			
+
 			priorities.append(area.priority_level)
 
 		#find the highest priority area
@@ -208,24 +208,24 @@ func _clamp_position(pos: Vector2) -> Vector2:
 		#set temp limit as limit
 		output.x = clamp(pos.x,temp_left+0.5*screen_size.x*zoom.x,temp_right-0.5*screen_size.x*zoom.x)
 		output.y = clamp(pos.y,temp_top+0.5*screen_size.y*zoom.y,temp_bottom-0.5*screen_size.y*zoom.y)
-		
+
 		bounds.left = temp_left
 		bounds.top = temp_top
 		bounds.right = temp_right
 		bounds.bottom = temp_bottom
-		
+
 		#print(bbox_array[0].global_position)
 		display_bound = true
-		
+
 		if bounds.left != -bridge_inf:
 			var test_temp_top = temp_top if bounds.top > -bridge_inf else 0.5*screen_size.y*zoom.y
 			var test_temp_bottom = temp_bottom if bounds.bottom < bridge_inf else -0.5*screen_size.y*zoom.y
 			current_bounds.append([Vector2(bounds.left,test_temp_top),Vector2(bounds.left,test_temp_bottom)])
 			pass
-		
-#		print("cam: (%.00f,%.00f)\nL: %.00f R: %.00f\nT: %.00f B: %.00f" 
+
+#		print("cam: (%.00f,%.00f)\nL: %.00f R: %.00f\nT: %.00f B: %.00f"
 #				%[output.x,output.y,temp_left,temp_right,temp_top,temp_bottom])
-	
+
 	elif detector_exited:
 		output.x = clamp(pos.x,bounds.left+0.5*screen_size.x*zoom.x,bounds.right-0.5*screen_size.x*zoom.x)
 		output.y = clamp(pos.y,bounds.top+0.5*screen_size.y*zoom.y,bounds.bottom-0.5*screen_size.y*zoom.y)
@@ -241,7 +241,7 @@ func _clamp_position(pos: Vector2) -> Vector2:
 		bounds.top = top_limit
 		bounds.right = right_limit
 		bounds.bottom = bottom_limit
-		
+
 		display_bound = false
 		current_bounds = []
 
@@ -250,13 +250,13 @@ func _clamp_position(pos: Vector2) -> Vector2:
 ## Interpolate to new position according to smoothings set.
 ## [br]Dependence to movement states apply here.
 func _interp_position(new_pos: Vector2, clamped_pos: Vector2) -> Vector2:
-	
+
 	var output: Vector2
-	
+
 	#horizontal
 	var hs: float = horizontal_slow_smoothing
 	#TODO: when player is too far from camera
-	
+
 #	#when wall jumping
 #	if (prev_state == movement_states.WALL and
 #		current_state == movement_states.JUMP):
@@ -265,7 +265,7 @@ func _interp_position(new_pos: Vector2, clamped_pos: Vector2) -> Vector2:
 #	else:
 #		if abs(player_velocity.x) > player_speed*0.5:
 #			hs = horizontal_fast_smoothing
-	
+
 	hs = horizontal_fast_smoothing
 	#vertical
 	var vs: float = vertical_slow_smoothing
@@ -276,13 +276,13 @@ func _interp_position(new_pos: Vector2, clamped_pos: Vector2) -> Vector2:
 
 	output.x = lerp(global_position.x,clamped_pos.x,hs)
 	output.y = lerp(global_position.y,clamped_pos.y,vs)
-	
+
 #	print("cam: (%.00f,%.00f)\nclamp: (%.00f,%.00f)\nbounds: L=%.00f R=%.00f\n        T=%.00f B=%.00f"
 #		%[output.x,output.y,clamped_pos.x,clamped_pos.y,bounds.left,bounds.right,bounds.top,bounds.bottom])
-	
+
 	DebugTexts.get_node("Control/HBoxContainer/VBoxContainer2/Label5").text = \
 	"cam: (%.00f,%.00f)\ncbounds: L=%.00f R=%.00f\nT=%.00f B=%.00f\nclamp: (%.00f,%.00f)\nbounds: L=%.00f R=%.00f\nT=%.00f B=%.00f" %[output.x,output.y,0,0,0,0,clamped_pos.x,clamped_pos.y,bounds.left,bounds.right,bounds.top,bounds.bottom]
-	
+
 	return output
 
 ## Append camera region node to [member bbox_array].
@@ -296,13 +296,13 @@ func on_CameraBBoxDetector_area_exited(area: Area2D) -> void:
 ## When player node is queue freed and its area detector exits the tree
 func on_area_detector_exiting() -> void:
 	detector_exited = true
-	
+
 ## Update stored player information after its physics step.
 func _on_player_node_updated(facing: float, cam_pos: Vector2) -> void:
-	
+
 	player_facing = facing
 	player_camera_center_pos = cam_pos
-	
+
 	pass
 
 func _get_offset() -> Vector2:
