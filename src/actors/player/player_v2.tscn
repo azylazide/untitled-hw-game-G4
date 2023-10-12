@@ -1,4 +1,4 @@
-[gd_scene load_steps=111 format=3 uid="uid://b12acqdh5oabo"]
+[gd_scene load_steps=111 format=3 uid="uid://q33unwxg0u1x"]
 
 [ext_resource type="Script" path="res://src/actors/player/player_v2.gd" id="1_wm1sy"]
 [ext_resource type="Resource" uid="uid://bjsu5tksv0kxc" path="res://src/actors/player/default_platformer_values.tres" id="2_e513s"]
@@ -17,7 +17,7 @@
 [ext_resource type="Script" path="res://src/actors/player/states/player_wall.gd" id="12_2oh6g"]
 [ext_resource type="Script" path="res://src/actors/player/states/player_wjump.gd" id="13_mkqwc"]
 [ext_resource type="Script" path="res://src/actors/player/states/playerstate.gd" id="14_kuw0v"]
-[ext_resource type="Script" path="res://src/actors/player/player_auto.gd" id="16_aq0am"]
+[ext_resource type="Script" path="res://src/actors/player/states/player_auto.gd" id="16_ht6vk"]
 [ext_resource type="Script" path="res://src/actors/player/states/player_neutral.gd" id="18_42bri"]
 [ext_resource type="Script" path="res://src/actors/player/states/player_hurt.gd" id="18_n4yim"]
 
@@ -700,6 +700,7 @@ tracks/2/keys = {
 
 [sub_resource type="Animation" id="Animation_7tema"]
 resource_name = "hurt_left"
+length = 0.5
 tracks/0/type = "value"
 tracks/0/imported = false
 tracks/0/enabled = true
@@ -739,6 +740,7 @@ tracks/2/keys = {
 
 [sub_resource type="Animation" id="Animation_xdv7s"]
 resource_name = "hurt_right"
+length = 0.5
 tracks/0/type = "value"
 tracks/0/imported = false
 tracks/0/enabled = true
@@ -1220,11 +1222,12 @@ script = ExtResource("13_mkqwc")
 fall = NodePath("../Fall")
 adash = NodePath("../ADash")
 
-[node name="Auto" type="Node" parent="StateMachinesHolder/MovementStateMachine" node_paths=PackedStringArray("idle", "run", "fall")]
-script = ExtResource("16_aq0am")
+[node name="Auto" type="Node" parent="StateMachinesHolder/MovementStateMachine" node_paths=PackedStringArray("idle", "run", "fall", "hurt")]
+script = ExtResource("16_ht6vk")
 idle = NodePath("../Idle")
 run = NodePath("../Run")
 fall = NodePath("../Fall")
+hurt = NodePath("../../ActionStateMachine/Hurt")
 
 [node name="ActionStateMachine" type="Node" parent="StateMachinesHolder" node_paths=PackedStringArray("pawn", "initial_state")]
 script = ExtResource("6_yn0ar")

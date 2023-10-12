@@ -17,3 +17,9 @@ func state_animated(anim_name: StringName) -> State:
 	if anim_name in ["hurt_left","hurt_right"]:
 		return neutral
 	return null
+
+func state_exit() -> void:
+#	get_tree().create_timer(2,false,true).timeout.connect(func(): player.is_vulnerable = true)
+	await player.invincibility_tween().finished
+	player.is_vulnerable = true
+

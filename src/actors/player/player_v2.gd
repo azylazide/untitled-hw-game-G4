@@ -112,8 +112,11 @@ signal player_attacked
 var is_dead:= false
 var is_hurt:= false
 var is_attack_charged:= false
+var is_vulnerable:= true
 
 var ghost_tweener: Tween
+
+var knockback_strength: float
 
 ## Setup movement values
 func _setup_movement() -> void:
@@ -164,12 +167,13 @@ func _physics_process(delta: float) -> void:
 	action_sm.machine_physics(delta)
 	_resolve_animations()
 
-	SignalBus.player_updated.emit(face_direction,camera_center.global_position,velocity,movement_sm.current_state,null)
+	SignalBus.player_updated.emit(face_direction,camera_center.global_position,velocity,movement_sm.current_state,action_sm.current_state)
 	debug_text()
 	pass
 
 func _unhandled_input(event: InputEvent) -> void:
 	movement_sm.machine_input(event)
+	action_sm.machine_input(event)
 	pass
 
 func _on_animation_tree_animation_finished(anim_name: StringName) -> void:
@@ -235,15 +239,43 @@ func jump_reset() -> void:
 	coyote_timer.stop()
 	jump_buffer_timer.stop()
 
-#TEMP
-func hurt(i):
-	action_sm.change_state($StateMachinesHolder/ActionStateMachine/Hurt)
+#temp
+func hurt(damage: float) -> void:
+	if is_vulnerable:
+		if stats.health == 0:
+			return
+
+		is_vulnerable = false
+		GlobalSoundPlayer.play_hurt()
+		stats.health -= damage
+		action_sm.change_state($StateMachinesHolder/ActionStateMachine/Hurt)
+
+## [GeneralHurtBox] interface
+func apply_hurtbox_effect(hazard_data: HazardData) -> void:
+	var damage:= 0.0
+
+	#hazard_data is a resource that stores damage, and effect of the hit
+	if hazard_data.do_knockback:
+		knockback_strength = hazard_data.knockback_strength
+	if hazard_data.do_damage:
+		damage = hazard_data.damage_strength
+		hurt(damage)
+	else:
+		velocity += hazard_data.knockback_vector
+
+## Creates invincibility frames in a loop
+func invincibility_tween() -> Tween:
+	var sprite:= $Sprite2D
+	var tween:= create_tween().set_loops(4)
+	tween.tween_property(sprite,"modulate:a",0.2,0.15)
+	tween.tween_property(sprite,"modulate:a",1,0.15)
+	return tween
 
 func debug_text() -> void:
 	var debug_text_vel = "velocity: (%.00f,%.00f)" %[velocity.x,velocity.y]
 	var debug_text_pos = "position: (%.00f,%.00f)" %[global_position.x,global_position.y]
 
-	var format_movementstates = [movement_sm.previous_state.name,movement_sm.current_state.name]
+	var format_movementstates = [movement_sm.previous_state.name if movement_sm.previous_state else "None",movement_sm.current_state.name]
 
 	var debug_text_movementstates = "MOVEMENT STATES\nprev: %s\ncurrent: %s" %format_movementstates
 	var debug_text_onfloor = "on floor: %s" %on_floor
@@ -251,7 +283,7 @@ func debug_text() -> void:
 	var debug_text_canajump = "can ajump: %s" %can_ajump
 	var debug_text_canadash = "can adash: %s" %can_adash
 
-#	var debug_text_actionstates = "ACTION STATES\nprev: %s\ncurrent: %s\n(next: %s)" %format_actionstates
+
 
 	var debug_text_health = "Player Health: %0.f/%0.f" %[stats.health,stats.max_health]
 
@@ -266,11 +298,13 @@ func debug_text() -> void:
 	DebugTexts.get_node("%canajump").text = debug_text_canajump
 	DebugTexts.get_node("%canadash").text = debug_text_canadash
 
-#	DebugTexts.get_node("%is_hurt").text = "is hurt: %s" %is_hurt
-#	DebugTexts.get_node("%is_dead").text = "is dead: %s" %is_dead
-#	DebugTexts.get_node("%is_attack_charged").text = "is attack charged: %s" %is_attack_charged
+	var format_actionstates = [action_sm.previous_state.name if action_sm.previous_state else "None",action_sm.current_state.name]
+	var debug_text_actionstates = "ACTION STATES\nprev: %s\ncurrent: %s" %format_actionstates
+	DebugTexts.get_node("%actionstates").text = debug_text_actionstates
 
-#	DebugTexts.get_node("%actionstates").text = debug_text_actionstates
+	DebugTexts.get_node("%is_hurt").text = "is hurt: %s" %is_hurt
+	DebugTexts.get_node("%is_dead").text = "is dead: %s" %is_dead
+	DebugTexts.get_node("%is_attack_charged").text = "is attack charged: %s" %is_attack_charged
 
 	var blend_pos: float = anim_tree.get("parameters/%s/blend_position" %anim_sm.get_current_node())
 

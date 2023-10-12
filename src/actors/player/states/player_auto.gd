@@ -5,20 +5,24 @@ extends PlayerState
 @export var run: State = null
 @export var fall: State = null
 
+@export_group("References")
+@export var hurt: State = null
+
 func state_enter() -> void:
 	super()
-	if machine.partner.current_state == $"../../ActionStateMachine/Hurt":
-		player.velocity.x = -player.face_direction*player.speed
+	if machine.partner.current_state == hurt:
+		player.velocity.x = -player.face_direction*player.knockback_strength
 		player.velocity.y = -0.5*player.jump_force
 
 func state_physics(delta: float) -> State:
-	if machine.partner.current_state == $"../../ActionStateMachine/Hurt":
+	if machine.partner.current_state == hurt:
+		player.velocity.y += 0.1*player.fall_gravity*delta
 		player.apply_movement(player.face_direction)
 
 	return null
 
 func state_exit() -> void:
-	if machine.partner.current_state == $"../../ActionStateMachine/Hurt":
+	if machine.partner.current_state == hurt:
 		player.velocity.x = 0
 
 func state_animated(anim_name: StringName) -> State:
