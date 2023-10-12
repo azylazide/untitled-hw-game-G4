@@ -10,6 +10,9 @@ class_name PlayerFall
 @export var wall: State = null
 @export var wjump: State = null
 
+func state_enter() -> void:
+	super()
+	player.anim_sm.travel("fall")
 
 func state_physics(delta: float) -> State:
 

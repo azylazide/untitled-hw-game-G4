@@ -7,7 +7,7 @@
 [ext_resource type="Script" path="res://src/camera_bound_box.gd" id="5_1slb7"]
 [ext_resource type="Script" path="res://src/RemoteCamera2.gd" id="6_hb2v4"]
 [ext_resource type="PackedScene" uid="uid://cwmj4tadylf8s" path="res://src/actors/EnemyTest.tscn" id="8_et7dr"]
-[ext_resource type="PackedScene" uid="uid://b7syhleiwn1bv" path="res://src/actors/player/player_v2.tscn" id="8_u1of7"]
+[ext_resource type="PackedScene" uid="uid://b12acqdh5oabo" path="res://src/actors/player/player_v2.tscn" id="8_u1of7"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_ffwgc"]
 size = Vector2(6050, 2460)

@@ -13,6 +13,6 @@ dash_jump_buffer_time = 0.2
 dash_cooldown_time = 0.2
 dash_length = 4.0
 wall_kick_time = 0.5
-wall_kick_power = 5.0
+wall_kick_power = 5
 wall_cooldown_time = 0.2
 wall_slide_multiplier = 0.1

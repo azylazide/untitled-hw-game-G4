@@ -11,6 +11,7 @@ class_name PlayerIdle
 func state_enter() -> void:
 	super()
 	player.ground_reset()
+	player.anim_sm.travel("idle")
 	player.velocity = Vector2.ZERO
 
 func state_physics(delta: float) -> State:

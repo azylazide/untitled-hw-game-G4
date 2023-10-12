@@ -78,6 +78,7 @@ class_name Player
 
 ## Statemachine
 @onready var movement_sm: StateMachine = $StateMachinesHolder/MovementStateMachine
+@onready var action_sm: StateMachine = $StateMachinesHolder/ActionStateMachine
 
 
 ## Gravity applied to the player when in jump state
@@ -155,10 +156,14 @@ func _ready() -> void:
 
 	movement_sm.initial_state = initial_movement_state
 	movement_sm.machine_init()
+	action_sm.machine_init()
 	pass
 
 func _physics_process(delta: float) -> void:
 	movement_sm.machine_physics(delta)
+	action_sm.machine_physics(delta)
+	_resolve_animations()
+
 	SignalBus.player_updated.emit(face_direction,camera_center.global_position,velocity,movement_sm.current_state,null)
 	debug_text()
 	pass
@@ -169,7 +174,14 @@ func _unhandled_input(event: InputEvent) -> void:
 
 func _on_animation_tree_animation_finished(anim_name: StringName) -> void:
 	movement_sm.machine_on_animation_signaled(anim_name)
+	action_sm.machine_on_animation_signaled(anim_name)
 	pass
+
+## Resolves blend position of some blendspaces
+func _resolve_animations() -> void:
+	var anim_list:= ["idle","run","fall","jump","land","gdash","adash","wall","hurt"]
+	for anim_name in anim_list:
+		anim_tree.set("parameters/%s/blend_position" %anim_name,face_direction)
 
 ## Returns current input direction
 func get_direction() -> float:
@@ -222,6 +234,10 @@ func ground_reset() -> void:
 func jump_reset() -> void:
 	coyote_timer.stop()
 	jump_buffer_timer.stop()
+
+#TEMP
+func hurt(i):
+	action_sm.change_state($StateMachinesHolder/ActionStateMachine/Hurt)
 
 func debug_text() -> void:
 	var debug_text_vel = "velocity: (%.00f,%.00f)" %[velocity.x,velocity.y]
