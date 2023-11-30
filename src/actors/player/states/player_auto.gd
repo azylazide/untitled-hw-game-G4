@@ -11,8 +11,7 @@ extends PlayerState
 func state_enter() -> void:
 	super()
 	if machine.partner.current_state == hurt:
-		player.velocity.x = -player.face_direction*player.knockback_strength
-		player.velocity.y = -0.5*player.jump_force
+		player.velocity = Vector2(-player.face_direction,-1)*player.knockback_strength
 
 func state_physics(delta: float) -> State:
 	if machine.partner.current_state == hurt:
@@ -24,6 +23,7 @@ func state_physics(delta: float) -> State:
 func state_exit() -> void:
 	if machine.partner.current_state == hurt:
 		player.velocity.x = 0
+		player.velocity.y = maxf(player.velocity.y,0)
 
 func state_animated(anim_name: StringName) -> State:
 	if anim_name in ["hurt_left","hurt_right"]:

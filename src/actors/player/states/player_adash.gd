@@ -12,10 +12,13 @@ func state_enter() -> void:
 	player.velocity.x = player.dash_force*player.face_direction
 	player.velocity.y = 0
 	player.dash_timer.start()
+	player.dash_ghost_tweener()
+	player.can_adash = false
 
 func state_exit() -> void:
 	super()
 	player.dash_cooldown_timer.start()
+	player.ghost_tweener.kill()
 
 func state_physics(delta: float) -> State:
 

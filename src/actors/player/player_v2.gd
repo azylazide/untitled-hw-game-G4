@@ -9,9 +9,15 @@ class_name Player
 ## Initial action state on ready
 @export var initial_action_state: PlayerState
 
+@export_group("Misc")
+@export var ghost_scene: PackedScene
+
+@export var attack_charge_time:= 0.8
+
 @export_category("Platformer Values")
 ## Stores player specific movement related parameters
 @export var platformer_settings: PlatformerResource
+
 
 ## Ground shapecast
 @onready var ground_cast:= $GroundDetector as ShapeCast2D
@@ -55,8 +61,8 @@ class_name Player
 ## Hurt duration timer
 @onready var hurt_timer:= $Timers/HurtTimer as Timer
 
-## Timer that determines if fully charged or interrupted
-#@onready var attack_charge_timer:= $Timers/AttackChargeTimer as Timer
+# Timer that determines if fully charged or interrupted
+@onready var attack_charge_timer:= $Timers/AttackChargeTimer as Timer
 
 ## If on floor on previous frame
 @onready var was_on_floor:= true
@@ -145,6 +151,7 @@ func _setup_timers() -> void:
 	wall_slide_timer.wait_time = 0.1
 	wall_cooldown_timer.wait_time = platformer_settings.wall_cooldown_time
 	wall_jump_hold_timer.wait_time = 0.5
+	attack_charge_timer.wait_time = attack_charge_time
 	pass
 
 ## Setup [AnimationTree]
@@ -168,7 +175,7 @@ func _physics_process(delta: float) -> void:
 	_resolve_animations()
 
 	SignalBus.player_updated.emit(face_direction,camera_center.global_position,velocity,movement_sm.current_state,action_sm.current_state)
-	debug_text()
+	debug_text.call_deferred()
 	pass
 
 func _unhandled_input(event: InputEvent) -> void:
@@ -270,6 +277,18 @@ func invincibility_tween() -> Tween:
 	tween.tween_property(sprite,"modulate:a",0.2,0.15)
 	tween.tween_property(sprite,"modulate:a",1,0.15)
 	return tween
+
+## Calls dash ghosts spawner in a loop
+func dash_ghost_tweener() -> void:
+	ghost_tweener = create_tween().set_loops()
+	ghost_tweener.tween_callback(dash_ghost)
+	ghost_tweener.tween_interval(0.35*platformer_settings.dash_time)
+
+## Instances and adds to tree dash ghosts
+func dash_ghost() -> void:
+	var ghost: Sprite2D = ghost_scene.instantiate()
+	ghost.sprite = $Sprite2D
+	add_child(ghost)
 
 func debug_text() -> void:
 	var debug_text_vel = "velocity: (%.00f,%.00f)" %[velocity.x,velocity.y]

@@ -1,4 +1,4 @@
-[gd_scene load_steps=14 format=3 uid="uid://ce0v8lqrfwgip"]
+[gd_scene load_steps=15 format=3 uid="uid://ce0v8lqrfwgip"]
 
 [ext_resource type="Script" path="res://src/levels/level_test.gd" id="1_f82kd"]
 [ext_resource type="PackedScene" uid="uid://cmgcdb5sm7mll" path="res://src/props/arrow.tscn" id="2_2onqg"]
@@ -18,13 +18,22 @@ size = Vector2(6050, 2460)
 script = ExtResource("10_s5wfp")
 hazard_flags = 1
 do_knockback = true
-knockback_strength = 100.0
+knockback_strength = 500.0
 knockback_vector = Vector2(0, -400)
 do_damage = true
 damage_strength = 10.0
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_ay15q"]
 radius = 119.004
+
+[sub_resource type="Resource" id="Resource_0quhr"]
+script = ExtResource("10_s5wfp")
+hazard_flags = 1
+do_knockback = true
+knockback_strength = 500.0
+knockback_vector = Vector2(0, -400)
+do_damage = false
+damage_strength = 10.0
 
 [node name="LevelTest" type="Node2D" node_paths=PackedStringArray("player_node")]
 script = ExtResource("1_f82kd")
@@ -74,4 +83,16 @@ hazard_data = SubResource("Resource_x74ju")
 shape = SubResource("CircleShape2D_ay15q")
 debug_color = Color(0.780392, 0.435294, 0.0588235, 0.419608)
 
+[node name="GeneralHurtBox2" type="Area2D" parent="."]
+position = Vector2(2266, 206)
+collision_layer = 0
+collision_mask = 2
+script = ExtResource("9_sgyc6")
+hazard_data = SubResource("Resource_0quhr")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="GeneralHurtBox2"]
+shape = SubResource("CircleShape2D_ay15q")
+debug_color = Color(0.780392, 0.435294, 0.0588235, 0.419608)
+
 [connection signal="body_entered" from="GeneralHurtBox" to="GeneralHurtBox" method="_on_body_entered"]
+[connection signal="body_entered" from="GeneralHurtBox2" to="GeneralHurtBox2" method="_on_body_entered"]

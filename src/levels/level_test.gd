@@ -19,5 +19,4 @@ func spawn_arrow(face_direction: float) -> void:
 	arrow_scn.direction = face_direction
 	arrow_scn.global_position = player_node.get_node("ArrowSpawn").global_position
 	add_child(arrow_scn)
-
 	pass
