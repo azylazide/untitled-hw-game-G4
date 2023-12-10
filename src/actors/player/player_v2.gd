@@ -294,7 +294,7 @@ func debug_text() -> void:
 	var debug_text_vel = "velocity: (%.00f,%.00f)" %[velocity.x,velocity.y]
 	var debug_text_pos = "position: (%.00f,%.00f)" %[global_position.x,global_position.y]
 
-	var format_movementstates = [movement_sm.previous_state.name if movement_sm.previous_state else "None",movement_sm.current_state.name]
+	var format_movementstates = [movement_sm.previous_state.name if movement_sm.previous_state else &"None",movement_sm.current_state.name]
 
 	var debug_text_movementstates = "MOVEMENT STATES\nprev: %s\ncurrent: %s" %format_movementstates
 	var debug_text_onfloor = "on floor: %s" %on_floor
@@ -317,7 +317,7 @@ func debug_text() -> void:
 	DebugTexts.get_node("%canajump").text = debug_text_canajump
 	DebugTexts.get_node("%canadash").text = debug_text_canadash
 
-	var format_actionstates = [action_sm.previous_state.name if action_sm.previous_state else "None",action_sm.current_state.name]
+	var format_actionstates = [action_sm.previous_state.name if action_sm.previous_state else &"None",action_sm.current_state.name]
 	var debug_text_actionstates = "ACTION STATES\nprev: %s\ncurrent: %s" %format_actionstates
 	DebugTexts.get_node("%actionstates").text = debug_text_actionstates
 
