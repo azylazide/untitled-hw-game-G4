@@ -12,6 +12,7 @@ func state_enter() -> void:
 	player.velocity.x = player.dash_force*player.face_direction
 	player.dash_timer.start()
 	player.dash_ghost_tweener()
+	player.anim_sm.travel("gdash")
 
 func state_exit() -> void:
 	super()

@@ -14,7 +14,7 @@ func state_enter() -> void:
 	player.face_direction = signf(player.wall_normal.x)
 	player.velocity.x = player.wall_kick_force*player.face_direction
 	player.velocity.y = -player.jump_force
-
+	player.anim_sm.travel("jump")
 
 func state_physics(delta: float) -> State:
 

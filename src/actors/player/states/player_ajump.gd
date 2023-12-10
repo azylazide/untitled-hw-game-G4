@@ -11,7 +11,7 @@ func state_enter() -> void:
 	player.can_ajump = false
 
 	player.velocity.y = -player.jump_force*player.platformer_settings.air_jump_multiplier
-
+	player.anim_sm.travel("jump")
 
 
 func state_physics(delta: float) -> State:

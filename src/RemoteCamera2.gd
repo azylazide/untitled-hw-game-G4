@@ -77,9 +77,10 @@ var shake_tween: Tween
 @onready var shake_offset:= Vector2.ZERO
 
 func _ready() -> void:
-	await player.ready
-#	await cameraboundcontainer.ready
-#	print(player)
+	_setup_camera.call_deferred()
+
+## Connect relevant signals, and initialized player informations
+func _setup_camera() -> void:
 	player.camera_bbox_detector.area_entered.connect(on_CameraBBoxDetector_area_entered)
 	player.camera_bbox_detector.area_exited.connect(on_CameraBBoxDetector_area_exited)
 	player.camera_bbox_detector.tree_exiting.connect(on_area_detector_exiting)

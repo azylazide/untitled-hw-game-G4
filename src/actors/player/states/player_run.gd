@@ -10,6 +10,7 @@ class_name PlayerRun
 func state_enter() -> void:
 	super()
 	player.ground_reset()
+	player.anim_sm.travel("run")
 
 func state_physics(delta: float) -> State:
 
