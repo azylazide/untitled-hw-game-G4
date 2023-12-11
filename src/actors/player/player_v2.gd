@@ -29,7 +29,7 @@ class_name Player
 @onready var right_wall_detector:= $WallDetectors/Right as ShapeCast2D
 
 ## Camera detector area
-@onready var camera_bbox_detector := $CameraBBoxDetector as CameraBBoxDetector
+@onready var camera_bbox_detector := $CameraBBoxDetector as CameraAreaDetector
 
 ## Camera center marker
 @onready var camera_center := $CameraCenter as Marker2D

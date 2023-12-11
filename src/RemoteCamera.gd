@@ -12,7 +12,7 @@
 ## [br] -Camera contextually bounded
 ## [br]
 extends Camera2D
-class_name RemoteCamera
+class_name RemoteCameraOld
 
 ## Player node the camera follows.
 @export var player: ActorBase

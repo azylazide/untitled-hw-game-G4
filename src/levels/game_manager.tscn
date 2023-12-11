@@ -6,7 +6,7 @@
 [ext_resource type="TileSet" uid="uid://dsgrixorcwhe3" path="res://src/levels/debugtileset.tres" id="2_jp1od"]
 [ext_resource type="PackedScene" uid="uid://cmgcdb5sm7mll" path="res://src/props/arrow.tscn" id="2_wpbwl"]
 [ext_resource type="Script" path="res://src/camera_bound_box.gd" id="3_ddghu"]
-[ext_resource type="Script" path="res://src/RemoteCamera2.gd" id="4_2w381"]
+[ext_resource type="Script" path="res://src/remote_camera.gd" id="7_v48bo"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_l4npv"]
 size = Vector2(3228, 1710)
@@ -28,18 +28,19 @@ layer_0/tile_data = PackedInt32Array(262120, 65536, 0, 327656, 65536, 1, 262121,
 
 [node name="CameraBoundaries" type="Node2D" parent="Level"]
 
-[node name="CameraBoundBox" type="Area2D" parent="Level/CameraBoundaries"]
+[node name="CameraBoundBox" type="Area2D" parent="Level/CameraBoundaries" node_paths=PackedStringArray("collision")]
 position = Vector2(0, -295)
 collision_layer = 16
 collision_mask = 0
 script = ExtResource("3_ddghu")
+collision = NodePath("CollisionShape2D")
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Level/CameraBoundaries/CameraBoundBox"]
 shape = SubResource("RectangleShape2D_l4npv")
 
 [node name="Player" parent="." instance=ExtResource("1_pub0o")]
 
-[node name="RemoteCamera2" type="Camera2D" parent="." node_paths=PackedStringArray("player")]
+[node name="PlayerRemoteCamera" type="Camera2D" parent="." node_paths=PackedStringArray("followed_node")]
 zoom = Vector2(0.5, 0.5)
-script = ExtResource("4_2w381")
-player = NodePath("../Player")
+script = ExtResource("7_v48bo")
+followed_node = NodePath("../Player")

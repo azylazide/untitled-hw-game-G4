@@ -12,7 +12,7 @@
 ## [br] -Camera contextually bounded
 ## [br]
 extends Camera2D
-class_name RemoteCamera2
+class_name RemoteCamera2old
 
 ## Player node the camera follows.
 @export var player: ActorBase
@@ -31,7 +31,7 @@ class_name RemoteCamera2
 @export_range(0,1) var vertical_fast_smoothing:= 0.4
 
 ## Array of nodes that stores [CameraBoundBox]
-var bbox_array: Array[CameraBoundBox] = []
+var bbox_array: Array[CameraArea] = []
 ## Default max limit greater than any camera bounds
 var bridge_inf:= limit_right
 
